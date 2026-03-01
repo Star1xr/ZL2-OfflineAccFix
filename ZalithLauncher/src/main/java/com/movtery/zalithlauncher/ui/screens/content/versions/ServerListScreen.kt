@@ -19,7 +19,6 @@
 package com.movtery.zalithlauncher.ui.screens.content.versions
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -109,6 +108,7 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.context.COPY_LABEL_SERVER_IP
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.game.version.multiplayer.AllServers
 import com.movtery.zalithlauncher.game.version.multiplayer.ServerData
@@ -384,12 +384,10 @@ private class ServerListViewModel(
      */
     fun copy(
         context: Context,
-        ip: String,
-        copiedText: String
+        ip: String
     ) {
         viewModelScope.launch(Dispatchers.Main) {
-            copyText(label = null, text = ip, context = context)
-            Toast.makeText(context, copiedText, Toast.LENGTH_SHORT).show()
+            copyText(label = COPY_LABEL_SERVER_IP, text = ip, context = context)
         }
     }
 
@@ -570,7 +568,6 @@ fun ServerListScreen(
                             }
                         )
 
-                        val copiedText = stringResource(R.string.generic_copied)
                         ServerListBody(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -579,7 +576,7 @@ fun ServerListScreen(
                             isSavingServer = viewModel.saving,
                             onLoad = { viewModel.loadServer(it) },
                             onRefresh = { viewModel.loadServer(it, true) },
-                            onCopy = { viewModel.copy(context, it, copiedText) },
+                            onCopy = { viewModel.copy(context, it) },
                             onPlay = { address ->
                                 launchGameViewModel.quickPlayServer(version, address)
                             },

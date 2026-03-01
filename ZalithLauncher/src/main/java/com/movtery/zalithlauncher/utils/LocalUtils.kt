@@ -28,6 +28,7 @@ import android.os.Build
 import android.os.Process
 import android.util.Log
 import android.view.KeyEvent
+import android.widget.Toast
 import com.google.gson.GsonBuilder
 import com.movtery.zalithlauncher.BuildConfig
 import com.movtery.zalithlauncher.R
@@ -154,9 +155,12 @@ fun getTimeAgo(
     return context.getString(R.string.just_now)
 }
 
-fun copyText(label: String?, text: String?, context: Context) {
+fun copyText(label: String?, text: String?, context: Context, showToast: Boolean = true) {
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     clipboardManager.setPrimaryClip(ClipData.newPlainText(label, text))
+    if (showToast) {
+        Toast.makeText(context, context.getString(R.string.generic_copied), Toast.LENGTH_SHORT).show()
+    }
 }
 
 fun getDisplayFriendlyRes(displaySideRes: Int, scaling: Float): Int {

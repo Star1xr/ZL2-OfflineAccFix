@@ -22,7 +22,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
@@ -34,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.context.COPY_LABEL_LINK
 import com.movtery.zalithlauncher.game.launch.LogName
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.ui.base.BaseAppCompatActivity
@@ -132,8 +132,7 @@ class ErrorActivity : BaseAppCompatActivity(refreshData = false) {
                     onUpload = {
                         viewModel.upload(logFile) { link ->
                             openLink(link)
-                            copyText(null, link, this@ErrorActivity)
-                            Toast.makeText(this@ErrorActivity, getString(R.string.generic_copied), Toast.LENGTH_SHORT).show()
+                            copyText(COPY_LABEL_LINK, link, this@ErrorActivity)
                         }
                     }
                 )

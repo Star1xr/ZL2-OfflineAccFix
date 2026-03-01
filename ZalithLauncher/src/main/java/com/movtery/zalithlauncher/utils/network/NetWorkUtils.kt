@@ -26,10 +26,12 @@ import android.net.NetworkCapabilities
 import androidx.core.net.toUri
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.context.COPY_LABEL_LINK
 import com.movtery.zalithlauncher.path.TIME_OUT
 import com.movtery.zalithlauncher.path.URL_USER_AGENT
 import com.movtery.zalithlauncher.path.createOkHttpClient
 import com.movtery.zalithlauncher.path.createRequestBuilder
+import com.movtery.zalithlauncher.utils.copyText
 import com.movtery.zalithlauncher.utils.file.compareSHA1
 import com.movtery.zalithlauncher.utils.file.ensureParentDirectory
 import com.movtery.zalithlauncher.utils.logging.Logger.lDebug
@@ -392,6 +394,10 @@ fun Activity.openLink(link: String, dataType: String?) {
             }
         }
         .setNegativeButton(R.string.generic_cancel) { dialog, _ ->
+            dialog.dismiss()
+        }
+        .setNeutralButton(R.string.generic_copy) { dialog, _ ->
+            copyText(COPY_LABEL_LINK, link, this)
             dialog.dismiss()
         }
         .show()

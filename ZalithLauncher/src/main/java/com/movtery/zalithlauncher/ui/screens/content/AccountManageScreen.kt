@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.context.COPY_LABEL_ACCOUNT_UUID
 import com.movtery.zalithlauncher.context.copyLocalFile
 import com.movtery.zalithlauncher.context.getFileName
 import com.movtery.zalithlauncher.coroutine.Task
@@ -917,9 +918,10 @@ private fun AccountsLayout(
                         },
                         onCopyUUID = {
                             copyText(
-                                label = "uuid",
+                                label = COPY_LABEL_ACCOUNT_UUID,
                                 text = account.profileId,
-                                context = context
+                                context = context,
+                                showToast = false
                             )
                             //弹出提示
                             Toast.makeText(

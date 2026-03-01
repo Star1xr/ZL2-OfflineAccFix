@@ -32,6 +32,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.context.COPY_LABEL_TERRACOTTA_INVITE_CODE
+import com.movtery.zalithlauncher.context.COPY_LABEL_TERRACOTTA_SERVER_ADDRESS
 import com.movtery.zalithlauncher.game.launch.handler.GameHandler
 import com.movtery.zalithlauncher.terracotta.Terracotta
 import com.movtery.zalithlauncher.terracotta.TerracottaState
@@ -144,7 +146,7 @@ class TerracottaViewModel(
         state: TerracottaState.HostOK
     ) {
         val code = state.code ?: return //理论上不会是null
-        copyText(label = "invite_code", text = code) {
+        copyText(label = COPY_LABEL_TERRACOTTA_INVITE_CODE, text = code) {
             it.getString(R.string.terracotta_status_host_ok_code_copy_toast)
         }
     }
@@ -156,7 +158,7 @@ class TerracottaViewModel(
         state: TerracottaState.GuestOK
     ) {
         val address = state.url ?: return
-        copyText(label = "server_address", text = address) {
+        copyText(label = COPY_LABEL_TERRACOTTA_SERVER_ADDRESS, text = address) {
             it.getString(R.string.terracotta_status_guest_ok_address_copy_toast)
         }
     }
@@ -170,7 +172,8 @@ class TerracottaViewModel(
         copyText(
             label = label,
             text = text,
-            context = context
+            context = context,
+            showToast = false
         )
         Toast.makeText(context, toast(context), Toast.LENGTH_SHORT).show()
     }

@@ -91,6 +91,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import coil3.compose.AsyncImage
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.context.COPY_LABEL_SAVE_SEED
 import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.download.assets.install.unpackSaveZip
 import com.movtery.zalithlauncher.game.version.installed.Version
@@ -683,7 +684,7 @@ private fun SaveItemLayout(
                                 shadowElevation = 3.dp
                             ) {
                                 SaveInfoTooltip(saveData) { seed ->
-                                    copyText(null, seed, context)
+                                    copyText(COPY_LABEL_SAVE_SEED, seed, context)
                                 }
                             }
                         }

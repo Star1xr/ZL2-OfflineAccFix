@@ -23,6 +23,7 @@ import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.context.COPY_LABEL_DEVICE_CODE
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.account.auth_server.AuthServerHelper
@@ -108,7 +109,7 @@ fun microsoftLogin(
         task = { task ->
             task.updateProgress(-1f, R.string.account_microsoft_fetch_device_code)
             val deviceCode = fetchDeviceCodeResponse(coroutineContext)
-            copyText(null, deviceCode.userCode, context)
+            copyText(COPY_LABEL_DEVICE_CODE, deviceCode.userCode, context, false)
             withContext(Dispatchers.Main) {
                 Toast.makeText(
                     context,
