@@ -18,6 +18,7 @@ import com.movtery.zalithlauncher.game.version.export.AbstractExporter
 import com.movtery.zalithlauncher.game.version.export.ExportInfo
 import com.movtery.zalithlauncher.game.version.export.PackType
 import com.movtery.zalithlauncher.game.version.installed.Version
+import com.movtery.zalithlauncher.game.version.mod.enabledMod
 import com.movtery.zalithlauncher.game.version.mod.isDisabled
 import com.movtery.zalithlauncher.utils.GSON
 import com.movtery.zalithlauncher.utils.logging.Logger.lWarning
@@ -179,7 +180,7 @@ class ModrinthPackExporter: AbstractExporter(
 
                                 val resourceFile = ModrinthManifest.ManifestFile(
                                     path = relativePath(
-                                        file = file,
+                                        file = enabledMod(file),
                                         rootPath = gamePath.absolutePath
                                     ),
                                     hashes = ModrinthManifest.ManifestFile.Hashes(sha1, sha512),

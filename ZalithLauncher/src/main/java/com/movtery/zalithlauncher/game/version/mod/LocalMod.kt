@@ -83,11 +83,7 @@ class LocalMod(
      * 启用模组
      */
     fun enable() {
-        val currentPath = file.absolutePath
-        if (file.isEnabled()) return
-
-        val newPath = currentPath.dropLast(".disabled".length)
-        val newFile = File(newPath)
+        val newFile = enabledMod(file)
         if (!file.renameToSafely(newFile)) return
 
         file = newFile
@@ -134,3 +130,11 @@ fun createNotMod(file: File): LocalMod = LocalMod(
     icon = null,
     notMod = true
 )
+
+fun enabledMod(file: File): File {
+    if (file.isEnabled()) return file
+
+    val currentPath = file.absolutePath
+    val newPath = currentPath.dropLast(".disabled".length)
+    return File(newPath)
+}
