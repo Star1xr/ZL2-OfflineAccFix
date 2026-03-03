@@ -25,6 +25,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
+import android.os.storage.StorageManager
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -32,6 +33,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.utils.logging.Logger.lWarning
+import java.io.File
 
 private const val REQUEST_CODE_PERMISSIONS: Int = 0
 private var hasStoragePermission: Boolean = false
@@ -153,3 +156,48 @@ private interface RequestPermissions {
     fun onRequest()
     fun onCancel()
 }
+
+/**
+ * @return 获取所有可插拔的外置 SD卡路径
+ */
+fun getExternalSDCardPaths(context: Context): List<SDCardInfo>? {
+    return runCatching {
+        val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
+        val storageVolumeClazz = Class.forName("android.os.storage.StorageVolume")
+
+        storageManager.getStorageVolumes().mapNotNull { volume ->
+            val path = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                //SDK 30+有一个官方推荐的 API，可以直接用
+                volume.directory ?: return@mapNotNull null
+            } else {
+                //其他情况需要进行反射
+                val getPathMethod = storageVolumeClazz.getMethod("getPath")
+                val path = getPathMethod.invoke(volume) as String
+                File(path)
+            }
+
+            val state = volume.state
+
+            if (
+                //已挂载，且可读/写
+                state == Environment.MEDIA_MOUNTED &&
+                //必须为可拔出的卡
+                volume.isRemovable
+            ) {
+                val description = volume.getDescription(context)
+                SDCardInfo(
+                    path = path.absolutePath,
+                    description = description
+                )
+            } else null
+        }
+    }.onFailure { e ->
+        lWarning("Failed to get external SD Card paths.", e)
+    }.getOrNull()
+}
+
+data class SDCardInfo(
+    val path: String,
+    val description: String?,
+    val isSDCard: Boolean = true
+)
