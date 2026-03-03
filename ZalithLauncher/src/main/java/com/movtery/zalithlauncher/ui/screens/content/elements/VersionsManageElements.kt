@@ -67,6 +67,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -76,7 +77,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.gif.GifDecoder
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.addons.modloader.ModLoader
 import com.movtery.zalithlauncher.game.path.GamePath
@@ -922,20 +925,30 @@ fun VersionIconImage(
     modifier: Modifier = Modifier,
     refreshKey: Any? = null
 ) {
+    val defaultIconRes = remember(version) {
+        version?.let { getLoaderIconRes(it) } ?: R.drawable.img_minecraft
+    }
+    val defaultIcon = painterResource(defaultIconRes)
+
+    val context = LocalContext.current
+    val loader = remember(version, refreshKey) {
+        ImageLoader.Builder(context)
+            .components { add(GifDecoder.Factory()) }
+            .build()
+    }
+
     val model = remember(version, refreshKey) {
         version?.let {
             val iconFile = VersionsManager.getVersionIconFile(it)
-            when {
-                iconFile.exists() -> iconFile
-                else -> getLoaderIconRes(it)
-            }
-        } ?: R.drawable.img_minecraft
+            if (iconFile.exists()) iconFile
+            else null
+        } ?: defaultIcon
     }
 
     when (model) {
-        is Int -> {
+        is Painter -> {
             Image(
-                painter = painterResource(id = model),
+                painter = model,
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = modifier
@@ -944,6 +957,7 @@ fun VersionIconImage(
         else -> {
             AsyncImage(
                 model = model,
+                imageLoader = loader,
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = modifier

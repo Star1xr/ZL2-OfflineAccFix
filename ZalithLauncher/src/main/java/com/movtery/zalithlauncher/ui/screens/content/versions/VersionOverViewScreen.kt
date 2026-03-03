@@ -144,9 +144,9 @@ fun VersionOverViewScreen(
                     submitError = submitError,
                     refreshKey = refreshVersionIcon,
                     onIconPicked = {
-                        refreshVersionIcon++
                         iconFileExists = VersionsManager.getVersionIconFile(version).exists()
                         versionsOperation = VersionsOperation.None
+                        refreshVersionIcon++
                     },
                     resetIcon = { versionsOperation = VersionsOperation.ResetIconAlert }
                 )
