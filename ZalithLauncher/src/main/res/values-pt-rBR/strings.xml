@@ -269,7 +269,7 @@
     <string name="download_assets_category_map_based">Baseado em mapa</string>
     <string name="download_assets_category_lightweight">Leve</string>
     <string name="download_assets_category_extra_large">Extra Grande</string>
-    <string name="download_assets_category_kitchen_sink">Pia de cozinha</string>
+    <string name="download_assets_category_kitchen_sink">Misto</string>
     <string name="download_assets_category_traditional">Tradicional</string>
     <string name="download_assets_category_steampunk">SteamPunk⚙️</string>
     <string name="download_assets_category_modern">Moderno</string>
@@ -424,7 +424,7 @@
     <string name="account_logging_blocked_ip">O endereço IP atual foi bloqueado para login.</string>
     <string name="account_logging_profile_not_exists">Crie um perfil de jogador do Minecraft primeiro e tente fazer login novamente!</string>
     <string name="account_logging_not_purchased_minecraft">Propriedade do Minecraft não verificada. Compre no site oficial da Mojang.</string>
-    <string name="account_type_microsoft">Conta Microsoft (Requer a licença do Minecraft)</string>
+    <string name="account_type_microsoft">Conta Microsoft (Requer Minecraft Java Original)</string>
     <string name="account_type_local">Criar conta pirata</string>
     <string name="account_add_new_server">Adicionar servidor de autenticação</string>
     <string name="account_add_new_server_button">Adicionar Autenticação</string>
@@ -1135,4 +1135,11 @@
     <string name="settings_gamepad_config_create_name">Nome da configuração</string>
     <string name="settings_gamepad_config_create_contains">Uma configuração com o mesmo nome já existe</string>
     <string name="settings_gamepad_config_no_items">Nenhuma configuração criada, não é possível alternar</string>
+    <string name="versions_export_tip_1">Antes de exportar o pacote de mods, certifique-se de que sua versão possa ser iniciada corretamente.</string>
+    <string name="versions_export_tip_2">Certifique-se de que seu Minecraft seja uma versão estável (Mod Loaders permitidos), não uma versão snapshot ou um cliente de terceiros.</string>
+    <string name="versions_export_tip_3">e que não inclui mods, texturas ou outros ativos que não podem ser distribuídos por canais não oficiais.</string>
+    <string name="versions_export_tip_4">nem deve conter mods, texturas ou outros ativos que violem o EULA</string>
+    <string name="versions_export_tip_5">O Modpack será exportado para o diretório selecionado, usando o nome do Modpack fornecido como nome do arquivo final.</string>
+    <string name="versions_export_tip_remote_1">Durante a exportação, o Launcher tentará encontrar recursos remotos na plataforma %s e incorporar links em vez de empacotar mods, texturas e shaders, o que ajuda a reduzir o tamanho do modpack.</string>
+    <string name="versions_export_tip_remote_2">Ao mesmo tempo, os mods desativados serão incluídos como componentes opcionais.</string>
 </resources>
