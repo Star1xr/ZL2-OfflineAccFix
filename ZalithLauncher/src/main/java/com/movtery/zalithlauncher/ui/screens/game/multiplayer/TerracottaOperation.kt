@@ -120,7 +120,7 @@ fun TerracottaOperation(
                         }
 
                         runCatching {
-                            Terracotta.setScanning(null, userName)
+                            Terracotta.setScanning(null, userName, nodeList)
                             viewModel.isWaitingInteractive = false
                         }.onFailure { e ->
                             lWarning("Error occurred at \"Terracotta.setScanning(null, userName)\", message = ${e.message}")
@@ -143,7 +143,7 @@ fun TerracottaOperation(
                         }
 
                         runCatching {
-                            val success = Terracotta.setGuesting(roomCode, userName)
+                            val success = Terracotta.setGuesting(roomCode, userName, nodeList)
                             viewModel.isWaitingInteractive = false
                             if (!success) {
                                 Toast.makeText(context, context.getString(R.string.terracotta_status_waiting_guest_prompt_invalid), Toast.LENGTH_SHORT).show()

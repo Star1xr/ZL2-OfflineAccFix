@@ -109,22 +109,22 @@ object Terracotta {
         TerracottaAndroidAPI.setWaiting()
     }
 
-    fun setScanning(room: String?, player: String?) {
+    fun setScanning(room: String?, player: String?, extraNodes: List<String>?) {
         checkInitialized()
         if (_state.value !is TerracottaState.Waiting)
             throw Exception("reset state to waiting first!")
 
         mode = Mode.Host
-        TerracottaAndroidAPI.setScanning(room, player)
+        TerracottaAndroidAPI.setScanning(room, player, extraNodes)
     }
 
-    fun setGuesting(room: String, player: String?): Boolean {
+    fun setGuesting(room: String, player: String?, extraNodes: List<String>?): Boolean {
         checkInitialized()
         if (_state.value !is TerracottaState.Waiting)
             throw Exception("reset state to waiting first!")
 
         mode = Mode.Guest
-        return TerracottaAndroidAPI.setGuesting(room, player)
+        return TerracottaAndroidAPI.setGuesting(room, player, extraNodes)
     }
 
     fun parseRoomCode(room: String?): TerracottaAndroidAPI.RoomType? {

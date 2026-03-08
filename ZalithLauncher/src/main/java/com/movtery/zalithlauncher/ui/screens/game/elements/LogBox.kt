@@ -97,8 +97,11 @@ fun LogBox(
             //自动滚动部分
             launch(Dispatchers.Main) {
                 scrollChannel.consumeAsFlow().collect {
-                    if (logList.isNotEmpty()) {
-                        scrollState.animateScrollToItem(logList.lastIndex)
+                    runCatching {
+                        val targetIndex = logList.lastIndex
+                        if (targetIndex >= 0 && targetIndex < logList.size) {
+                            scrollState.animateScrollToItem(targetIndex)
+                        }
                     }
                 }
             }
