@@ -1130,8 +1130,19 @@
     <string name="settings_gamepad_config_title">Pengaturan Tombol Gamepad</string>
     <string name="settings_gamepad_config_summary">Pilih pengaturan tombol gamepad yang digunakan</string>
     <string name="settings_gamepad_config_delete">Hapus Pengaturan Saat Ini</string>
-    <string name="settings_gamepad_config_delete_message">Apakah anda yakin ingin menghapus pengaturan ini?</string>
-    <string name="settings_gamepad_config_create">Buat Pengaturan Tombol Gamepad</string>
-    <string name="settings_gamepad_config_create_name">Nama Pengaturan</string>
-    <string name="settings_gamepad_config_no_items">Belum ada pengaturan yang dibuat, tidak bisa beralih</string>
+    <string name="settings_gamepad_config_delete_message">Apakah anda yakin ingin menghapus konfigurasi ini?</string>
+    <string name="settings_gamepad_config_create">Buat Konfigurasi Tombol Gamepad</string>
+    <string name="settings_gamepad_config_create_name">Nama Konfigurasi</string>
+    <string name="settings_gamepad_config_no_items">Belum ada konfigurasi yang dibuat, tidak bisa beralih</string>
+    <string name="files_browse_folder">Telusuri Folder</string>
+    <string name="files_importing">Mengimpor File</string>
+    <string name="files_delete_file">Apakah Anda yakin ingin menghapus %s?</string>
+    <string name="versions_export_tip_1">Sebelum mengekspor modpack, pastikan versi Anda dapat berjalan dengan baik,</string>
+    <string name="versions_export_tip_2">Pastikan Minecraft yang digunakan adalah versi rilis (mod loader boleh digunakan), bukan snapshot atau klien pihak ketiga,</string>
+    <string name="versions_export_tip_3">dan tidak menyertakan mod, resource pack, atau aset lain yang tidak diizinkan untuk didistribusikan melalui saluran tidak resmi,</string>
+    <string name="versions_export_tip_4">serta tidak boleh berisi mod, resource pack, atau aset lain yang melanggar EULA,</string>
+    <string name="versions_export_tip_5">Modpack akan diekspor ke folder yang dipilih, menggunakan nama modpack yang Anda berikan sebagai nama file akhir.</string>
+    <string name="versions_export_tip_remote_1">Selama proses ekspor, launcher akan mencoba mencocokkan resource online di platform %s dan menyematkan tautan alih-alih mengemas mod, resource pack, dan shader pack, sehingga ukuran modpack dapat diperkecil.</string>
+    <string name="versions_export_tip_remote_2">Pada saat yang sama, mod yang dinonaktifkan akan disertakan sebagai komponen opsional.</string>
+    <string name="settings_gamepad_config_create_contains">Konfigurasi dengan nama yang sama sudah ada</string>
 </resources>
