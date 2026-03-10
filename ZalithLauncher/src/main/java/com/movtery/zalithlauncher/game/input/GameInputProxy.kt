@@ -170,7 +170,7 @@ class GameInputProxy(
             KeyEvent.KEYCODE_DPAD_UP -> sender.sendUp()
             KeyEvent.KEYCODE_DPAD_DOWN -> sender.sendDown()
 
-            KeyEvent.KEYCODE_ENTER -> sender.sendEnter()
+//            KeyEvent.KEYCODE_ENTER -> sender.sendEnter()
             KeyEvent.KEYCODE_TAB -> sender.sendTab()
 
             else -> sender.sendOther(keyEvent)

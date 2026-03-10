@@ -1090,7 +1090,7 @@
     <string name="versions_export_type_mcbbs">MCBBS Modpack</string>
     <string name="versions_export_type_mcbbs_summary">Dapat diimpor oleh %s, HMCL, dan launcher lainnya</string>
     <string name="versions_export_type_modrinth">Modrinth Modpack</string>
-    <string name="versions_export_type_modrinth_summary">Dapat diimpor oleh launcher pihak ketiga yang umum digunakan</string>
+    <string name="versions_export_type_summary_common">Dapat diimpor oleh launcher pihak ketiga yang umum digunakan</string>
     <string name="versions_export_type_multimc">MultiMC Modpack</string>
     <string name="versions_export_type_multimc_summary">Dapat diimpor oleh %s, MultiMC, dan launcher lainnya</string>
     <string name="versions_export_alias_options">Pengaturan Game</string>
@@ -1110,8 +1110,8 @@
     <string name="versions_export_alias_resource_packs">Folder Resource Pack</string>
     <string name="versions_export_alias_saves">Folder Penyimpanan</string>
     <string name="versions_export_pack_max_memory">Maksimal Alokasi Memori</string>
-    <string name="versions_export_pack_pack_remote">Unduh resource penting dari Modrinth</string>
-    <string name="versions_export_pack_pack_curseforge">Sertakan resource CurseForge online dalam paket</string>
+    <string name="versions_export_pack_pack_remote">Unduh resource penting dari %s</string>
+    <string name="versions_export_pack_also_pack_curseforge">Sertakan resource CurseForge online dalam paket</string>
     <string name="versions_export_pack_select_files">Pilih File</string>
     <string name="versions_export_pack_select_output">Ekspor Sebagai</string>
     <string name="versions_export_pack_select_folder_title">Pilih Folder Ekspor</string>

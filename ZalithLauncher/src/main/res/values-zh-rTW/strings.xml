@@ -620,7 +620,8 @@
     <string name="versions_export_type_mcbbs">MCBBS 模組包</string>
     <string name="versions_export_type_mcbbs_summary">可被 %s、HMCL 等啟動器匯入</string>
     <string name="versions_export_type_modrinth">Modrinth 模組包</string>
-    <string name="versions_export_type_modrinth_summary">可被常見的第三方啟動器匯入</string>
+    <string name="versions_export_type_summary_common">可被常見的第三方啟動器匯入</string>
+    <string name="versions_export_type_curseforge">CurseForge 模組包</string>
     <string name="versions_export_type_multimc">MultiMC 模組包</string>
     <string name="versions_export_type_multimc_summary">可被 %s、MultiMC 等啟動器匯入</string>
     <string name="versions_export_alias_options">遊戲設定</string>
@@ -640,8 +641,8 @@
     <string name="versions_export_pack_website">模組包官方網站</string>
     <string name="versions_export_pack_min_memory">最小分配記憶體</string>
     <string name="versions_export_pack_max_memory">最大分配記憶體</string>
-    <string name="versions_export_pack_pack_remote">從 Modrinth 下載關鍵資源</string>
-    <string name="versions_export_pack_pack_curseforge">一併打包 CurseForge 的遠端資源</string>
+    <string name="versions_export_pack_pack_remote">從 %s 下載關鍵資源</string>
+    <string name="versions_export_pack_also_pack_curseforge">一併打包 CurseForge 的遠端資源</string>
     <string name="versions_export_pack_select_files">選擇檔案</string>
     <string name="versions_export_pack_select_output">匯出為</string>
     <string name="versions_export_pack_select_folder_title">選擇匯出目錄</string>

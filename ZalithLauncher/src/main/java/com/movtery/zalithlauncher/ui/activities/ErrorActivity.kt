@@ -26,11 +26,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.context.COPY_LABEL_LINK
@@ -142,11 +140,15 @@ class ErrorActivity : BaseAppCompatActivity(refreshData = false) {
                         viewModel = viewModel,
                         crashType = errorMessage.crashType,
                         shareLogs = logFile.exists() && logFile.isFile,
+                        canUpload = viewModel.canUpload,
                         canRestart = canRestart,
                         onShareLogsClick = {
                             if (logFile.exists() && logFile.isFile) {
                                 shareFile(this@ErrorActivity, logFile)
                             }
+                        },
+                        onUploadClick = {
+                            viewModel.operation = ShareLinkOperation.Tip
                         },
                         onRestartClick = {
                             ProcessPhoenix.triggerRebirth(this@ErrorActivity)
@@ -161,15 +163,6 @@ class ErrorActivity : BaseAppCompatActivity(refreshData = false) {
                             text = errorMessage.messageBody,
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        if (viewModel.canUpload) {
-                            Button(
-                                onClick = {
-                                    viewModel.operation = ShareLinkOperation.Tip
-                                }
-                            ) {
-                                Text(text = stringResource(R.string.crash_link_share_button))
-                            }
-                        }
                     }
                 }
             }

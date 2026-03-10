@@ -69,8 +69,10 @@ fun ErrorScreen(
     viewModel: CrashLogsUploadViewModel,
     crashType: CrashType,
     shareLogs: Boolean = true,
+    canUpload: Boolean = false,
     canRestart: Boolean = true,
     onShareLogsClick: () -> Unit = {},
+    onUploadClick: () -> Unit = {},
     onRestartClick: () -> Unit = {},
     onExitClick: () -> Unit = {},
     body: @Composable ColumnScope.() -> Unit
@@ -83,8 +85,10 @@ fun ErrorScreen(
         ErrorScreenLandscape(
             crashType = crashType,
             shareLogs = shareLogs,
+            canUpload = canUpload,
             canRestart = canRestart,
             onShareLogsClick = onShareLogsClick,
+            onUploadClick = onUploadClick,
             onRestartClick = onRestartClick,
             onExitClick = onExitClick,
             body = body
@@ -93,8 +97,10 @@ fun ErrorScreen(
         ErrorScreenPortrait(
             crashType = crashType,
             shareLogs = shareLogs,
+            canUpload = canUpload,
             canRestart = canRestart,
             onShareLogsClick = onShareLogsClick,
+            onUploadClick = onUploadClick,
             onRestartClick = onRestartClick,
             onExitClick = onExitClick,
             body = body
@@ -109,8 +115,10 @@ fun ErrorScreen(
 private fun ErrorScreenLandscape(
     crashType: CrashType,
     shareLogs: Boolean,
+    canUpload: Boolean,
     canRestart: Boolean,
     onShareLogsClick: () -> Unit,
+    onUploadClick: () -> Unit,
     onRestartClick: () -> Unit,
     onExitClick: () -> Unit,
     body: @Composable ColumnScope.() -> Unit
@@ -151,8 +159,10 @@ private fun ErrorScreenLandscape(
                         .padding(all = 12.dp),
                     crashType = crashType,
                     shareLogs = shareLogs,
+                    canUpload = canUpload,
                     canRestart = canRestart,
                     onShareLogsClick = onShareLogsClick,
+                    onUploadClick = onUploadClick,
                     onRestartClick = onRestartClick,
                     onExitClick = onExitClick
                 )
@@ -169,8 +179,10 @@ private fun ErrorScreenLandscape(
 private fun ErrorScreenPortrait(
     crashType: CrashType,
     shareLogs: Boolean,
+    canUpload: Boolean,
     canRestart: Boolean,
     onShareLogsClick: () -> Unit,
+    onUploadClick: () -> Unit,
     onRestartClick: () -> Unit,
     onExitClick: () -> Unit,
     body: @Composable ColumnScope.() -> Unit
@@ -203,6 +215,17 @@ private fun ErrorScreenPortrait(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
+                        if (canUpload) {
+                            DropdownMenuItem(
+                                text = {
+                                    MarqueeText(text = stringResource(R.string.crash_link_share_button))
+                                },
+                                onClick = {
+                                    showMenu = false
+                                    onUploadClick()
+                                }
+                            )
+                        }
                         DropdownMenuItem(
                             text = {
                                 MarqueeText(text = stringResource(R.string.crash_share_logs))
@@ -324,8 +347,10 @@ private fun ActionContext(
     modifier: Modifier = Modifier,
     crashType: CrashType,
     shareLogs: Boolean,
+    canUpload: Boolean,
     canRestart: Boolean,
     onShareLogsClick: () -> Unit = {},
+    onUploadClick: () -> Unit = {},
     onRestartClick: () -> Unit = {},
     onExitClick: () -> Unit = {}
 ) {
@@ -353,6 +378,15 @@ private fun ActionContext(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.Bottom
         ) {
+            if (canUpload) {
+                ScalingActionButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onUploadClick
+                ) {
+                    MarqueeText(text = stringResource(R.string.crash_link_share_button))
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+            }
             if (shareLogs) {
                 ScalingActionButton(
                     modifier = Modifier.fillMaxWidth(),

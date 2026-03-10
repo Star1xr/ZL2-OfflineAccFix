@@ -211,7 +211,6 @@ fun TextInputBar(
     onHandle: (text: String, selection: TextRange) -> Unit,
     onSend: (text: String) -> Unit,
     onClear: () -> Unit,
-//    onSendText: (String) -> Unit,
     onShiftClick: (press: Boolean) -> Unit,
     onCtrlClick: (press: Boolean) -> Unit,
     onTabClick: () -> Unit,
@@ -231,24 +230,14 @@ fun TextInputBar(
             targetOffsetY = { -it }
         ) + fadeOut(),
     ) {
-        when (inputMode) {
-            InputMode.Default -> {
-                val currentOnHandle by rememberUpdatedState(onHandle)
-                LaunchedEffect(textFieldState.text, textFieldState.selection) {
-                    val currentText = textFieldState.text.toString()
-                    val currentSelection = textFieldState.selection
-                    currentOnHandle(currentText, currentSelection)
-                }
-            }
-            InputMode.Simple -> {
-                val currentOnSend by rememberUpdatedState(onSend)
-                LaunchedEffect(textFieldState.text) {
-                    val currentText = textFieldState.text.toString()
-                    currentOnSend(currentText)
-                }
-            }
-            InputMode.Send -> {
-                //发送模式不会自动发送，由用户手动发送
+        //发送模式：不会自动发送，由用户手动发送
+        //简单模式：由TouchCharInput控制发送
+        if (inputMode == InputMode.Default) {
+            val currentOnHandle by rememberUpdatedState(onHandle)
+            LaunchedEffect(textFieldState.text, textFieldState.selection) {
+                val currentText = textFieldState.text.toString()
+                val currentSelection = textFieldState.selection
+                currentOnHandle(currentText, currentSelection)
             }
         }
 
@@ -547,18 +536,19 @@ fun TextInputBar(
                         focusManager = focusManager,
                         keyboardController = keyboardController,
                         view = view,
-                        onViewReady = {
-                            view = it
-                            view?.setListener(
-                                object : InputListener {
-                                    override fun onEnter() {
-                                        onEnterClick()
+                        onViewReady = { view0 ->
+                            view = view0.also {
+                                it.setListener(
+                                    object : InputListener {
+                                        override fun onEnter() {
+                                            onEnterClick()
+                                        }
+                                        override fun onSend(char: Char) {
+                                            onSend(char.toString())
+                                        }
                                     }
-                                    override fun onSend(char: Char) {
-                                        onSend(char.toString())
-                                    }
-                                }
-                            )
+                                )
+                            }
                         }
                     )
 

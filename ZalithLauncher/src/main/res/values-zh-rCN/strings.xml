@@ -668,7 +668,8 @@
     <string name="versions_export_type_mcbbs">MCBBS 整合包</string>
     <string name="versions_export_type_mcbbs_summary">可被 %s，HMCL 等启动器导入</string>
     <string name="versions_export_type_modrinth">Modrinth 整合包</string>
-    <string name="versions_export_type_modrinth_summary">可被常见第三方启动器导入</string>
+    <string name="versions_export_type_summary_common">可被常见第三方启动器导入</string>
+    <string name="versions_export_type_curseforge">CurseForge 整合包</string>
     <string name="versions_export_type_multimc">MultiMC 整合包</string>
     <string name="versions_export_type_multimc_summary">可被 %s，MultiMC 等启动器导入</string>
     <string name="versions_export_alias_options">游戏设置</string>
@@ -688,8 +689,8 @@
     <string name="versions_export_pack_website">整合包官方网站</string>
     <string name="versions_export_pack_min_memory">最小分配内存</string>
     <string name="versions_export_pack_max_memory">最大分配内存</string>
-    <string name="versions_export_pack_pack_remote">从 Modrinth 下载关键资源</string>
-    <string name="versions_export_pack_pack_curseforge">一并打包 CurseForge 的远程资源</string>
+    <string name="versions_export_pack_pack_remote">从 %s 下载关键资源</string>
+    <string name="versions_export_pack_also_pack_curseforge">一并打包 CurseForge 的远程资源</string>
     <string name="versions_export_pack_select_files">选择文件</string>
     <string name="versions_export_pack_select_output">导出为</string>
     <string name="versions_export_pack_select_folder_title">选择导出目录</string>
