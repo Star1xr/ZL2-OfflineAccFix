@@ -1091,7 +1091,7 @@
     <string name="versions_export_type_mcbbs">MCBBS モッドパック</string>
     <string name="versions_export_type_mcbbs_summary">%s や、HMCL などのランチャーでインポートできます</string>
     <string name="versions_export_type_modrinth">Modrinth モッドパック</string>
-    <string name="versions_export_type_modrinth_summary">一般的なサードパーティー製ランチャーでインポートできます</string>
+    <string name="versions_export_type_summary_common">一般的なサードパーティー製ランチャーでインポートできます</string>
     <string name="versions_export_type_multimc">MultiMC モッドパック</string>
     <string name="versions_export_type_multimc_summary">%s や、MultiMC などのランチャーでインポートできます</string>
     <string name="versions_export_alias_options">ゲーム設定</string>
@@ -1111,8 +1111,8 @@
     <string name="versions_export_pack_website">モッドパックの公式サイト</string>
     <string name="versions_export_pack_min_memory">最小割り当てメモリ</string>
     <string name="versions_export_pack_max_memory">最大割り当てメモリ</string>
-    <string name="versions_export_pack_pack_remote">Modrinth から主要リソースをダウンロード</string>
-    <string name="versions_export_pack_pack_curseforge">CurseForge のリモートリソースをまとめてパッケージ化する</string>
+    <string name="versions_export_pack_pack_remote">%s から主要リソースをダウンロード</string>
+    <string name="versions_export_pack_also_pack_curseforge">CurseForge のリモートリソースをまとめてパッケージ化する</string>
     <string name="versions_export_pack_select_files">ファイルを選択</string>
     <string name="versions_export_pack_select_output">エクスポート形式</string>
     <string name="versions_export_pack_select_folder_title">エクスポートディレクトリを選択</string>

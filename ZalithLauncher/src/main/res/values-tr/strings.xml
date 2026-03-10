@@ -1075,7 +1075,7 @@
     <string name="versions_export_type_mcbbs">MCBBS Mod Paketi</string>
     <string name="versions_export_type_mcbbs_summary">%s, HMCL ve diğer başlatıcılar tarafından içe aktarılabilir.</string>
     <string name="versions_export_type_modrinth">Modrinth Mod Paketi</string>
-    <string name="versions_export_type_modrinth_summary">Yaygın üçüncü taraf başlatıcılar tarafından içe aktarılabilir</string>
+    <string name="versions_export_type_summary_common">Yaygın üçüncü taraf başlatıcılar tarafından içe aktarılabilir</string>
     <string name="versions_export_type_multimc">MultiMC Mod Paketi</string>
     <string name="versions_export_type_multimc_summary">%s, MultiMC ve diğer başlatıcılar tarafından içe aktarılabilir.</string>
     <string name="versions_export_alias_options">Oyun Ayarları</string>
@@ -1095,8 +1095,8 @@
     <string name="versions_export_pack_website">Modpack Web Sitesi</string>
     <string name="versions_export_pack_min_memory">Minimum Ayrılan Bellek</string>
     <string name="versions_export_pack_max_memory">Tahsis Edilen Maksimum Bellek</string>
-    <string name="versions_export_pack_pack_remote">Modrinth\'ten önemli kaynakları indirin.</string>
-    <string name="versions_export_pack_pack_curseforge">CurseForge uzak kaynaklarını pakete dahil edin.</string>
+    <string name="versions_export_pack_pack_remote">%s\'ten önemli kaynakları indirin.</string>
+    <string name="versions_export_pack_also_pack_curseforge">CurseForge uzak kaynaklarını pakete dahil edin.</string>
     <string name="versions_export_pack_select_files">Dosyaları Seç</string>
     <string name="versions_export_pack_select_output">Dışarı çıkart:</string>
     <string name="versions_export_pack_select_folder_title">Dışa Aktarma Dizini Seçin</string>

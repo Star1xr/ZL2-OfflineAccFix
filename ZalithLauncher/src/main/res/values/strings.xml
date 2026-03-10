@@ -670,7 +670,8 @@
     <string name="versions_export_type_mcbbs">MCBBS Modpack</string>
     <string name="versions_export_type_mcbbs_summary">Can be imported by %s, HMCL, and other launchers</string>
     <string name="versions_export_type_modrinth">Modrinth Modpack</string>
-    <string name="versions_export_type_modrinth_summary">Can be imported by common third-party launchers</string>
+    <string name="versions_export_type_summary_common">Can be imported by common third-party launchers</string>
+    <string name="versions_export_type_curseforge">CurseForge Modpack</string>
     <string name="versions_export_type_multimc">MultiMC Modpack</string>
     <string name="versions_export_type_multimc_summary">Can be imported by %s, MultiMC, and other launchers</string>
     <string name="versions_export_alias_options">Game Settings</string>
@@ -690,8 +691,8 @@
     <string name="versions_export_pack_website">Modpack Website</string>
     <string name="versions_export_pack_min_memory">Minimum Allocated Memory</string>
     <string name="versions_export_pack_max_memory">Maximum Allocated Memory</string>
-    <string name="versions_export_pack_pack_remote">Download key resources from Modrinth</string>
-    <string name="versions_export_pack_pack_curseforge">Include CurseForge remote resources in the package</string>
+    <string name="versions_export_pack_pack_remote">Download key resources from %s</string>
+    <string name="versions_export_pack_also_pack_curseforge">Include CurseForge remote resources in the package</string>
     <string name="versions_export_pack_select_files">Select Files</string>
     <string name="versions_export_pack_select_output">Export As</string>
     <string name="versions_export_pack_select_folder_title">Select Export Directory</string>
