@@ -61,12 +61,8 @@ class LibSortFix(
         }
 
         if (name.startsWith("org.ow2.asm:asm:")) {
-            if (any { (key, _) -> key.name.startsWith("org.ow2.asm:asm-all:") }) {
-                return
-            }
-        } else if (name.startsWith("org.ow2.asm:asm-all:")) {
             removeIf { (key, _) ->
-                key.name.startsWith("org.ow2.asm:asm:")
+                key.name.startsWith("org.ow2.asm:asm-all:")
             }
         }
 
