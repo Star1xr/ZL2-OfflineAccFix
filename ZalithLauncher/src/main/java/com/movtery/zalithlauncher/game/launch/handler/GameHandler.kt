@@ -89,6 +89,7 @@ class GameHandler(
 
         MCOptions.apply {
             set("fullscreen", "false")
+            set("touchscreen", "false")
             set("options.narrator", "0") //关闭文本转语音功能
             set("overrideWidth", screenSize.width.toString())
             set("overrideHeight", screenSize.height.toString())
