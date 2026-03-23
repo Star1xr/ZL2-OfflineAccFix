@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.components
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
@@ -35,6 +36,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -74,7 +76,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.movtery.zalithlauncher.setting.enums.isLauncherInDarkTheme
 import com.movtery.zalithlauncher.ui.screens.content.elements.DisabledAlpha
+import com.movtery.zalithlauncher.ui.theme.zl1DarkButtonBackground
+import com.movtery.zalithlauncher.ui.theme.zl1DarkButtonBackgroundSelected
+import com.movtery.zalithlauncher.ui.theme.zl1DarkPrimaryText
+import com.movtery.zalithlauncher.ui.theme.zl1LightButtonBackground
+import com.movtery.zalithlauncher.ui.theme.zl1LightButtonBackgroundSelected
+import com.movtery.zalithlauncher.ui.theme.zl1LightPrimaryText
 import kotlinx.coroutines.launch
 
 @Composable
@@ -317,6 +326,85 @@ fun TooltipIconButton(
             }
         ) {
             content()
+        }
+    }
+}
+
+/**
+ * 是的，这是一个 ZL1 按钮样式的按钮
+ *
+ * Compose 实现这玩意怎么能这么简单 :(
+ */
+@Composable
+fun ZL1Button(
+    onClick: () -> Unit,
+    content: @Composable RowScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.labelMedium,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val isDark = isLauncherInDarkTheme()
+
+    val textColor = if (isDark) {
+        zl1DarkPrimaryText
+    } else {
+        zl1LightPrimaryText
+    }
+
+    val buttonColor = if (isDark) {
+        zl1DarkButtonBackground
+    } else {
+        zl1LightButtonBackground
+    }
+
+    val buttonSelectedColor = if (isDark) {
+        zl1DarkButtonBackgroundSelected
+    } else {
+        zl1LightButtonBackgroundSelected
+    }
+
+    val borderColor = if (isPressed) {
+        buttonSelectedColor
+    } else {
+        Color.Transparent
+    }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        label = "ButtonScale"
+    )
+
+    val shadowElevation by animateDpAsState(
+        targetValue = if (isPressed) 12.dp else 6.dp
+    )
+
+    Surface(
+        modifier = modifier
+            .semantics { role = Role.Button }
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+        },
+        shape = RoundedCornerShape(6.dp),
+        color = buttonColor,
+        border = BorderStroke(width = 1.dp, color = borderColor),
+        shadowElevation = shadowElevation,
+        onClick = onClick,
+        interactionSource = interactionSource,
+    ) {
+        val mergedStyle = LocalTextStyle.current.merge(textStyle)
+        CompositionLocalProvider(
+            LocalContentColor provides textColor,
+            LocalTextStyle provides mergedStyle,
+        ) {
+            Row(
+                modifier = Modifier.padding(all = 12.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                content = content
+            )
         }
     }
 }

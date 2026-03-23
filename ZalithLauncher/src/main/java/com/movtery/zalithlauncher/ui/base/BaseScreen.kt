@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clipToBounds
 import com.movtery.zalithlauncher.ui.screens.TitledNavKey
 
 /**
@@ -128,7 +129,11 @@ private fun BaseScreen(
     content: @Composable (isVisible: Boolean) -> Unit,
     visible: Boolean
 ) {
-    Box {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clipToBounds()
+    ) {
         content(visible)
 
         if (!visible) {

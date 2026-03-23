@@ -43,6 +43,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -154,6 +155,14 @@ fun getTimeAgo(
     if (minutes > 0) return context.getString(R.string.minutes_ago, minutes)
 
     return context.getString(R.string.just_now)
+}
+
+/**
+ * 检查当前系统时间是否为指定日期
+ */
+fun checkDate(month: Int, day: Int): Boolean {
+    val now = LocalDate.now()
+    return now.monthValue == month && now.dayOfMonth == day
 }
 
 fun copyText(label: String?, text: String?, context: Context, showToast: Boolean = true) {

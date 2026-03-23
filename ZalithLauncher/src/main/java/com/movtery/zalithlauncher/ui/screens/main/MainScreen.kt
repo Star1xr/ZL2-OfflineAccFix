@@ -110,6 +110,10 @@ import com.movtery.zalithlauncher.ui.screens.content.navigateToDownload
 import com.movtery.zalithlauncher.ui.screens.navigateTo
 import com.movtery.zalithlauncher.ui.screens.onBack
 import com.movtery.zalithlauncher.ui.screens.rememberTransitionSpec
+import com.movtery.zalithlauncher.ui.theme.menuBackgroundColor
+import com.movtery.zalithlauncher.ui.theme.menuContentColor
+import com.movtery.zalithlauncher.ui.theme.menuTopBarBackgroundColor
+import com.movtery.zalithlauncher.ui.theme.menuTopBarContentColor
 import com.movtery.zalithlauncher.utils.animation.getAnimateTween
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
@@ -121,6 +125,7 @@ import com.movtery.zalithlauncher.viewmodel.sendKeepScreen
 
 @Composable
 fun MainScreen(
+    isAprilFools: Boolean,
     screenBackStackModel: ScreenBackStackViewModel,
     launchGameViewModel: LaunchGameViewModel,
     eventViewModel: EventViewModel,
@@ -150,28 +155,45 @@ fun MainScreen(
         screenBackStackModel.mainScreen.clearWith(NormalNavKey.LauncherMain)
     }
 
+    val mainScreenKey = screenBackStackModel.mainScreen.currentKey
+    val inLauncherScreen = mainScreenKey == null || mainScreenKey is NormalNavKey.LauncherMain
+
     val isBackgroundValid = LocalBackgroundViewModel.current?.isValid == true
     val launcherBackgroundOpacity = AllSettings.launcherBackgroundOpacity.state.toFloat() / 100f
 
-    val topBarColor = MaterialTheme.colorScheme.surfaceContainer
-    val backgroundColor = MaterialTheme.colorScheme.surface
+    val backgroundColor = if (isBackgroundValid) {
+        MaterialTheme.colorScheme.surface.copy(alpha = launcherBackgroundOpacity)
+    } else MaterialTheme.colorScheme.surface
+
+    val backgroundColor0 = if (isAprilFools) {
+        menuBackgroundColor(
+            color = backgroundColor,
+            hasBackgroundContent = isBackgroundValid,
+            enabled = inLauncherScreen
+        )
+    } else backgroundColor
+
+    val contentColor = if (isAprilFools) {
+        menuContentColor(
+            color = MaterialTheme.colorScheme.onSurface,
+            enabled = inLauncherScreen
+        )
+    } else MaterialTheme.colorScheme.onSurface
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = if (isBackgroundValid) {
-            backgroundColor.copy(alpha = launcherBackgroundOpacity)
-        } else {
-            backgroundColor
-        },
-        contentColor = MaterialTheme.colorScheme.onSurface
+        color = backgroundColor0,
+        contentColor = contentColor
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+            val topBarColor = MaterialTheme.colorScheme.surfaceContainer
             TopBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
                     .zIndex(10f),
-                mainScreenKey = screenBackStackModel.mainScreen.currentKey,
+                mainScreenKey = mainScreenKey,
+                inLauncherScreen = inLauncherScreen,
                 taskRunning = tasks.isEmpty(),
                 isTasksExpanded = isTaskMenuExpanded,
                 color = if (isBackgroundValid) {
@@ -198,10 +220,12 @@ fun MainScreen(
                         removes = screenBackStackModel.clearBeforeNavKeys,
                         screenKey = NormalNavKey.Multiplayer
                     )
-                }
-            ) {
-                changeTasksExpandedState()
-            }
+                },
+                changeExpandedState = {
+                    changeTasksExpandedState()
+                },
+                isAprilFools = isAprilFools
+            )
 
             Box(
                 modifier = Modifier
@@ -210,6 +234,7 @@ fun MainScreen(
             ) {
                 NavigationUI(
                     modifier = Modifier.fillMaxSize(),
+                    isAprilFools = isAprilFools,
                     screenBackStackModel = screenBackStackModel,
                     toMainScreen = toMainScreen,
                     launchGameViewModel = launchGameViewModel,
@@ -237,6 +262,7 @@ fun MainScreen(
 @Composable
 private fun <E: TitledNavKey> TopBar(
     mainScreenKey: E?,
+    inLauncherScreen: Boolean,
     taskRunning: Boolean,
     isTasksExpanded: Boolean,
     modifier: Modifier = Modifier,
@@ -247,17 +273,29 @@ private fun <E: TitledNavKey> TopBar(
     toSettingsScreen: () -> Unit,
     toDownloadScreen: () -> Unit,
     toMultiplayerScreen: () -> Unit,
-    changeExpandedState: () -> Unit = {}
+    changeExpandedState: () -> Unit,
+    isAprilFools: Boolean
 ) {
-    val inLauncherScreen = mainScreenKey == null || mainScreenKey is NormalNavKey.LauncherMain
     val inMultiplayerScreen = mainScreenKey is NormalNavKey.Multiplayer
     val inDownloadScreen = mainScreenKey is NestedNavKey.Download
     val inSettingsScreen = mainScreenKey is NestedNavKey.Settings
 
+    val color0 = if (isAprilFools) {
+        menuTopBarBackgroundColor(color, inLauncherScreen)
+    } else {
+        color
+    }
+
+    val contentColor0 = if (isAprilFools) {
+        menuTopBarContentColor(contentColor, inLauncherScreen)
+    } else {
+        contentColor
+    }
+
     Surface(
         modifier = modifier,
-        color = color,
-        contentColor = contentColor,
+        color = color0,
+        contentColor = contentColor0,
         tonalElevation = 3.dp
     ) {
         ConstraintLayout {
@@ -382,7 +420,7 @@ private fun <E: TitledNavKey> TopBar(
                     onClick = {
                         if (!inMultiplayerScreen) toMultiplayerScreen()
                     },
-                    color = contentColor
+                    color = contentColor0
                 )
 
                 TopBarRailItem(
@@ -392,7 +430,7 @@ private fun <E: TitledNavKey> TopBar(
                     onClick = {
                         if (!inDownloadScreen) toDownloadScreen()
                     },
-                    color = contentColor
+                    color = contentColor0
                 )
 
                 TopBarRailItem(
@@ -402,7 +440,7 @@ private fun <E: TitledNavKey> TopBar(
                     onClick = {
                         if (!inSettingsScreen) toSettingsScreen()
                     },
-                    color = contentColor
+                    color = contentColor0
                 )
             }
         }
@@ -449,6 +487,7 @@ private fun TopBarRailItem(
 @Composable
 private fun NavigationUI(
     modifier: Modifier = Modifier,
+    isAprilFools: Boolean,
     screenBackStackModel: ScreenBackStackViewModel,
     toMainScreen: () -> Unit,
     launchGameViewModel: LaunchGameViewModel,
@@ -491,6 +530,7 @@ private fun NavigationUI(
             entryProvider = entryProvider {
                 entry<NormalNavKey.LauncherMain> {
                     LauncherScreen(
+                        isAprilFools = isAprilFools,
                         backStackViewModel = screenBackStackModel,
                         navigateToVersions = navigateToVersions,
                         launchGameViewModel = launchGameViewModel
