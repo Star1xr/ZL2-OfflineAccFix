@@ -194,8 +194,13 @@ sealed class AccountManageIntent {
 sealed class AccountManageEffect {
     /** 显示错误对话框 */
     data class ShowError(val title: String, val message: String) : AccountManageEffect()
-    data class ShowToast(val messageRes: Int, val formatArgs: List<Any> = emptyList(), val duration: Int = android.widget.Toast.LENGTH_SHORT) :
-        AccountManageEffect()
+
+    /** 显示 Toast 提示 */
+    data class ShowToast(
+        val messageRes: Int,
+        val formatArgs: List<Any> = emptyList(),
+        val duration: Int = android.widget.Toast.LENGTH_SHORT
+    ) : AccountManageEffect()
 }
 
 /**
@@ -304,7 +309,11 @@ class AccountManageViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun emitToast(messageRes: Int, vararg args: Any, duration: Int = android.widget.Toast.LENGTH_SHORT) {
+    private fun emitToast(
+        messageRes: Int,
+        vararg args: Any,
+        duration: Int = android.widget.Toast.LENGTH_SHORT
+    ) {
         viewModelScope.launch {
             _effect.send(AccountManageEffect.ShowToast(messageRes, args.toList(), duration))
         }
@@ -382,6 +391,7 @@ class AccountManageViewModel @Inject constructor() : ViewModel() {
         val account = intent.account
         val skinFile = intent.skinFile
         val skinModel = intent.skinModel
+        onIntent(AccountManageIntent.UpdateMicrosoftSkinOp(MicrosoftChangeSkinOperation.None)) // Clear state immediately
         TaskSystem.submitTask(
             Task.runTask(
                 dispatcher = Dispatchers.IO,
@@ -400,7 +410,11 @@ class AccountManageViewModel @Inject constructor() : ViewModel() {
                             formatAccountError(context, th)
                         )
                     }
-                    emitToast(R.string.account_change_skin_update_toast, duration = android.widget.Toast.LENGTH_LONG)
+                    emitToast(
+                        R.string.account_change_skin_update_toast,
+                        duration = android.widget.Toast.LENGTH_LONG
+                    )
+                    // State should already be None from the line above, but keeping for clarity if logic changes.
                     onIntent(AccountManageIntent.UpdateMicrosoftSkinOp(MicrosoftChangeSkinOperation.None))
                 },
                 onError = { th ->
@@ -656,14 +670,13 @@ class AccountManageViewModel @Inject constructor() : ViewModel() {
      * 格式化账号相关的异常为本地化字符串
      */
     fun formatAccountError(context: Context, th: Throwable): String = when (th) {
-        is ResponseException -> th.responseMessage
         is NotPurchasedMinecraftException -> toLocal(context)
         is MinecraftProfileException -> th.toLocal(context)
         is XboxLoginException -> th.toLocal(context)
         is HttpRequestTimeoutException -> context.getString(R.string.error_timeout)
         is UnknownHostException, is UnresolvedAddressException -> context.getString(R.string.error_network_unreachable)
         is ConnectException -> context.getString(R.string.error_connection_failed)
-        is io.ktor.client.plugins.ResponseException -> {
+        is io.ktor.client.plugins.ResponseException -> { // Ktor specific response exception
             val res = when (th.response.status) {
                 HttpStatusCode.Unauthorized -> R.string.error_unauthorized
                 HttpStatusCode.NotFound -> R.string.error_notfound
@@ -671,10 +684,11 @@ class AccountManageViewModel @Inject constructor() : ViewModel() {
             }
             context.getString(res, th.response.status.value)
         }
-
+        is ResponseException -> th.responseMessage // Custom generic response exception
         else -> {
             lError("An unknown exception was caught!", th)
-            val errorMessage = th.localizedMessage ?: th.message ?: th::class.qualifiedName ?: "Unknown error"
+            val errorMessage =
+                th.localizedMessage ?: th.message ?: th::class.qualifiedName ?: "Unknown error"
             context.getString(R.string.error_unknown, errorMessage)
         }
     }

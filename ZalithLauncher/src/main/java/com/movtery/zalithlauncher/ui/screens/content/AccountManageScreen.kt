@@ -382,6 +382,7 @@ private fun MicrosoftChangeSkinOperation(
                     )
                 },
                 onSelected = { type ->
+                    actions.onIntent(AccountManageIntent.UpdateMicrosoftSkinOp(MicrosoftChangeSkinOperation.None)) // Bug 1 fix
                     actions.onIntent(
                         AccountManageIntent.UploadMicrosoftSkin(
                             context,
@@ -584,13 +585,15 @@ private fun OtherLoginOperation(
 
         is OtherLoginOperation.OnFailed -> {
             val message = actions.formatError(context, operation.th)
-            actions.onIntent(AccountManageIntent.UpdateOtherLoginOp(OtherLoginOperation.None))
-            actions.submitError(
-                ErrorViewModel.ThrowableMessage(
-                    title = stringResource(R.string.account_logging_in_failed),
-                    message = message
+            LaunchedEffect(operation) { // Bug 2 fix
+                actions.submitError(
+                    ErrorViewModel.ThrowableMessage(
+                        title = context.getString(R.string.account_logging_in_failed),
+                        message = message
+                    )
                 )
-            )
+                actions.onIntent(AccountManageIntent.UpdateOtherLoginOp(OtherLoginOperation.None))
+            }
         }
 
         is OtherLoginOperation.SelectRole -> {
@@ -619,6 +622,7 @@ private fun ServerTypeOperation(
     operation: ServerOperation,
     actions: AccountActions
 ) {
+    val context = LocalContext.current // Context moved outside LaunchedEffect
     when (operation) {
         is ServerOperation.AddNew -> {
             var serverUrl by rememberSaveable { mutableStateOf("") }
@@ -664,13 +668,16 @@ private fun ServerTypeOperation(
         }
 
         is ServerOperation.OnThrowable -> {
-            actions.submitError(
-                ErrorViewModel.ThrowableMessage(
-                    title = stringResource(R.string.account_other_login_adding_failure),
-                    message =
-                    operation.throwable.getMessageOrToString())
-            )
-            actions.onIntent(AccountManageIntent.UpdateServerOp(ServerOperation.None))
+            val message = operation.throwable.getMessageOrToString()
+            LaunchedEffect(operation) { // Bug 2 fix
+                actions.submitError(
+                    ErrorViewModel.ThrowableMessage(
+                        title = context.getString(R.string.account_other_login_adding_failure),
+                        message = message
+                    )
+                )
+                actions.onIntent(AccountManageIntent.UpdateServerOp(ServerOperation.None))
+            }
         }
 
         is ServerOperation.None -> {}
@@ -896,13 +903,15 @@ private fun AccountOperation(
 
         is AccountOperation.OnFailed -> {
             val message = actions.formatError(context, operation.th)
-            actions.submitError(
-                ErrorViewModel.ThrowableMessage(
-                    title = stringResource(R.string.account_logging_in_failed),
-                    message = message
+            LaunchedEffect(operation) { // Bug 2 fix
+                actions.submitError(
+                    ErrorViewModel.ThrowableMessage(
+                        title = context.getString(R.string.account_logging_in_failed),
+                        message = message
+                    )
                 )
-            )
-            actions.onIntent(AccountManageIntent.UpdateAccountOp(AccountOperation.None))
+                actions.onIntent(AccountManageIntent.UpdateAccountOp(AccountOperation.None))
+            }
         }
 
         is AccountOperation.None -> {}
