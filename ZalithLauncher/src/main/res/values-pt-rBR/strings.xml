@@ -1111,8 +1111,8 @@
     <string name="versions_export_pack_jvm_args">Argumentos do jogo</string>
     <string name="versions_export_pack_java_args">Argumentos da Máquina Virtual Java</string>
     <string name="versions_export_pack_website">Site do Modpack</string>
-    <string name="versions_export_pack_min_memory">Alocação mínima necessária para uma experiência estável:</string>
-    <string name="versions_export_pack_max_memory">Memória Alocada Máxima</string>
+    <string name="versions_export_pack_min_memory">Quantidade de RAM mínima para rodar o Modpack:</string>
+    <string name="versions_export_pack_max_memory">Quantidade de RAM recomendada para obter a melhor experiência com o Modpack:</string>
     <string name="versions_export_pack_pack_remote">Baixar recursos principais do %s</string>
     <string name="versions_export_pack_also_pack_curseforge">Incluir recursos remotos do CurseForge no pacote</string>
     <string name="versions_export_pack_select_files">Selecionar Arquivos</string>

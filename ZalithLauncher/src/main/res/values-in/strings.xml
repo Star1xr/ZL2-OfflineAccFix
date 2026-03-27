@@ -1151,4 +1151,5 @@
     <string name="page_title_account_list">Daftar Akun</string>
     <string name="page_title_select_files">Pilih Lokasi</string>
     <string name="versions_install_loader">Pasang Loader</string>
+    <string name="unpack_screen_jre25">Lingkungan Java 25 (diperlukan untuk Minecraft 26.1+)</string>
 </resources>

@@ -2,7 +2,7 @@
 <resources>
     <string name="terracotta">ผู้เล่นหลายคน</string>
     <string name="terracotta_metadata_ver">เวอร์ชั่น Terracotta: %s</string>
-    <string name="terracotta_metadata_easytier_ver">เวอร์ชัน EasyTier: %s</string>
+    <string name="terracotta_metadata_easytier_ver">เวอร์ชันของEasyTier: %s</string>
     <string name="terracotta_easytier">เกี่ยวกับ EasyTier</string>
     <string name="terracotta_terracotta">Terracotta | โหมดผู้เล่นหลายคน</string>
     <string name="terracotta_back">ออก</string>
@@ -61,4 +61,7 @@
     <string name="terracotta_status_guest_ok_address_desc">โปรดอย่าใช้ที่อยู่นี้ เว้นแต่ว่าจำเป็น</string>
     <string name="terracotta_status_exception">ศูนย์เสียการการเชื่อมต่อ</string>
     <string name="terracotta_status_exception_back">โปรดลองอีกครั้ง</string>
+    <string name="terracotta_permission_vpn">กรุณาให้สิทธิ์แอพพิเคชั่นในการใช้ VPNก่อน.</string>
+    <string name="terracotta_player_list">รายชื่อผู้เล่น</string>
+    <string name="terracotta_player_anonymous">ผู้เล่นไม่ระบุตัวตน</string>
 </resources>
