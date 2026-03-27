@@ -1146,4 +1146,10 @@
     <string name="versions_export_tip_5">モッドパックは指定したモッドパック名を最終ファイル名として、選択したディレクトリにエクスポートされます。</string>
     <string name="versions_export_tip_remote_1">エクスポート中、ランチャーは %s プラットフォーム上のリモートリソースを照合し、モッド、リソースパック、シェーダーパックをパッケージ化する代わりにリンクを埋め込みます。これにより、モッドパックのサイズが削減されます。</string>
     <string name="versions_export_tip_remote_2">同時に、無効化されたモッドはオプションとして利用できるようになります。</string>
+    <string name="page_title_version_list">バージョンリスト</string>
+    <string name="page_title_version_manage">バージョン管理</string>
+    <string name="page_title_account_list">アカウントリスト</string>
+    <string name="page_title_select_files">パスの選択</string>
+    <string name="unpack_screen_jre25">Java 25 環境 (Minecraft 26.1 以降に必要)</string>
+    <string name="versions_install_loader">ローダーのインストール</string>
 </resources>
