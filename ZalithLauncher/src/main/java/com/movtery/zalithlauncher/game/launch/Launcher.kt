@@ -33,6 +33,7 @@ import com.movtery.zalithlauncher.game.multirt.RuntimesManager
 import com.movtery.zalithlauncher.game.path.GamePathManager
 import com.movtery.zalithlauncher.game.path.getGameHome
 import com.movtery.zalithlauncher.game.plugin.ffmpeg.FFmpegPluginManager
+import com.movtery.zalithlauncher.game.plugin.natives.NativePluginManager
 import com.movtery.zalithlauncher.game.plugin.renderer.RendererPluginManager
 import com.movtery.zalithlauncher.info.InfoDistributor
 import com.movtery.zalithlauncher.path.LibPath
@@ -309,24 +310,26 @@ abstract class Launcher(
         val jvmLibDir = getJvmLibDir()
 
         val libName = if (is64BitsDevice) "lib64" else "lib"
-        val path = listOfNotNull(
-            FFmpegPluginManager.takeIf { it.isAvailable }?.libraryPath,
-            RendererPluginManager.selectedRendererPlugin?.path,
-            "$runtimeHome$javaLibDir",
-            "$runtimeHome$javaLibDir/jli",
+        val paths = buildList {
+            FFmpegPluginManager.takeIf { it.isAvailable }?.libraryPath?.let { add(it) }
+            RendererPluginManager.selectedRendererPlugin?.path?.let { add(it) }
+            NativePluginManager.getPlugins().forEach { plugin ->
+                add(plugin.path)
+            }
+            add("$runtimeHome$javaLibDir/jli")
             if (runtime.isJDK8) {
-                "$runtimeHome/jre$javaLibDir$jvmLibDir:$runtimeHome/jre$javaLibDir"
+                add("$runtimeHome/jre$javaLibDir$jvmLibDir:$runtimeHome/jre$javaLibDir")
             } else {
-                "$runtimeHome$javaLibDir$jvmLibDir"
-            },
-            "/system/$libName",
-            "/vendor/$libName",
-            "/vendor/$libName/hw",
-            LibPath.JNA.absolutePath,
-            PathManager.DIR_RUNTIME_MOD?.absolutePath,
-            PathManager.DIR_NATIVE_LIB
-        )
-        return path.joinToString(":")
+                add("$runtimeHome$javaLibDir$jvmLibDir")
+            }
+            add("/system/$libName")
+            add("/vendor/$libName")
+            add("/vendor/$libName/hw")
+            add(LibPath.JNA.absolutePath)
+            PathManager.DIR_RUNTIME_MOD?.absolutePath?.let { add(it) }
+            add(PathManager.DIR_NATIVE_LIB)
+        }
+        return paths.joinToString(":")
     }
 
     protected fun getLibraryPath(): String {

@@ -24,6 +24,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import com.movtery.zalithlauncher.game.plugin.driver.DriverPluginManager
 import com.movtery.zalithlauncher.game.plugin.ffmpeg.FFmpegPluginManager
+import com.movtery.zalithlauncher.game.plugin.natives.NativePluginManager
 import com.movtery.zalithlauncher.game.plugin.renderer.RendererPluginManager
 import com.movtery.zalithlauncher.game.renderer.Renderers
 import com.movtery.zalithlauncher.game.renderer.toInterface
@@ -50,8 +51,9 @@ object PluginLoader {
 
         val apkPluginList: MutableList<ApkPlugin> = mutableListOf()
 
-        DriverPluginManager.initDriver(context, force)
-        if (force) RendererPluginManager.clearPlugin()
+        DriverPluginManager.initDriver(context)
+        RendererPluginManager.clearPlugin()
+        NativePluginManager.clearPlugin()
 
         val queryIntentActivities =
             context.packageManager.queryIntentActivities(
@@ -60,8 +62,9 @@ object PluginLoader {
             )
         queryIntentActivities.forEach { resolve ->
             val applicationInfo = resolve.activityInfo.applicationInfo
-            DriverPluginManager.parsePlugin(context, applicationInfo) { apkPluginList.add(it) }
+            DriverPluginManager.parseApkPlugin(context, applicationInfo) { apkPluginList.add(it) }
             RendererPluginManager.parseApkPlugin(context, applicationInfo) { apkPluginList.add(it) }
+            NativePluginManager.parseApkPlugin(context, applicationInfo) { apkPluginList.add(it) }
         }
         FFmpegPluginManager.loadPlugin(context) { apkPluginList.add(it) }
 

@@ -20,31 +20,28 @@ package com.movtery.zalithlauncher.game.plugin.renderer
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.os.Bundle
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.plugin.ApkPlugin
+import com.movtery.zalithlauncher.game.plugin.ApkPluginManager
 import com.movtery.zalithlauncher.game.plugin.cacheAppIcon
 import com.movtery.zalithlauncher.game.renderer.Renderers
-import com.movtery.zalithlauncher.utils.string.isNotEmptyOrBlank
 
 /**
  * FCL、ZalithLauncher 渲染器插件，同时支持使用本地渲染器插件
  * [FCL Renderer Plugin](https://github.com/FCL-Team/FCLRendererPlugin)
  */
-object RendererPluginManager {
+object RendererPluginManager: ApkPluginManager() {
     private val rendererPluginList: MutableList<RendererPlugin> = mutableListOf()
     private val apkRendererPluginList: MutableList<ApkRendererPlugin> = mutableListOf()
 
     /**
      * 获取当前渲染器插件加载的所有渲染器
      */
-    @JvmStatic
     fun getRendererList(): List<RendererPlugin> = rendererPluginList
 
     /**
      * 移除某些已加载的渲染器
      */
-    @JvmStatic
     fun removeRenderer(rendererPlugins: Collection<RendererPlugin>) {
         rendererPluginList.removeAll(rendererPlugins)
     }
@@ -52,7 +49,6 @@ object RendererPluginManager {
     /**
      * @return 是可用的
      */
-    @JvmStatic
     fun isAvailable(): Boolean {
         return rendererPluginList.isNotEmpty()
     }
@@ -61,7 +57,6 @@ object RendererPluginManager {
      * 当前选择的渲染器插件所加载的渲染器
      * 根据总渲染器管理者选择的渲染器的渲染器唯一标识符进行判断
      */
-    @JvmStatic
     val selectedRendererPlugin: RendererPlugin?
         get() {
             val currentRenderer = runCatching {
@@ -94,10 +89,10 @@ object RendererPluginManager {
     /**
      * 解析 ZalithLauncher、FCL 渲染器插件
      */
-    fun parseApkPlugin(
+    override fun parseApkPlugin(
         context: Context,
         info: ApplicationInfo,
-        loaded: (ApkPlugin) -> Unit = {}
+        loaded: (ApkPlugin) -> Unit
     ) {
         if (info.flags and ApplicationInfo.FLAG_SYSTEM == 0) {
             val metaData = info.metaData ?: return
@@ -169,16 +164,4 @@ object RendererPluginManager {
     private fun String.progressEglName(libPath: String): String =
         if (startsWith("/")) "$libPath$this"
         else this
-
-    private fun Bundle.getVersionString(key: String): String? {
-        return if (containsKey(key)) {
-            runCatching {
-                when (val o = get(key)) {
-                    is String -> o
-                    is Number -> o.toString()
-                    else -> null
-                }
-            }.getOrNull()?.takeIf { it.isNotEmptyOrBlank() }
-        } else null
-    }
 }

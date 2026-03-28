@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
-package com.movtery.zalithlauncher.game.plugin.driver
+package com.movtery.zalithlauncher.game.plugin.natives
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -24,47 +24,24 @@ import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.plugin.ApkPlugin
 import com.movtery.zalithlauncher.game.plugin.ApkPluginManager
 import com.movtery.zalithlauncher.game.plugin.cacheAppIcon
-import com.movtery.zalithlauncher.setting.AllSettings
 
-/**
- * FCL 驱动器插件
- * [FCL DriverPlugin.kt](https://github.com/FCL-Team/FoldCraftLauncher/blob/main/FCLauncher/src/main/java/com/tungsten/fclauncher/plugins/DriverPlugin.kt)
- */
-object DriverPluginManager: ApkPluginManager() {
-    private val driverList: MutableList<Driver> = mutableListOf()
+object NativePluginManager: ApkPluginManager() {
+    private val nativePlugins = mutableListOf<NativePlugin>()
 
-    @JvmStatic
-    fun getDriverList(): List<Driver> = driverList.toList()
+    fun getPlugins(): List<NativePlugin> = nativePlugins.toList()
 
-    private lateinit var currentDriver: Driver
-
-    @JvmStatic
-    fun setDriverById(driverId: String) {
-        currentDriver = driverList.find { it.id == driverId } ?: driverList[0]
+    fun getJVMEnv(): List<String> {
+        return buildList {
+            nativePlugins.forEach { plugin ->
+                addAll(plugin.envList)
+            }
+        }
     }
 
-    @JvmStatic
-    fun getDriver(): Driver = currentDriver
-
-    /**
-     * 初始化驱动器
-     */
-    fun initDriver(context: Context) {
-        driverList.clear()
-        val applicationInfo = context.applicationInfo
-        driverList.add(
-            Driver(
-                id = AllSettings.vulkanDriver.defaultValue,
-                name = "Turnip",
-                path = applicationInfo.nativeLibraryDir
-            )
-        )
-        setDriverById(AllSettings.vulkanDriver.getValue())
+    fun clearPlugin() {
+        nativePlugins.clear()
     }
 
-    /**
-     * 通用 FCL 插件
-     */
     override fun parseApkPlugin(
         context: Context,
         info: ApplicationInfo,
@@ -72,22 +49,38 @@ object DriverPluginManager: ApkPluginManager() {
     ) {
         if (info.flags and ApplicationInfo.FLAG_SYSTEM == 0) {
             val metaData = info.metaData ?: return
-            if (metaData.getBoolean("fclPlugin", false)) {
-                val driver = metaData.getString("driver") ?: return
+            if (
+                metaData.getBoolean("FCLNativePlugin", false)
+            ) {
                 val nativeLibraryDir = info.nativeLibraryDir
-
                 val packageManager = context.packageManager
                 val packageName = info.packageName
                 val appName = info.loadLabel(packageManager).toString()
 
-                driverList.add(
-                    Driver(
-                        id = packageName,
-                        name = driver,
-                        summary = context.getString(R.string.settings_renderer_from_plugins, appName),
-                        path = nativeLibraryDir
-                    )
+                val environment = metaData.getString("environment") ?: return
+                val des = metaData.getString("des") ?: ""
+
+                val envList = if (environment.isNotEmpty()) {
+                    val entries = environment.split(" ")
+                    buildList {
+                        entries.forEach { entry ->
+                            add(parseEntry(entry, nativeLibraryDir))
+                        }
+                    }
+                } else {
+                    emptyList()
+                }
+
+                val plugin = NativePlugin(
+                    packageName = packageName,
+                    displayName = des,
+                    summary = context.getString(R.string.settings_renderer_from_plugins, appName),
+                    minMCVer = metaData.getVersionString("minMCVer"),
+                    maxMCVer = metaData.getVersionString("maxMCVer"),
+                    path = nativeLibraryDir,
+                    envList = envList
                 )
+                nativePlugins.add(plugin)
 
                 runCatching {
                     cacheAppIcon(context, info)
@@ -99,5 +92,18 @@ object DriverPluginManager: ApkPluginManager() {
                 }.getOrNull()?.let { loaded(it) }
             }
         }
+    }
+
+    private fun parseEntry(
+        entry: String,
+        nativeLibraryDir: String
+    ): String {
+        var (key, value) = entry.split("=")
+
+        if (value == "{nativeLibraryDir}") {
+            value = nativeLibraryDir
+        }
+
+        return "$key=$value"
     }
 }

@@ -28,6 +28,7 @@ import com.movtery.zalithlauncher.game.account.offline.OfflineYggdrasilServer
 import com.movtery.zalithlauncher.game.multirt.Runtime
 import com.movtery.zalithlauncher.game.path.getAssetsHome
 import com.movtery.zalithlauncher.game.path.getLibrariesHome
+import com.movtery.zalithlauncher.game.plugin.natives.NativePluginManager
 import com.movtery.zalithlauncher.game.version.download.artifactToPath
 import com.movtery.zalithlauncher.game.version.download.filterLibrary
 import com.movtery.zalithlauncher.game.version.download.getLibraryReplacement
@@ -67,6 +68,7 @@ class LaunchArgs(
 
         argsList.addAll(getJavaArgs())
         argsList.addAll(getMinecraftJVMArgs())
+        argsList.addAll(NativePluginManager.getJVMEnv())
 
         if (runtime.javaVersion > 8) {
             argsList.add("--add-exports")
