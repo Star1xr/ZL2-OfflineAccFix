@@ -1052,6 +1052,7 @@
     <string name="control_editor_menu_save_and_exit">保存并退出</string>
     <string name="control_editor_layers_title">控件层</string>
     <string name="control_editor_layers_create">新建</string>
+    <string name="control_editor_layers_delete">你确定要删除控件层 %s 吗？</string>
     <string name="control_editor_layers_attribute">控件层属性</string>
     <string name="control_editor_layers_attribute_name">控件层名称</string>
     <string name="control_editor_layers_attribute_hide">默认隐藏控件层</string>
@@ -1063,6 +1064,7 @@
     <string name="control_editor_edit_dialog_close_preview">关闭预览</string>
     <string name="control_editor_edit_dialog_clone_widget">复制控件</string>
     <string name="control_editor_edit_dialog_clone_widget_title">复制到控件层</string>
+    <string name="control_editor_edit_dialog_delete_widget">你确定要删除此控件吗？</string>
     <string name="control_editor_edit_category_info">基本信息</string>
     <string name="control_editor_edit_category_event">点击事件</string>
     <string name="control_editor_edit_category_style">控件样式</string>
@@ -1124,6 +1126,7 @@
     <string name="control_editor_edit_style_config_name">控件外观名称</string>
     <string name="control_editor_edit_style_config_animate_swap">启用动画过渡</string>
     <string name="control_editor_edit_style_config_common_style">不区分暗色主题</string>
+    <string name="control_editor_edit_style_config_delete">确定要删除控件外观 %s？</string>
     <string name="control_editor_edit_style_config_light">亮色外观</string>
     <string name="control_editor_edit_style_config_dark">暗色外观</string>
     <string name="control_editor_edit_style_config_normal">正常</string>

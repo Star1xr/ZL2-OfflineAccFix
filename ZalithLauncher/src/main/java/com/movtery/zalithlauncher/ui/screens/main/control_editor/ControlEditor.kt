@@ -234,8 +234,7 @@ fun BoxWithConstraintsScope.ControlEditor(
             viewModel.editorOperation = EditorOperation.None
         },
         onDelete = { data, layer ->
-            viewModel.removeWidget(layer, data)
-            viewModel.editorOperation = EditorOperation.None
+            viewModel.editorWidgetOperation = EditorWidgetOperation.DeleteButton(data, layer)
         },
         onClone = { data, layer ->
             viewModel.editorWidgetOperation = EditorWidgetOperation.CloneButton(data, layer)
@@ -330,6 +329,10 @@ fun BoxWithConstraintsScope.ControlEditor(
         controlLayers = layers,
         onCloneWidgets = { widget, layers ->
             viewModel.cloneWidgetToLayers(widget, layers)
+        },
+        onDeleteWidget = { widget, layer ->
+            viewModel.removeWidget(layer, widget)
+            viewModel.editorOperation = EditorOperation.None
         }
     )
 
@@ -368,8 +371,7 @@ private fun EditorOperation(
                     changeOperation(EditorOperation.None)
                 },
                 onDelete = {
-                    onDeleteLayer(layer)
-                    changeOperation(EditorOperation.None)
+                    changeOperation(EditorOperation.DeleteLayer(layer))
                 },
                 onMergeDownward = {
                     onMergeDownward(layer)
@@ -377,6 +379,20 @@ private fun EditorOperation(
                 onCopy = {
                     onCopy(layer)
                 },
+            )
+        }
+        is EditorOperation.DeleteLayer -> {
+            val layer = operation.layer
+            SimpleAlertDialog(
+                title = stringResource(R.string.generic_delete),
+                text = stringResource(R.string.control_editor_layers_delete, layer.name),
+                onDismiss = {
+                    changeOperation(EditorOperation.None)
+                },
+                onConfirm = {
+                    onDeleteLayer(layer)
+                    changeOperation(EditorOperation.None)
+                }
             )
         }
         is EditorOperation.OpenStyleList -> {
@@ -390,7 +406,7 @@ private fun EditorOperation(
                     onCloneStyle(style)
                 },
                 onDelete = { style ->
-                    onDeleteStyle(style)
+                    changeOperation(EditorOperation.DeleteButtonStyle(style))
                 },
                 onClose = {
                     changeOperation(EditorOperation.None)
@@ -410,6 +426,20 @@ private fun EditorOperation(
                 onConfirm = {
                     onCreateStyle(name)
                     changeOperation(EditorOperation.OpenStyleList)
+                }
+            )
+        }
+        is EditorOperation.DeleteButtonStyle -> {
+            val style = operation.style
+            SimpleAlertDialog(
+                title = stringResource(R.string.generic_delete),
+                text = stringResource(R.string.control_editor_edit_style_config_delete, style.name),
+                onDismiss = {
+                    changeOperation(EditorOperation.None)
+                },
+                onConfirm = {
+                    onDeleteStyle(style)
+                    changeOperation(EditorOperation.None)
                 }
             )
         }
@@ -466,6 +496,7 @@ private fun EditorWidgetOperation(
     changeOperation: (EditorWidgetOperation) -> Unit,
     controlLayers: List<ObservableControlLayer>,
     onCloneWidgets: (ObservableWidget, List<ObservableControlLayer>) -> Unit,
+    onDeleteWidget: (ObservableWidget, ObservableControlLayer) -> Unit,
 ) {
     when (operation) {
         is EditorWidgetOperation.None -> {}
@@ -482,6 +513,21 @@ private fun EditorWidgetOperation(
                 confirmText = stringResource(R.string.control_editor_edit_dialog_clone_widget),
                 onConfirm = { layers ->
                     onCloneWidgets(data, layers)
+                    changeOperation(EditorWidgetOperation.None)
+                }
+            )
+        }
+        is EditorWidgetOperation.DeleteButton -> {
+            val data = operation.data
+            val layer = operation.layer
+            SimpleAlertDialog(
+                title = stringResource(R.string.generic_delete),
+                text = stringResource(R.string.control_editor_edit_dialog_delete_widget),
+                onDismiss = {
+                    changeOperation(EditorWidgetOperation.None)
+                },
+                onConfirm = {
+                    onDeleteWidget(data, layer)
                     changeOperation(EditorWidgetOperation.None)
                 }
             )

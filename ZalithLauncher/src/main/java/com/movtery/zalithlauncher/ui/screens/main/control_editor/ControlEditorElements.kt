@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import com.movtery.layer_controller.data.HideLayerWhen
 import com.movtery.layer_controller.data.VisibilityType
 import com.movtery.layer_controller.event.ClickEvent
+import com.movtery.layer_controller.observable.ObservableButtonStyle
 import com.movtery.layer_controller.observable.ObservableControlLayer
 import com.movtery.layer_controller.observable.ObservableNormalData
 import com.movtery.layer_controller.observable.ObservableTranslatableString
@@ -99,12 +100,16 @@ sealed interface EditorOperation {
     data object SelectButton : EditorOperation
     /** 编辑控件层属性 */
     data class EditLayer(val layer: ObservableControlLayer) : EditorOperation
+    /** 删除控件层 */
+    data class DeleteLayer(val layer: ObservableControlLayer) : EditorOperation
     /** 打开控件外观列表 */
     data object OpenStyleList : EditorOperation
     /** 创建控件外观 */
     data object CreateStyle : EditorOperation
     /** 编辑控件外观 */
     data object EditButtonStyle : EditorOperation
+    /** 删除控件外观 */
+    data class DeleteButtonStyle(val style: ObservableButtonStyle) : EditorOperation
     /** 创建摇杆样式独立设定 */
     data object CreateJoystickStyle : EditorOperation
     /** 关于摇杆的提醒 */
@@ -126,6 +131,8 @@ sealed interface EditorWidgetOperation {
     data object None : EditorWidgetOperation
     /** 选择了一个控件, 并询问用户将其复制到哪些控制层 */
     data class CloneButton(val data: ObservableWidget, val layer: ObservableControlLayer) : EditorWidgetOperation
+    /** 删除一个控件 */
+    data class DeleteButton(val data: ObservableWidget, val layer: ObservableControlLayer) : EditorWidgetOperation
     /** 编辑控件的显示文本 */
     data class EditWidgetText(val string: ObservableTranslatableString) : EditorWidgetOperation
     /** 编辑切换控件层可见性事件 */

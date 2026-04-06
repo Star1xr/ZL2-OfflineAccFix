@@ -1086,6 +1086,7 @@
     <string name="control_editor_menu_save_and_exit">儲存並退出</string>
     <string name="control_editor_layers_title">控制項圖層</string>
     <string name="control_editor_layers_create">新建</string>
+    <string name="control_editor_layers_delete">你確定要刪除控制項層 %s 嗎？</string>
     <string name="control_editor_layers_attribute">控制項圖層屬性</string>
     <string name="control_editor_layers_attribute_name">控制項圖層名稱</string>
     <string name="control_editor_layers_attribute_hide">預設隱藏控制項圖層</string>
@@ -1097,6 +1098,7 @@
     <string name="control_editor_edit_dialog_close_preview">關閉預覽</string>
     <string name="control_editor_edit_dialog_clone_widget">複製控制項</string>
     <string name="control_editor_edit_dialog_clone_widget_title">複製到控制項圖層</string>
+    <string name="control_editor_edit_dialog_delete_widget">你確定要刪除此控制項嗎？</string>
     <string name="control_editor_edit_category_info">基本資訊</string>
     <string name="control_editor_edit_category_event">點擊事件</string>
     <string name="control_editor_edit_category_style">控制項樣式</string>
@@ -1158,6 +1160,7 @@
     <string name="control_editor_edit_style_config_name">控制項外觀名稱</string>
     <string name="control_editor_edit_style_config_animate_swap">啟用動畫過渡</string>
     <string name="control_editor_edit_style_config_common_style">不區分深色主題</string>
+    <string name="control_editor_edit_style_config_delete">確定要刪除控制項外觀 %s 嗎？</string>
     <string name="control_editor_edit_style_config_light">亮色外觀</string>
     <string name="control_editor_edit_style_config_dark">暗色外觀</string>
     <string name="control_editor_edit_style_config_normal">正常</string>
