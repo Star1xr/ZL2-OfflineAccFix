@@ -404,6 +404,15 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener {
             }
         })
 
+        //关闭菜单之后，每次启动游戏都提醒，防止部分人误触了不知道怎么解决 >:(
+        if (!AllSettings.showMenuBall.getValue()) {
+            Toast.makeText(
+                this@VMActivity,
+                getString(R.string.game_menu_option_show_menu_hided),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
         setContent {
             ZalithLauncherTheme {
                 Screen {
