@@ -75,6 +75,22 @@ private class SearchScreenViewModel(
     var currentSearchJob: Job? = null
 
     /**
+     * 仅更新搜索名称
+     */
+    fun updateFilter(searchName: String) {
+        searchFilter = searchFilter.copy(searchName = searchName)
+    }
+
+    /**
+     * 重置并重新搜索
+     */
+    fun resetSearch() {
+        pages.clear()
+        searchFilter = searchFilter.copy(index = 0) //重置索引到起始处
+        search()
+    }
+
+    /**
      * 更新过滤器时，重置已有结果，重新触发搜索
      */
     fun researchWithFilter(filter: PlatformSearchFilter) {
@@ -279,9 +295,10 @@ fun SearchAssetsScreen(
                 },
                 searchName = viewModel.searchFilter.searchName,
                 onSearchNameChange = {
-                    viewModel.researchWithFilter(
-                        viewModel.searchFilter.copy(searchName = it)
-                    )
+                    viewModel.updateFilter(it)
+                },
+                onSearch = {
+                    viewModel.resetSearch()
                 },
                 gameVersion = viewModel.searchFilter.gameVersion,
                 onGameVersionChange = {

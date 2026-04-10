@@ -125,8 +125,8 @@ fun SmallOutlinedEditField(
     shape: Shape = OutlinedTextFieldDefaults.shape,
     textStyle: TextStyle = TextStyle(color = contentColor).copy(fontSize = 12.sp),
     cursorBrush: Brush = SolidColor(LocalTextSelectionColors.current.handleColor),
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    keyboardOptions: KeyboardOptions? = null,
+    keyboardActions: KeyboardActions? = null,
     singleLine: Boolean = false,
     interactionSource: MutableInteractionSource? = null,
 ) {
@@ -151,28 +151,33 @@ fun SmallOutlinedEditField(
         textStyle = textStyle,
         cursorBrush = cursorBrush,
         singleLine = singleLine,
-        keyboardOptions = if (singleLine) keyboardOptions.copy(
-            imeAction = ImeAction.Done
-        ) else keyboardOptions,
+        keyboardOptions = keyboardOptions
+            ?: if (singleLine) KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+            else KeyboardOptions.Default,
         keyboardActions = KeyboardActions(
             onDone = {
                 focusManager.clearFocus(true)
-                keyboardActions.onDone?.invoke(this@KeyboardActions)
+                (keyboardActions ?: KeyboardActions.Default).onDone?.invoke(this@KeyboardActions)
             },
             onGo = {
-                keyboardActions.onGo?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onGo?.invoke(this@KeyboardActions)
             },
             onNext = {
-                keyboardActions.onNext?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onNext?.invoke(this@KeyboardActions)
             },
             onPrevious = {
-                keyboardActions.onPrevious?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onPrevious?.invoke(this@KeyboardActions)
             },
             onSearch = {
-                keyboardActions.onSearch?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onSearch?.invoke(this@KeyboardActions)
             },
             onSend = {
-                keyboardActions.onSend?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onSend?.invoke(this@KeyboardActions)
             }
         ),
         decorationBox = { innerTextField ->
@@ -216,8 +221,8 @@ fun OwnOutlinedTextField(
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    keyboardOptions: KeyboardOptions? = null,
+    keyboardActions: KeyboardActions? = null,
     singleLine: Boolean = false,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
@@ -249,28 +254,33 @@ fun OwnOutlinedTextField(
         supportingText = supportingText,
         isError = isError,
         visualTransformation = visualTransformation,
-        keyboardOptions = if (singleLine) KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done
-        ) else keyboardOptions,
+        keyboardOptions = keyboardOptions
+            ?: if (singleLine) KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+            else KeyboardOptions.Default,
         keyboardActions = KeyboardActions(
             onDone = {
                 focusManager.clearFocus(true)
-                keyboardActions.onDone?.invoke(this@KeyboardActions)
+                (keyboardActions ?: KeyboardActions.Default).onDone?.invoke(this@KeyboardActions)
             },
             onGo = {
-                keyboardActions.onGo?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onGo?.invoke(this@KeyboardActions)
             },
             onNext = {
-                keyboardActions.onNext?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onNext?.invoke(this@KeyboardActions)
             },
             onPrevious = {
-                keyboardActions.onPrevious?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onPrevious?.invoke(this@KeyboardActions)
             },
             onSearch = {
-                keyboardActions.onSearch?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onSearch?.invoke(this@KeyboardActions)
             },
             onSend = {
-                keyboardActions.onSend?.invoke(this@KeyboardActions)
+                focusManager.clearFocus(true)
+                (keyboardActions ?: KeyboardActions.Default).onSend?.invoke(this@KeyboardActions)
             }
         ),
         singleLine = singleLine,

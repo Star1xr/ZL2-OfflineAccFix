@@ -38,7 +38,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material3.Checkbox
@@ -62,6 +65,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -103,6 +107,7 @@ fun SearchFilter(
     onPlatformChange: (Platform) -> Unit = {},
     searchName: String,
     onSearchNameChange: (String) -> Unit = {},
+    onSearch: () -> Unit,
     gameVersion: String?,
     onGameVersionChange: (String?) -> Unit = {},
     sortField: PlatformSortField,
@@ -135,7 +140,25 @@ fun SearchFilter(
                 label = {
                     Text(text = stringResource(R.string.download_assets_filter_search_name))
                 },
-                singleLine = true
+                trailingIcon = {
+                    IconButton(
+                        onClick = onSearch
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = stringResource(R.string.generic_search)
+                        )
+                    }
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Search
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        onSearch()
+                    }
+                )
             )
         }
 
