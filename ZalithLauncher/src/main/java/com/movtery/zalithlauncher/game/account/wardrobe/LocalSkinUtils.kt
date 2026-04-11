@@ -18,7 +18,11 @@
 
 package com.movtery.zalithlauncher.game.account.wardrobe
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.core.graphics.alpha
+import com.movtery.zalithlauncher.utils.image.isColorMatch
+import com.movtery.zalithlauncher.utils.image.recycleIfLarge
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -99,4 +103,41 @@ fun BitmapFactory.Options.isDualLayerSkin(): Boolean {
  */
 fun BitmapFactory.Options.isClassicSkin(): Boolean {
     return outWidth == 64 && outHeight == 32
+}
+
+/**
+ * 检查皮肤是否为纤细（Alex）模型
+ */
+suspend fun File.isSlimModel(): Boolean = withContext(Dispatchers.IO) {
+    val options = BitmapFactory.Options()
+    val bitmap = BitmapFactory.decodeFile(absolutePath, options) ?: return@withContext false
+    try {
+        if (options.isClassicSkin()) {
+            //旧版单层皮肤不支持细臂
+            false
+        } else {
+            val rightHand = bitmap.isTransparent(50..51, 16..19)
+            val rightArm = bitmap.isTransparent(54..55, 20..31)
+
+            val leftHand = bitmap.isTransparent(42..43, 48..51)
+            val leftArm = bitmap.isTransparent(46..47, 52..63)
+
+            rightHand && rightArm && leftHand && leftArm
+        }
+    } catch (_: Exception) {
+        false
+    } finally {
+        bitmap.recycleIfLarge()
+    }
+}
+
+private fun Bitmap.isTransparent(xRange: IntRange, yRange: IntRange): Boolean {
+    return isColorMatch(
+        xRange = xRange,
+        yRange = yRange,
+        predicate = { color, _, _ ->
+            color.alpha == 0
+        },
+        requireAll = true
+    )
 }

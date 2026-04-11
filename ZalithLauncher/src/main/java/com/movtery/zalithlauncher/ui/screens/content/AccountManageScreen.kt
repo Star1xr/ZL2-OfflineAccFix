@@ -63,11 +63,7 @@ import com.movtery.zalithlauncher.game.account.Account
 import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.game.account.auth_server.data.AuthServer
 import com.movtery.zalithlauncher.game.account.isAuthServerAccount
-import com.movtery.zalithlauncher.game.account.isLocalAccount
-import com.movtery.zalithlauncher.game.account.isMicrosoftAccount
 import com.movtery.zalithlauncher.game.account.isMicrosoftLogging
-import com.movtery.zalithlauncher.game.account.wardrobe.EmptyCape
-import com.movtery.zalithlauncher.game.account.wardrobe.getLocalUUIDWithSkinModel
 import com.movtery.zalithlauncher.game.account.yggdrasil.PlayerProfile
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.BackgroundCard
@@ -230,7 +226,8 @@ private fun AccountManageContent(
             accounts = profileUiState.accounts,
             currentAccount = profileUiState.currentAccount,
             accountOperation = operationUiState.accountOp,
-            accountSkins = profileUiState.accountSkinOpMap,
+            accountSkinOperation = operationUiState.accountSkinOp,
+            accountSkinDialogState = operationUiState.accountSkinDialogState,
             accountCapes = profileUiState.accountCapeOpMap,
             actions = actions
         )
@@ -649,7 +646,8 @@ private fun AccountsLayout(
     accounts: List<Account>,
     currentAccount: Account?,
     accountOperation: AccountOperation,
-    accountSkins: Map<String, AccountSkinOperation>,
+    accountSkinOperation: AccountSkinOperation,
+    accountSkinDialogState: AccountManageViewModel.AccountSkinDialogState,
     accountCapes: Map<String, List<PlayerProfile.Cape>>,
     actions: AccountActions
 ) {
@@ -657,6 +655,13 @@ private fun AccountsLayout(
     val context = LocalContext.current
 
     AccountOperation(accountOperation, actions)
+
+    AccountSkinOperation(
+        accountSkinOperation = accountSkinOperation,
+        skinDialogState = accountSkinDialogState,
+        accountCapes = accountCapes,
+        actions = actions
+    )
 
     BackgroundCard(
         modifier = modifier.offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
@@ -670,23 +675,6 @@ private fun AccountsLayout(
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 items(accounts, key = { it.uniqueUUID }) { account ->
-                    val skinOp = accountSkins[account.uniqueUUID] ?: AccountSkinOperation.None
-
-                    AccountSkinOperation(
-                        account = account,
-                        accountSkinOperation = skinOp,
-                        availableCapes = accountCapes[account.uniqueUUID] ?: emptyList(),
-                        updateOperation = {
-                            actions.onIntent(
-                                AccountManageIntent.UpdateAccountSkinOp(
-                                    account.uniqueUUID,
-                                    it
-                                )
-                            )
-                        },
-                        actions = actions
-                    )
-
                     AccountItem(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -698,8 +686,7 @@ private fun AccountsLayout(
                             if (!account.isAuthServerAccount()) {
                                 actions.onIntent(
                                     AccountManageIntent.UpdateAccountSkinOp(
-                                        account.uniqueUUID,
-                                        AccountSkinOperation.ChangeSkin
+                                        AccountSkinOperation.ChangeSkin(account)
                                     )
                                 )
                             }
@@ -748,56 +735,55 @@ private fun AccountsLayout(
  */
 @Composable
 private fun AccountSkinOperation(
-    account: Account,
     accountSkinOperation: AccountSkinOperation,
-    availableCapes: List<PlayerProfile.Cape>,
-    updateOperation: (AccountSkinOperation) -> Unit,
+    skinDialogState: AccountManageViewModel.AccountSkinDialogState,
+    accountCapes: Map<String, List<PlayerProfile.Cape>>,
     actions: AccountActions
 ) {
     when (accountSkinOperation) {
         is AccountSkinOperation.None -> {}
         is AccountSkinOperation.ChangeSkin -> {
+            val account = accountSkinOperation.account
             ChangeSkinDialog(
                 account = account,
-                availableCapes = availableCapes,
-                onDismissRequest = { updateOperation(AccountSkinOperation.None) },
+                availableCapes = accountCapes[account.uniqueUUID] ?: emptyList(),
+                skinState = skinDialogState.pendingSkinData,
+                onSkinStateChange = { skinState ->
+                    actions.onIntent(
+                        AccountManageIntent.UpdatePendingSkinData(
+                            skinState
+                        )
+                    )
+                },
+                capeState = skinDialogState.pendingCapeData,
+                onCapeStateChange = { capeState ->
+                    actions.onIntent(
+                        AccountManageIntent.UpdatePendingCapeData(
+                            capeState
+                        )
+                    )
+                },
+                isImportingSkin = skinDialogState.importingSkin,
+                onSkinPicked = { uri ->
+                    actions.onIntent(
+                        AccountManageIntent.OnSkinPicked(uri)
+                    )
+                },
+                onDismissRequest = {
+                    actions.onIntent(AccountManageIntent.ResetAccountSkinDialogState)
+                    actions.onIntent(AccountManageIntent.UpdateAccountSkinOp(AccountSkinOperation.None))
+                },
                 onResetSkin = {
-                    if (account.isLocalAccount()) {
-                        actions.onIntent(AccountManageIntent.ResetSkin(account))
-                    }
+                    actions.onIntent(AccountManageIntent.ResetSkin(account))
                 },
                 onFetchCapes = {
-                    if (account.isMicrosoftAccount()) {
-                        actions.onIntent(AccountManageIntent.FetchMicrosoftCapes(account))
-                    }
+                    actions.onIntent(AccountManageIntent.FetchMicrosoftCapes(account))
                 },
-                onChangeSkin = { uri, model ->
-                    when {
-                        account.isLocalAccount() -> {
-                            account.skinModelType = model
-                            account.profileId = getLocalUUIDWithSkinModel(account.username, model)
-                            actions.onIntent(
-                                AccountManageIntent.SaveLocalSkin(account, uri)
-                            )
-                        }
-                        account.isMicrosoftAccount() -> {
-                            actions.onIntent(
-                                AccountManageIntent.ImportSkinFile(account, uri, model)
-                            )
-                        }
-                    }
+                onApplySkin = { file, model ->
+                    actions.onIntent(AccountManageIntent.ApplySkin(account, file, model))
                 },
-                onChangeCape = { cape, name ->
-                    if (account.isMicrosoftAccount()) {
-                        actions.onIntent(
-                            AccountManageIntent.ApplyMicrosoftCape(
-                                account,
-                                cape.takeIf { cape != EmptyCape },
-                                name,
-                                cape == EmptyCape
-                            )
-                        )
-                    }
+                onApplyCape = { cape ->
+                    actions.onIntent(AccountManageIntent.ApplyMicrosoftCape(account, cape))
                 }
             )
         }
