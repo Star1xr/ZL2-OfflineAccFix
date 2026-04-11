@@ -1241,7 +1241,8 @@ public class GLFW
     }
 
     public static int glfwGetKey(@NativeType("GLFWwindow *") long window, int key) {
-        return keyDownBuffer.get(Math.max(0, key-31));
+        if (key == GLFW_KEY_LAST) return GLFW_KEY_LAST;
+        return keyDownBuffer.get(Math.max(0, key - 31));
     }
 
     public static int glfwGetMouseButton(@NativeType("GLFWwindow *") long window, int button) {
