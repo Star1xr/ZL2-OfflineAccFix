@@ -23,7 +23,7 @@
     <string name="terracotta_confirm_p2p">Terracotta, P2P teknolojisini kullanır. Başarılı bir bağlantıdan sonra, odadaki kullanıcılar doğrudan birbirlerine bağlanır ve trafiğiniz üçüncü taraf bir sunucu tarafından yönlendirilmez. Son çok oyunculu deneyimi, katılımcıların ağ durumuna büyük ölçüde bağlıdır.</string>
     <string name="terracotta_confirm_law">Çok oyunculu süreç boyunca, ülkenizin ve bölgenizin tüm yas ve yönetmeliklerine kesinlikle uymanız gerekmektedir.</string>
     <string name="terracotta_menu">Çok Oyunculu Menü</string>
-    <string name="terracotta_notification_title">Terracotta çalışıyor</string>
+    <string name="terracotta_notification_title">Terracotta | Çok Oyunculu Çalışıyor</string>
     <string name="terracotta_notification_desc">Kimlik: %s, Eyalet: %s</string>
     <string name="terracotta_status_waiting_host_title">Bir oturum düzenlemek istiyorum</string>
     <string name="terracotta_status_waiting_host_desc">Arkadaşlarınızla oynamak için bir oda oluşturun ve davet kodu üretin</string>
@@ -73,4 +73,15 @@
     <string name="terracotta_status_exception_desc_scaffolding_invalid_response">Geçersiz Protokol: Sunucu geçersiz bir yanıt gönderdi, lütfen bu sorunu geliştiricilere bildirin</string>
     <string name="terracotta_status_host_ok_code_desc">Lütfen arkadaşlarınıza çok oyunculu modda Misafir modunu seçmelerini ve bu davet kodunu girmelerini hatırlatın.</string>
     <string name="terracotta_status_exception">Bağlantı kesildi</string>
+    <string name="terracotta_tutorial_step_enable_multiplayer">- Başlatıcının çok oyunculu ana sayfasındaki kullanıcı uyarısını okuyun ve ardından çok oyunculu işlevini etkinleştirin.</string>
+    <string name="terracotta_tutorial_step_open_multiplayer_menu">- Oyunu başlatın, ardından oyun içindeki çok oyunculu menüsünü bulun ve açın.</string>
+    <string name="terracotta_tutorial_step_vpn_permission">- Eğer bir açılır pencere VPN izinleri istemenizi isterse, lütfen izin verin; aksi takdirde düzgün çalışmayacaktır.</string>
+    <string name="terracotta_tutorial_step_offline_account_support">- Bu yazılım çevrimdışı hesapları desteklemektedir.</string>
+    <string name="terracotta_tutorial_step_interoperability">- Bu yazılım, FCL, HMCL ve PCL CE (Terracotta) gibi Scaffolding protokolünü destekleyen yazılımlarla ara bağlantıyı destekler.</string>
+    <string name="terracotta_tutorial_host_step_become_host">- Oyun portunu taramak için \"Oturum başlatmak istiyorum\" seçeneğine tıklayın.</string>
+    <string name="terracotta_tutorial_host_step_open_lan">- Kendi dünyanıza girin ve duraklatma menüsünde Yerel Ağa Aç seçeneğini etkinleştirin.</string>
+    <string name="terracotta_tutorial_host_step_copy_invite">- Davet kodunun otomatik olarak kopyalanması için bir süre bekleyin; kopyalanmazsa, çok oyunculu menüsünden kopyalayabilirsiniz.</string>
+    <string name="terracotta_tutorial_guest_step_become_guest">- \"Oturuma katılmak istiyorum\" seçeneğine dokunun, ev sahibi tarafından verilen davet kodunu girin ve sabırla bekleyin.</string>
+    <string name="terracotta_tutorial_guest_step_join_room">- Odaya katıldıktan sonra ana menüde Çok Oyunculu seçeneğine gidin, sayfayı yenileyin ve Terracotta lobisine girmek için çift tıklayın.</string>
+    <string name="terracotta_tutorial_guest_step_alternate_server">- Alternatif sunucu adresleri üzerinden katılırken çevrimdışı hesaplar desteklenmemektedir; bu sorunu kendiniz çözün.</string>
 </resources>
