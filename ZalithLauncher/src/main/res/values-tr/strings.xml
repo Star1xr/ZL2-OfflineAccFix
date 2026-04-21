@@ -294,12 +294,12 @@
     <string name="download_assets_features_items">İtemler</string>
     <string name="download_assets_features_locale">Yerel</string>
     <string name="download_assets_features_models">Modeller</string>
-    <string name="import_modpack">Modpack\'i içe aktar</string>
+    <string name="import_modpack">Modpack\'i İçe Aktar</string>
     <string name="import_modpack_tip">Yerel mod paketi dosyalarını içe aktarabilirsiniz. Başlatıcı şu anda bu formatları desteklemektedir:</string>
     <string name="import_modpack_task_unpack">Dosyayı İçe Aktar ve Paketten Çıkar</string>
     <string name="import_modpack_task_parse">Mod Paketini Ayrıştır</string>
     <string name="import_modpack_task_extract_files">Mod Paketi Dosyalarını Çıkar</string>
-    <string name="import_modpack_task_extract_files_and_schedule_download">İndirilenleri Çıkar ve Hazırla</string>
+    <string name="import_modpack_task_extract_files_and_schedule_download">İndirilenleri çıkar ve hazırla</string>
     <string name="import_modpack_not_supported_title">Desteklenmeyen Modpack</string>
     <string name="import_modpack_not_supported_formats">Bu modpack formatı desteklenmiyor.Deateklenen formatlar :</string>
     <string name="import_modpack_not_supported_text1">Başlatıcı, aşağıdaki nedenlerden dolayı bu mod paketini içe aktaramıyor:</string>
@@ -1174,4 +1174,7 @@
     <string name="download_game_version_overwrite">Mevcut sürümün üzerine yazılacak: %s</string>
     <string name="download_game_version_overwrite_select">Üzerine yazılacak sürüm</string>
     <string name="download_game_version_overwrite_select_subtitle">Üzerine yazılacak sürümü seçin. Bu özelliği hedef sürümü yükseltmek/düşürmek için kullanabilirsiniz.</string>
+    <string name="plugin_download_title">Eklentileri İndir</string>
+    <string name="plugin_download_summary">Eklentiyi indirin ve uygulama olarak yükleyin. Başlatıcıyı yeniden açmanız yeterli, otomatik olarak yüklenecektir!</string>
+    <string name="settings_game_graphics_api_default_opengl">İlk çalıştırmada yalnızca OpenGL\'e ayarlandı</string>
 </resources>

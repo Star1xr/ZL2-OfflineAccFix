@@ -1176,4 +1176,5 @@
     <string name="download_game_version_overwrite_select_subtitle">Selecione a versão para sobrescrever. Você pode usar este recurso para atualizar/rebaixar a versão selecionada.</string>
     <string name="plugin_download_title">Baixar Plugin</string>
     <string name="plugin_download_summary">Baixe o plugin e instale-o como um aplicativo. Basta reabrir o launcher e ele será carregado automaticamente!</string>
+    <string name="settings_game_graphics_api_default_opengl">Defina para OpenGL somente na primeira inicialização</string>
 </resources>

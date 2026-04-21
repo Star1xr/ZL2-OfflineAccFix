@@ -428,7 +428,7 @@
     <string name="url_wiki_minecraft_game_snapshot">https://minecraft.wiki/w/Java_Edition_%s</string>
     <string name="generic_ignore">Игнорировать</string>
     <string name="generic_authorization">Авторизация</string>
-    <string name="unit_day">День</string>
+    <string name="unit_day">Количество дней</string>
     <string name="date_format">d MMM yyyy, HH:mm:ss</string>
     <string name="just_now">Только что</string>
     <string name="minutes_ago">%d Минут назад</string>
@@ -1081,4 +1081,10 @@
     <string name="download_install_warning_mobile_data">Вы используете мобильный интернет. Продолжение скачивания может использовать ваш трафик.</string>
     <string name="version_summary_fools_2_0">Мы не будем их обновлять! Если вы обнаружили ошибку, вам просто не повезло! XD</string>
     <string name="game_saponsorship_finished_game">Лаунчер успешно запустил игру %s раз! Если вам это полезно, пожалуйста, поддержите разработчика! :)</string>
+    <string name="page_title_version_manage">Менеджер версий</string>
+    <string name="page_title_account_list">Учёьная запись</string>
+    <string name="page_title_select_files">Выберите путь</string>
+    <string name="files_browse_folder">Просмотр файлов</string>
+    <string name="files_importing">Импорт файлов</string>
+    <string name="files_delete_file">Вы уверены, что хотите удалить %s?</string>
 </resources>
