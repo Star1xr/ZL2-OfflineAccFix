@@ -550,7 +550,6 @@
     <string name="versions_manage_category_modloader">可安裝模組</string>
     <string name="versions_manage_pin">置頂</string>
     <string name="versions_manage_install_exists">此名稱的版本已存在！</string>
-    <string name="versions_manage_install_cannot_use_mc_name">已選擇附加內容，需確保原版核心的獨立性，請勿使用原版名稱。</string>
     <string name="versions_manage_invalid">此版本無效</string>
     <string name="versions_manage_rename_version">重新命名版本</string>
     <string name="versions_manage_copy_version">複製版本</string>
@@ -991,7 +990,6 @@
     <string name="screenshots_manage_export_failed">匯出失敗</string>
     <string name="screenshots_manage_export_all_message">是否匯出所有圖片到系統相冊？</string>
     <string name="screenshots_manage_export_selected_message">是否匯出選中的 %1$d 張圖片到系統相冊？</string>
-    <string name="screenshots_manage_export_delete_after">匯出後刪除</string>
     <string name="servers_list">伺服器</string>
     <string name="servers_list_no_servers">目前版本尚未新增伺服器</string>
     <string name="servers_list_failed_to_connect">無法連線至伺服器</string>

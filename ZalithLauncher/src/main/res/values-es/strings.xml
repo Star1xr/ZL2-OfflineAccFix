@@ -546,7 +546,6 @@
     <string name="versions_manage_category_modloader">Modificable</string>
     <string name="versions_manage_pin">Fijar</string>
     <string name="versions_manage_install_exists">¡El nombre de la versión ya existe!</string>
-    <string name="versions_manage_install_cannot_use_mc_name">No uses nombres vanilla para versiones con mods.</string>
     <string name="versions_manage_invalid">Versión inválida</string>
     <string name="versions_manage_rename_version">Renombrar versión</string>
     <string name="versions_manage_copy_version">Copiar versión</string>

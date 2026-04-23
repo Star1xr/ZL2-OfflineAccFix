@@ -439,7 +439,6 @@
     <string name="versions_manage_category_vanilla">Vanilla</string>
     <string name="versions_manage_category_modloader">Modificável</string>
     <string name="versions_manage_install_exists">Esse nome já existe em outra versão!</string>
-    <string name="versions_manage_install_cannot_use_mc_name">Não utilize os nomes vanilla para versões modificadas.</string>
     <string name="versions_manage_rename_version">Renomear versão</string>
     <string name="versions_manage_delete_version_tip_hint1">Apagar uma versão também excluirá todos os arquivos dentro do diretório ./versions/%s, incluindo arquivos importantes, como mundos, pacotes de recursos e mods para essa versão.</string>
     <string name="versions_manage_delete_version_tip_hint2">Caso o isolamento de versão esteja ativado, os arquivos serão armazenados apenas nesse diretório e apagar a versão excluirá esses arquivos;</string>

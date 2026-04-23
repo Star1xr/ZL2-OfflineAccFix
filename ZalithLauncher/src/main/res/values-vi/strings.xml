@@ -413,7 +413,6 @@
     <string name="versions_manage_game_storage_permissions_sdk30">Bạn muốn sử dụng đường dẫn trò chơi bên ngoài? Vui lòng bật quyền \"Quản lý tất cả tệp trên thiết bị\" cho trình khởi chạy trước, nếu không trình khởi chạy sẽ không thể truy cập các tệp trò chơi bên ngoài!</string>
     <string name="versions_manage_no_versions">Không có phiên bản nào được cài đặt</string>
     <string name="versions_manage_install_exists">Tên phiên bản đã tồn tại!</string>
-    <string name="versions_manage_install_cannot_use_mc_name">Không sử dụng tên Vanilla cho các phiên bản đã sửa đổi.</string>
     <string name="versions_manage_invalid">Phiên bản không hợp lệ</string>
     <string name="versions_manage_rename_version">Đổi tên phiên bản</string>
     <string name="versions_manage_copy_version">Sao chép phiên bản</string>

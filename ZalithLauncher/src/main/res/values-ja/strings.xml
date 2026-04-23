@@ -698,7 +698,6 @@
     <string name="versions_manage_category_vanilla">バニラ</string>
     <string name="versions_manage_category_modloader">モッドの導入可能</string>
     <string name="versions_manage_install_exists">このバージョン名はすでに存在します！</string>
-    <string name="versions_manage_install_cannot_use_mc_name">モッドバージョンにはバニラの名前を使用しないでください。</string>
     <string name="versions_manage_invalid">無効なバージョンです</string>
     <string name="versions_manage_copy_version_all">全てのファイルをコピー</string>
     <string name="versions_manage_delete_version">バージョンを削除</string>

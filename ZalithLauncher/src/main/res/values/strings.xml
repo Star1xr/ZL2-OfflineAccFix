@@ -600,7 +600,6 @@
     <string name="versions_manage_category_modloader">Moddable</string>
     <string name="versions_manage_pin">Pin</string>
     <string name="versions_manage_install_exists">Version name already exists!</string>
-    <string name="versions_manage_install_cannot_use_mc_name">Do not use vanilla names for modded versions.</string>
     <string name="versions_manage_invalid">Invalid version</string>
     <string name="versions_manage_rename_version">Rename Version</string>
     <string name="versions_manage_copy_version">Copy Version</string>
@@ -803,7 +802,6 @@
     <string name="screenshots_manage_export_failed">Export failed</string>
     <string name="screenshots_manage_export_all_message">Export all screenshots to the system gallery?</string>
     <string name="screenshots_manage_export_selected_message">Export %1$d selected screenshots to the system gallery?</string>
-    <string name="screenshots_manage_export_delete_after">Delete after export</string>
     <string name="servers_list">Servers</string>
     <string name="servers_list_no_servers">No servers have been added for this version</string>
     <string name="servers_list_failed_to_connect">Unable to Connect to Server</string>

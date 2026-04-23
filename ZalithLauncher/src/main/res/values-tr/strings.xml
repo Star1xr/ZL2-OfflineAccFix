@@ -415,7 +415,6 @@
     <string name="versions_manage_game_path_error_title">Oyun dizini ile işlem yaparken bir sorun oluştu</string>
     <string name="versions_manage_no_versions">Kurulu sürüm yok</string>
     <string name="versions_manage_install_exists">Sürüm adı zaten var!</string>
-    <string name="versions_manage_install_cannot_use_mc_name">Modlu sürümler için orijinal isim kullanma.</string>
     <string name="versions_manage_invalid">Geçersiz sürüm</string>
     <string name="versions_manage_rename_version">Sürümü Yeniden Adlandır</string>
     <string name="versions_manage_copy_version">Sürümü Kopyala</string>

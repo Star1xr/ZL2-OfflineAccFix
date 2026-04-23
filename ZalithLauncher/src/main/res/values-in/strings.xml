@@ -409,7 +409,6 @@
     <string name="versions_manage_no_versions">Tidak ada versi yang terinstal</string>
     <string name="versions_manage_category_vanilla">Vanila</string>
     <string name="versions_manage_category_modloader">Bisa di Mod</string>
-    <string name="versions_manage_install_cannot_use_mc_name">Jangan gunakan nama vanila untuk versi yang dimodifikasi.</string>
     <string name="versions_manage_install_exists">Nama versi sudah ada!</string>
     <string name="versions_manage_invalid">Versi tidak valid</string>
     <string name="versions_manage_rename_version">Ganti Nama Versi</string>
