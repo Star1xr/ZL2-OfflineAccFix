@@ -1223,4 +1223,5 @@
     <string name="versions_export_tip_1"></string>
     <string name="versions_export_tip_remote_1"></string>
     <string name="versions_export_tip_2"></string>
+    <string name="versions_export_pack_min_memory"></string>
 </resources>
