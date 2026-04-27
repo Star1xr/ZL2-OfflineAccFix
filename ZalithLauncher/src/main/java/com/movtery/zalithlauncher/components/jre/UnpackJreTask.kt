@@ -27,6 +27,7 @@ import com.movtery.zalithlauncher.game.multirt.RuntimesManager
 import com.movtery.zalithlauncher.utils.device.Architecture
 import com.movtery.zalithlauncher.utils.file.readString
 import com.movtery.zalithlauncher.utils.logging.Logger.lError
+import com.movtery.zalithlauncher.utils.logging.Logger.lInfo
 import com.movtery.zalithlauncher.utils.logging.Logger.lWarning
 
 class UnpackJreTask(
@@ -40,6 +41,11 @@ class UnpackJreTask(
     init {
         runCatching {
             assetManager = context.assets
+            if (!isJreArchSupported()) {
+                //当前设备架构不支持使用这个环境
+                isCheckFailed = true
+                return@runCatching
+            }
             launcherRuntimeVersion = assetManager.open(jre.jrePath + "/version").readString()
         }.onFailure { e ->
             lWarning("Failed to init jre version. assetsPath=${jre.jrePath}/version", e)
@@ -68,13 +74,27 @@ class UnpackJreTask(
         }
     }
 
+    private fun isJreArchSupported(): Boolean {
+        return runCatching {
+            val allPacks = assetManager.list(jre.jrePath) ?: return@runCatching false
+            //检查是否包含符合当前设备架构的环境
+            val runtime = getRuntimeByArch()
+            allPacks.contains(runtime).also {
+                lInfo("Device requires environment: ${jre.jrePath}/$runtime, contains = $it")
+            }
+        }.getOrElse { e ->
+            lWarning("Failed to list assets directory", e)
+            false
+        }
+    }
+
+    private fun getRuntimeByArch() = "bin-" + Architecture.archAsString(ZLApplication.DEVICE_ARCHITECTURE) + ".tar.xz"
+
     override suspend fun run() {
         runCatching {
             RuntimesManager.installRuntimeBinPack(
                 universalFileInputStream = assetManager.open(jre.jrePath + "/universal.tar.xz"),
-                platformBinsInputStream = assetManager.open(
-                    jre.jrePath + "/bin-" + Architecture.archAsString(ZLApplication.DEVICE_ARCHITECTURE) + ".tar.xz"
-                ),
+                platformBinsInputStream = assetManager.open(jre.jrePath + "/" + getRuntimeByArch()),
                 name = jre.jreName,
                 binPackVersion = launcherRuntimeVersion,
                 updateProgress = { textRes, textArgs ->
