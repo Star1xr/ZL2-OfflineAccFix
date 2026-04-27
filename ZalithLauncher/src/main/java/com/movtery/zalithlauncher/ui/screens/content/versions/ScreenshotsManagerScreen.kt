@@ -729,7 +729,7 @@ private fun ScreenshotGrid(
                                 // 唤起系统看图软件打开该图片
                                 val uri = FileProvider.getUriForFile(
                                     context,
-                                    "${context.packageName}.fileprovider",
+                                    "${context.packageName}.provider",
                                     info.file
                                 )
                                 val intent = Intent(Intent.ACTION_VIEW).apply {
