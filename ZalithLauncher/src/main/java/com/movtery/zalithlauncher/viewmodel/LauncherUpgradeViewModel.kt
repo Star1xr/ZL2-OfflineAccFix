@@ -61,7 +61,7 @@ sealed interface LauncherUpgradeOperation {
  */
 private const val LATEST_VERSION = "latest_version_md.json"
 private const val LATEST_API_URL = "$URL_PROJECT_INFO/$LATEST_VERSION"
-private const val LATEST_API_CHINESE_URL = "https://fcl.lemwood.icu/zalith-info/v2/$LATEST_VERSION"
+private const val LATEST_API_CHINESE_URL = "https://fcl.lemwood.cn/zalith-info/v2/$LATEST_VERSION"
 
 /**
  * 用于记录启动器更新 ViewModel
