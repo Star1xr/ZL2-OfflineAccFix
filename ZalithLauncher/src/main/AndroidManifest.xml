@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
@@ -107,7 +108,6 @@
 
         <activity
             android:name=".ui.activities.MainActivity"
-            android:launchMode="singleTask"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|keyboard|navigation"
             android:screenOrientation="sensorLandscape" />
         <activity
@@ -116,10 +116,9 @@
             android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".ui.activities.VMActivity"
-            android:alwaysRetainTaskState="true"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|keyboard|navigation"
             android:process=":game"
-            android:launchMode="singleTask"
+            android:launchMode="standard"
             android:screenOrientation="sensorLandscape" />
         <activity android:name=".ui.activities.ErrorActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|keyboard|navigation"
@@ -131,15 +130,29 @@
         <service
             android:name=".game.download.jvm_server.JvmService"
             android:enabled="true"
-            android:foregroundServiceType="dataSync"
-            android:process=":jvm" />
+            android:foregroundServiceType="specialUse"
+            android:process=":jvm">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_TYPE"
+                android:value="Run Java Virtual Machine for game or server tasks" />
+        </service>
+
+        <service
+            android:name=".game.launch.GameService"
+            android:enabled="true"
+            android:foregroundServiceType="specialUse"
+            android:process=":game">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_TYPE"
+                android:value="Running the game engine and maintaining game process" />
+        </service>
 
         <service
             android:name=".terracotta.TerracottaVPNService"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:exported="true"
             android:process=":game"
-            android:foregroundServiceType="connectedDevice|dataSync"
+            android:foregroundServiceType="connectedDevice"
             tools:ignore="VpnServicePolicy">
             <intent-filter>
                 <action android:name="android.net.VpnService" />

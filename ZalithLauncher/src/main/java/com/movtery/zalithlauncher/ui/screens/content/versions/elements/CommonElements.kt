@@ -24,6 +24,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -449,11 +450,12 @@ fun FileNameInputDialog(
     onConfirm: (vale: String) -> Unit = {}
 ) {
     var value by remember { mutableStateOf(initValue) }
-    var errorMessage by remember { mutableStateOf("") }
 
-    val isError = value.isEmpty() || isFilenameInvalid(value) { message ->
-        errorMessage = message
-    } || existsCheck(value).also { if (it != null) errorMessage = it } != null
+    val filenameInvalidMessage = key(value) {
+        isFilenameInvalid(value)
+    }
+    val existsText = key(value) { existsCheck(value) }
+    val isError = value.isEmpty() || filenameInvalidMessage != null || existsText != null
 
     SimpleEditDialog(
         title = title,
@@ -466,7 +468,8 @@ fun FileNameInputDialog(
         supportingText = {
             when {
                 value.isEmpty() -> Text(text = stringResource(R.string.generic_cannot_empty))
-                isError -> Text(text = errorMessage)
+                filenameInvalidMessage != null -> Text(text = filenameInvalidMessage)
+                existsText != null -> Text(text = existsText)
             }
         },
         singleLine = true,

@@ -39,6 +39,12 @@ import com.movtery.zalithlauncher.utils.logging.Logger.lWarning
 import com.movtery.zalithlauncher.utils.string.isEmptyOrBlank
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import okhttp3.Call
@@ -52,6 +58,7 @@ import java.io.InterruptedIOException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.URL
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @return 当前网络是否可用
@@ -295,6 +302,61 @@ suspend fun downloadFromMirrorListSuspend(
             sha1 = sha1,
             sizeCallback = sizeCallback
         )
+    }
+}
+
+/**
+ * 速率监测报告
+ * @param onSpeedReport 在1秒延迟后汇报期间的数据量，单位：bytes
+ */
+suspend fun <T> withSpeedReport(
+    onSpeedReport: (Long) -> Unit,
+    onClear: () -> Unit = {},
+    block: suspend (onBytesWritten: (Long) -> Unit) -> T
+): T = coroutineScope {
+    val bytesWritten = AtomicLong(0L)
+
+    withSpeedReport(
+        onTimeReport = {
+            val currentBytes = bytesWritten.getAndSet(0L)
+            onSpeedReport(currentBytes)
+        },
+        onClear = {
+            bytesWritten.set(0L)
+            onClear()
+        },
+        block = {
+            block { bytes ->
+                bytesWritten.addAndGet(bytes)
+            }
+        }
+    )
+}
+
+/**
+ * 速率监测报告
+ * @param onTimeReport 在1秒延迟后调用，可在此期间汇报
+ */
+suspend fun <T> withSpeedReport(
+    onTimeReport: () -> Unit,
+    onClear: () -> Unit,
+    block: suspend () -> T
+): T = coroutineScope {
+    var reportJob: Job? = null
+
+    try {
+        onClear()
+        reportJob = launch(Dispatchers.Default) {
+            while (isActive) {
+                delay(1000L)
+                onTimeReport()
+            }
+        }
+
+        block()
+    } finally {
+        reportJob?.cancelAndJoin()
+        onClear()
     }
 }
 

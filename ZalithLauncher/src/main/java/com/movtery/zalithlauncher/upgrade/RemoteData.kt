@@ -55,14 +55,30 @@ data class RemoteData(
      * 网盘链接，按语言区分
      * @param language 语言标识
      * @param link 网盘链接
+     * @param links 同时支持的所有网盘列检
      */
     @Serializable
     data class CloudDrive(
         @SerialName("language")
         val language: String,
         @SerialName("link")
-        val link: String
-    )
+        val link: String,
+        @SerialName("links")
+        val links: List<Link> = emptyList()
+    ) {
+        /**
+         * 单个支持的网盘链接
+         * @param name 网盘名称
+         * @param link 网盘分享链接
+         */
+        @Serializable
+        data class Link(
+            @SerialName("name")
+            val name: String,
+            @SerialName("link")
+            val link: String
+        )
+    }
 
     /**
      * 最新版本的启动器的安装包文件

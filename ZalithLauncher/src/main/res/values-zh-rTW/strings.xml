@@ -124,6 +124,7 @@
     <string name="notification_data_jvm_service_name">前景安裝服務</string>
     <string name="notification_data_jvm_service_running">正在透過前景服務安裝遊戲中</string>
     <string name="notification_data_terracotta_message">在多人連線的過程中，啟動器會使用前台服務來顯示當前連線狀態，因此需要您開啟通知權限。</string>
+    <string name="notification_jvm_running_name">JVM 保活服務</string>
     <!--  麥克風  -->
     <string name="microphone_check_title">檢查麥克風輸入</string>
     <string name="microphone_check_volume">音量：%d</string>
@@ -1207,13 +1208,11 @@
     <string name="control_editor_special_joystick_style_joystick_size">搖桿大小</string>
     <string name="control_editor_exit_message">您確定要直接退出嗎？這將導致您的任何變更都無法被儲存。若需要儲存，請檢查編輯器選單。</string>
     <string name="control_editor_exit_confirm">直接退出</string>
-
     <string name="vibrate_kind_one_shot">持續</string>
     <string name="vibrate_kind_click">單擊</string>
     <string name="vibrate_kind_double_click">雙擊</string>
     <string name="vibrate_kind_heavy_click">重擊</string>
     <string name="vibrate_kind_tick">滴答</string>
-
     <string name="festivals_new_year">新年快樂！</string>
     <string name="festivals_april_fools">愚人節快樂！</string>
     <string name="festivals_christmas">聖誕節快樂！</string>

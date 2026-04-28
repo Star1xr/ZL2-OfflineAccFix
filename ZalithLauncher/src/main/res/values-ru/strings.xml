@@ -365,7 +365,7 @@
     <string name="settings_renderer_vulkan_driver_system_title">Использовать системный драйвер Vulkan</string>
     <string name="settings_renderer_vulkan_driver_system_summary">При включении лаунчер будет использовать встроенный системный драйвер Vulkan (для GPU Adreno) вместо драйвера Turnip по умолчанию. Эта настройка влияет только на бэкенд Zink и связанные моды, использующие рендеринг Vulkan</string>
     <string name="settings_renderer_zink_driver_adreno">Лаунчер обнаружил, что ваше устройство имеет GPU Adreno. Включение этой опции может привести к сбоям в работе визуализатора Zink. Вы уверены, что хотите включить её?</string>
-    <string name="settings_renderer_vsync_in_zink_title"> Вертикальная синхронизация Zink</string>
+    <string name="settings_renderer_vsync_in_zink_title">Вертикальная синхронизация Zink</string>
     <string name="settings_renderer_vsync_in_zink_summary">Включить вертикальную синхронизацию для визуализатора Zink</string>
     <string name="settings_renderer_force_big_core_title">Принудительное использование мощных ядер</string>
     <string name="settings_renderer_force_big_core_summary">Заставляет использовать самые мощные ядра при работе процессора</string>

@@ -24,10 +24,9 @@ import android.view.View
 import android.view.WindowManager
 import androidx.annotation.CallSuper
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
@@ -35,7 +34,21 @@ abstract class FullScreenAppCompatActivity : AbstractAppCompatActivity() {
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        applyFullImmersive()
+        applyFullscreen()
+    }
+
+    @CallSuper
+    override fun onPostResume() {
+        super.onPostResume()
+        applyFullscreen()
+    }
+
+    @CallSuper
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            applyFullscreen()
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -47,6 +60,14 @@ abstract class FullScreenAppCompatActivity : AbstractAppCompatActivity() {
                     or View.SYSTEM_UI_FLAG_FULLSCREEN
                     or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             )
+
+    private fun applyFullscreen() {
+        if (isInMultiWindowMode) {
+            applyDefault()
+        } else {
+            applyFullImmersive()
+        }
+    }
 
     @Suppress("DEPRECATION")
     private fun applyFullImmersive() {
@@ -65,6 +86,30 @@ abstract class FullScreenAppCompatActivity : AbstractAppCompatActivity() {
             window.decorView.systemUiVisibility = systemUIVisibility
         }
     }
+
+    @Suppress("DEPRECATION")
+    private fun applyDefault() {
+        if (window != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val params = window.attributes
+                val newParams = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+                if (params.layoutInDisplayCutoutMode != newParams) {
+                    params.layoutInDisplayCutoutMode = newParams
+                    window.attributes = params
+                }
+            }
+
+            window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
+            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN) //隐藏状态栏
+            window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            or View.SYSTEM_UI_FLAG_FULLSCREEN
+                            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    )
+        }
+    }
 }
 
 @Composable
@@ -72,6 +117,6 @@ fun Modifier.applyFullscreen(value: Boolean): Modifier {
     val modifier = Modifier.fillMaxSize()
     return then(
         if (value) modifier
-        else modifier.padding(WindowInsets.displayCutout.asPaddingValues())
+        else modifier.windowInsetsPadding(WindowInsets.displayCutout)
     )
 }

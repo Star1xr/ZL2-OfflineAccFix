@@ -31,6 +31,7 @@ import com.movtery.zalithlauncher.utils.file.formatFileSize
 import com.movtery.zalithlauncher.utils.logging.Logger.lInfo
 import com.movtery.zalithlauncher.utils.logging.Logger.lWarning
 import com.movtery.zalithlauncher.utils.network.downloadFromMirrorListSuspend
+import com.movtery.zalithlauncher.utils.network.withSpeedReport
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ResponseException
@@ -134,17 +135,27 @@ private fun downloadSingleFile(
                 }
                 updateProgress()
 
-                downloadFromMirrorListSuspend(
-                    urls = version
-                        .platformDownloadUrl()
-                        .mapMCIMMirrorUrls(),
-                    sha1 = version.platformSha1(),
-                    outputFile = file.ensureParentDirectory(),
-                    sizeCallback = { size ->
-                        downloadedSize += size
-                        updateProgress()
+                withSpeedReport(
+                    onSpeedReport = { bytes ->
+                        task.updateSpeed(bytes)
+                    },
+                    onClear = {
+                        task.clearSpeed()
                     }
-                )
+                ) { report ->
+                    downloadFromMirrorListSuspend(
+                        urls = version
+                            .platformDownloadUrl()
+                            .mapMCIMMirrorUrls(),
+                        sha1 = version.platformSha1(),
+                        outputFile = file.ensureParentDirectory(),
+                        sizeCallback = { size ->
+                            downloadedSize += size
+                            updateProgress()
+                            report(size)
+                        }
+                    )
+                }
 
                 onDownloaded(task)
             },

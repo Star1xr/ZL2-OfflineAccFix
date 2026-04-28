@@ -26,6 +26,7 @@ import com.movtery.zalithlauncher.game.version.download.DownloadTask
 import com.movtery.zalithlauncher.game.version.download.parseTo
 import com.movtery.zalithlauncher.game.versioninfo.models.GameManifest
 import com.movtery.zalithlauncher.utils.file.formatFileSize
+import com.movtery.zalithlauncher.utils.network.withSpeedReport
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -61,6 +62,9 @@ class GameLibDownloader(
 
     //判断是否已经开始下载
     private var isDownloadStarted: Boolean = false
+
+    /** 用于速率监测的已写入大小记录 */
+    private val mSpeedReport = AtomicLong(0L)
 
     /**
      * 计划下载所有支持库
@@ -137,7 +141,18 @@ class GameLibDownloader(
             }
 
             try {
-                downloadJobs.joinAll()
+                withSpeedReport(
+                    onTimeReport = {
+                        val currentBytes = mSpeedReport.getAndSet(0L)
+                        task.updateSpeed(currentBytes)
+                    },
+                    onClear = {
+                        mSpeedReport.set(0L)
+                        task.clearSpeed()
+                    }
+                ) {
+                    downloadJobs.joinAll()
+                }
             } catch (e: CancellationException) {
                 downloadJobs.forEach { it.cancel("Parent cancelled", e) }
                 throw e
@@ -169,6 +184,7 @@ class GameLibDownloader(
                 },
                 onFileDownloadedSize = { downloadedSize ->
                     downloadedFileSize.addAndGet(downloadedSize)
+                    mSpeedReport.addAndGet(downloadedSize)
                 },
                 onFileDownloaded = {
                     downloadedFileCount.incrementAndGet()

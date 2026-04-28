@@ -139,6 +139,7 @@
     <string name="notification_data_jvm_service_name">前台安装服务</string>
     <string name="notification_data_jvm_service_running">正在前台服务安装游戏中</string>
     <string name="notification_data_terracotta_message">在多人联机的过程中，启动器会使用前台服务来显示当前联机状态，因此需要您开启通知权限。</string>
+    <string name="notification_jvm_running_name">JVM 保活服务</string>
     <!--  麦克风  -->
     <string name="microphone_check_title">检查麦克风输入</string>
     <string name="microphone_check_volume">音量：%d</string>
@@ -1216,7 +1217,6 @@
     <string name="vibrate_kind_double_click">双击</string>
     <string name="vibrate_kind_heavy_click">重击</string>
     <string name="vibrate_kind_tick">滴答</string>
-
     <string name="festivals_new_year">新年快乐！</string>
     <string name="festivals_april_fools">愚人节快乐！</string>
     <string name="festivals_christmas">圣诞节快乐！</string>

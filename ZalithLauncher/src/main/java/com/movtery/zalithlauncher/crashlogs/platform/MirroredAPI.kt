@@ -22,5 +22,5 @@ import com.movtery.zalithlauncher.crashlogs.AbstractAPI
 
 object MirroredAPI: AbstractAPI(
     api = "https://api.logshare.cn/1/log",
-    root = "https://mclogs.lemwood.icu"
+    root = "https://logshare.cn"
 )

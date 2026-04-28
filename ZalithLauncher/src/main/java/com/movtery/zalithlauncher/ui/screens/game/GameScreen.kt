@@ -550,8 +550,7 @@ fun GameScreen(
         operation = viewModel.forceCloseState,
         onChange = { viewModel.forceCloseState = it },
         onForceClose = {
-            Terracotta.setWaiting(true)
-            terracottaViewModel.forceStopVPN()
+            Terracotta.setWaiting(false)
             ZLNativeInvoker.jvmExit(0, false)
         },
         text = stringResource(R.string.game_menu_option_force_close_text)

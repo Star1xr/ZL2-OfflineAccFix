@@ -26,6 +26,7 @@ import com.movtery.zalithlauncher.game.versioninfo.models.VersionManifest
 import com.movtery.zalithlauncher.utils.file.formatFileSize
 import com.movtery.zalithlauncher.utils.logging.Logger.lError
 import com.movtery.zalithlauncher.utils.logging.Logger.lInfo
+import com.movtery.zalithlauncher.utils.network.withSpeedReport
 import com.movtery.zalithlauncher.utils.string.getMessageOrToString
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +75,9 @@ class MinecraftDownloader(
 
     private var allDownloadTasks = mutableListOf<DownloadTask>()
     private var downloadFailedTasks = mutableListOf<DownloadTask>()
+
+    /** 用于速率监测的已写入大小记录 */
+    private val mSpeedReport = AtomicLong(0L)
 
     private fun getTaskMessage(download: Int, verify: Int): Int =
         when (mode) {
@@ -170,7 +174,18 @@ class MinecraftDownloader(
             }
 
             try {
-                downloadJobs.joinAll()
+                withSpeedReport(
+                    onTimeReport = {
+                        val currentBytes = mSpeedReport.getAndSet(0L)
+                        task.updateSpeed(currentBytes)
+                    },
+                    onClear = {
+                        mSpeedReport.set(0L)
+                        task.clearSpeed()
+                    }
+                ) {
+                    downloadJobs.joinAll()
+                }
             } catch (e: CancellationException) {
                 downloadJobs.forEach { it.cancel("Parent cancelled", e) }
                 throw e
@@ -276,6 +291,7 @@ class MinecraftDownloader(
                 },
                 onFileDownloadedSize = { downloadedSize ->
                     downloadedFileSize.addAndGet(downloadedSize)
+                    mSpeedReport.addAndGet(downloadedSize)
                 },
                 onFileDownloaded = {
                     downloadedFileCount.incrementAndGet()

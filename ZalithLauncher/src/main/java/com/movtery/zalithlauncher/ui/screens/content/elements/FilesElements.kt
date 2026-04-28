@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -113,11 +114,11 @@ fun CreateNewDirDialog(
     createDir: (name: String) -> Unit = {}
 ) {
     var value by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
 
-    val isError = value.isEmpty() || isFilenameInvalid(value) { message ->
-        errorMessage = message
+    val filenameInvalidMessage = key(value) {
+        isFilenameInvalid(value)
     }
+    val isError = value.isEmpty() || filenameInvalidMessage != null
 
     SimpleEditDialog(
         title = stringResource(R.string.files_create_dir),
@@ -127,7 +128,7 @@ fun CreateNewDirDialog(
         supportingText = {
             when {
                 value.isEmpty() -> Text(text = stringResource(R.string.generic_cannot_empty))
-                isError -> Text(text = errorMessage)
+                filenameInvalidMessage != null -> Text(text = filenameInvalidMessage)
             }
         },
         singleLine = true,
@@ -138,15 +139,13 @@ fun CreateNewDirDialog(
 
 @Composable
 fun isFilenameInvalid(
-    str: String,
-    onError: (message: String) -> Unit
-): Boolean {
+    str: String
+): String? {
     return try {
         checkFilenameValidity(str)
-        false
+        null
     } catch (e: InvalidFilenameException) {
-        onError(e.getInvalidSummary())
-        true
+        e.getInvalidSummary()
     }
 }
 

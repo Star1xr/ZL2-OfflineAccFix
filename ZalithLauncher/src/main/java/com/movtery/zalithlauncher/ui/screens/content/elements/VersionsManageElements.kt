@@ -50,6 +50,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -385,7 +386,6 @@ fun VersionsOperation(
         }
         is VersionsOperation.Copy -> {
             CopyVersionDialog(
-                version = versionsOperation.version,
                 onDismissRequest = { updateVersionsOperation(VersionsOperation.None) },
                 onConfirm = { name, copyAll ->
                     updateVersionsOperation(
@@ -449,13 +449,15 @@ fun RenameVersionDialog(
     onConfirm: (value: String) -> Unit = {}
 ) {
     var name by remember { mutableStateOf(version.getVersionName()) }
-    var errorMessage by remember { mutableStateOf("") }
 
-    val isError = name.isEmpty() || isFilenameInvalid(name) { message ->
-        errorMessage = message
-    } || VersionsManager.validateVersionName(name) { message ->
-        errorMessage = message
+    val filenameInvalidMessage = key(name) {
+        isFilenameInvalid(name)
     }
+
+    val isVersionExists = remember(name) {
+        VersionsManager.isVersionExists(name, true)
+    }
+    val isError = name.isEmpty() || filenameInvalidMessage != null || isVersionExists
 
     SimpleEditDialog(
         title = stringResource(R.string.versions_manage_rename_version),
@@ -464,8 +466,9 @@ fun RenameVersionDialog(
         isError = isError,
         supportingText = {
             when {
-                name.isEmpty() -> Text(text = stringResource(R.string.generic_cannot_empty))
-                isError -> Text(text = errorMessage)
+                name.isEmpty() -> Text(stringResource(R.string.generic_cannot_empty))
+                filenameInvalidMessage != null -> Text(filenameInvalidMessage)
+                isVersionExists -> Text(stringResource(R.string.versions_manage_install_exists))
             }
         },
         singleLine = true,
@@ -480,20 +483,20 @@ fun RenameVersionDialog(
 
 @Composable
 fun CopyVersionDialog(
-    version: Version,
     onDismissRequest: () -> Unit = {},
     onConfirm: (value: String, copyAll: Boolean) -> Unit = { _, _ -> }
 ) {
     var copyAll by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
 
-    var errorMessage by remember { mutableStateOf("") }
-
-    val isError = name.isEmpty() || isFilenameInvalid(name) { message ->
-        errorMessage = message
-    } || VersionsManager.validateVersionName(name) { message ->
-        errorMessage = message
+    val filenameInvalidMessage = key(name) {
+        isFilenameInvalid(name)
     }
+
+    val isVersionExists = remember(name) {
+        VersionsManager.isVersionExists(name, true)
+    }
+    val isError = name.isEmpty() || filenameInvalidMessage != null || isVersionExists
 
     SimpleCheckEditDialog(
         title = stringResource(R.string.versions_manage_copy_version),
@@ -506,8 +509,9 @@ fun CopyVersionDialog(
         isError = isError,
         supportingText = {
             when {
-                name.isEmpty() -> Text(text = stringResource(R.string.generic_cannot_empty))
-                isError -> Text(text = errorMessage)
+                name.isEmpty() -> Text(stringResource(R.string.generic_cannot_empty))
+                filenameInvalidMessage != null -> Text(filenameInvalidMessage)
+                isVersionExists -> Text(stringResource(R.string.versions_manage_install_exists))
             }
         },
         singleLine = true,

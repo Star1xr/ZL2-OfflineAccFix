@@ -21,6 +21,7 @@ package com.movtery.zalithlauncher.game.download.game.cleanroom
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.game.addons.modloader.cleanroom.CleanroomVersion
 import com.movtery.zalithlauncher.utils.network.downloadFileSuspend
+import com.movtery.zalithlauncher.utils.network.withSpeedReport
 import java.io.File
 
 const val CLEANROOM_DOWNLOAD_ID = "Download.Cleanroom"
@@ -33,11 +34,21 @@ fun getCleanroomDownloadTask(
 ): Task {
     return Task.runTask(
         id = CLEANROOM_DOWNLOAD_ID,
-        task = {
-            downloadFileSuspend(
-                url = cleanroomVersion.installerUrl,
-                outputFile = targetTempInstaller
-            )
+        task = { task ->
+            withSpeedReport(
+                onSpeedReport = { bytes ->
+                    task.updateSpeed(bytes)
+                },
+                onClear = {
+                    task.clearSpeed()
+                }
+            ) { report ->
+                downloadFileSuspend(
+                    url = cleanroomVersion.installerUrl,
+                    outputFile = targetTempInstaller,
+                    sizeCallback = report
+                )
+            }
         }
     )
 }

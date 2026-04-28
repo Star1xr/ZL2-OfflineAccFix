@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -491,13 +492,15 @@ fun ModpackVersionNameDialog(
     onCancel: () -> Unit,
 ) {
     var name by remember { mutableStateOf(name) }
-    var errorMessage by remember { mutableStateOf("") }
 
-    val isError = name.isEmpty() || isFilenameInvalid(name) { message ->
-        errorMessage = message
-    } || VersionsManager.validateVersionName(name) { message ->
-        errorMessage = message
+    val filenameInvalidMessage = key(name) {
+        isFilenameInvalid(name)
     }
+
+    val isVersionExists = remember(name) {
+        VersionsManager.isVersionExists(name, true)
+    }
+    val isError = name.isEmpty() || filenameInvalidMessage != null || isVersionExists
 
     SimpleEditDialog(
         title = stringResource(R.string.download_install_input_version_name_title),
@@ -506,8 +509,9 @@ fun ModpackVersionNameDialog(
         isError = isError,
         supportingText = {
             when {
-                name.isEmpty() -> Text(text = stringResource(R.string.generic_cannot_empty))
-                isError -> Text(text = errorMessage)
+                name.isEmpty() -> Text(stringResource(R.string.generic_cannot_empty))
+                filenameInvalidMessage != null -> Text(filenameInvalidMessage)
+                isVersionExists -> Text(stringResource(R.string.versions_manage_install_exists))
             }
         },
         singleLine = true,

@@ -105,7 +105,7 @@ object AccountsManager {
         _accountsFlow.value = _accounts.toList()
 
         if (_accounts.isNotEmpty() && !isAccountExists(AllSettings.currentAccount.getValue())) {
-            setCurrentAccount(_accounts[0])
+            setCurrentAccountInternal(_accounts[0])
         }
 
         refreshCurrentAccountState()
@@ -198,8 +198,12 @@ object AccountsManager {
      * 设置并保存当前账号
      */
     fun setCurrentAccount(account: Account) {
-        AllSettings.currentAccount.save(account.uniqueUUID)
+        setCurrentAccountInternal(account)
         refreshCurrentAccountState()
+    }
+
+    private fun setCurrentAccountInternal(account: Account) {
+        AllSettings.currentAccount.save(account.uniqueUUID)
     }
 
     /**
@@ -236,6 +240,8 @@ object AccountsManager {
         runCatching {
             accountDao.saveAccount(account)
             lInfo("Saved account: ${account.username}")
+            //同时设置当前账号
+            setCurrentAccountInternal(account)
         }.onFailure { e ->
             lError("Failed to save account: ${account.username}", e)
         }

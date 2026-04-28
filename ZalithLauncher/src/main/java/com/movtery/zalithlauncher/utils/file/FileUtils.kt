@@ -120,6 +120,14 @@ fun checkFilenameValidity(str: String) {
         .distinct()
         .toMutableSet()
 
+    //防止路径穿越
+    if (str.contains("..")) {
+        throw InvalidFilenameException("Filename contains path traversal sequence '..'", "..")
+    }
+    if (str.startsWith("/") || str.startsWith("\\")) {
+        throw InvalidFilenameException("Filename cannot start with '/' or '\\'", str.first().toString())
+    }
+
     findAllUnsafeUnicodeChars(str).takeIf { it.isNotEmpty() }?.let { chars ->
         illegalChars += chars
     }

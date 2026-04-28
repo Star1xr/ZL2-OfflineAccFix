@@ -429,7 +429,7 @@ fun isChineseLocale(locale: Locale): Boolean {
 }
 
 fun isInGreaterChina(): Boolean {
-    return isChinaTimeZone() || Locale.getDefault().language == "zh"
+    return isChinaTimeZone() && Locale.getDefault().language == "zh"
 }
 
 /**

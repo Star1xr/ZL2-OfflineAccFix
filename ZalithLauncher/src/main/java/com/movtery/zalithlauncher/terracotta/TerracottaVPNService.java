@@ -18,6 +18,8 @@
 
 package com.movtery.zalithlauncher.terracotta;
 
+import static com.movtery.zalithlauncher.notification._NotificationIDKt.NOTIFICATION_ID_VPN_REQUEST_CODE;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -25,7 +27,9 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.net.VpnService;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
@@ -53,8 +57,6 @@ public class TerracottaVPNService extends VpnService {
 
     private static final String EXTRA_FROM_DELETE    = "from_delete";
     public static final String EXTRA_STATE_TEXT      = "terracotta_state_text";
-
-    public static final int VPN_REQUEST_CODE         = 1000;
 
     private NotificationManager notificationManager;
     private int currentStateStringRes = -1;
@@ -105,7 +107,8 @@ public class TerracottaVPNService extends VpnService {
             Notification notification = buildVpnNotification();
             if (notification == null)
                 return Service.START_NOT_STICKY;
-            startForeground(VPN_NOTIFICATION_ID, notification);
+
+            startForeground0(notification);
             return Service.START_STICKY;
         }
 
@@ -114,7 +117,8 @@ public class TerracottaVPNService extends VpnService {
         Notification notification = buildVpnNotification();
         if (notification == null)
             return Service.START_NOT_STICKY;
-        startForeground(VPN_NOTIFICATION_ID, notification);
+
+        startForeground0(notification);
 
         Builder vpnBuilder = new Builder().setSession("Terracotta Connection");
 
@@ -185,7 +189,7 @@ public class TerracottaVPNService extends VpnService {
                 .putExtra(EXTRA_STATE_TEXT, currentStateStringRes);
         PendingIntent deletePendingIntent = PendingIntent.getService(
                 this,
-                VPN_REQUEST_CODE,
+                NOTIFICATION_ID_VPN_REQUEST_CODE,
                 deleteIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
@@ -200,6 +204,14 @@ public class TerracottaVPNService extends VpnService {
                 .setDeleteIntent(deletePendingIntent);
 
         return builder.build();
+    }
+
+    private void startForeground0(Notification notification) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(TerracottaVPNService.VPN_NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE);
+        } else {
+            startForeground(TerracottaVPNService.VPN_NOTIFICATION_ID, notification);
+        }
     }
 
     private void cleanup() {

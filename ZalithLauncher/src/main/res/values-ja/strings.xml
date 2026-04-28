@@ -359,7 +359,7 @@
     <string name="settings_control_physical_key_bind_ime_bound">割り当てキー: %s</string>
     <string name="settings_control_physical_key_bind_ime_un_bind">未割り当て</string>
     <string name="settings_game_jvm_args_title">JVM引数</string>
-    <string name="settings_renderer_vsync_in_zink_title"> Zink垂直同期</string>
+    <string name="settings_renderer_vsync_in_zink_title">Zink垂直同期</string>
     <string name="settings_renderer_vsync_in_zink_summary">システムインターフェースを使用してZinkレンダラーの垂直同期を有効にします</string>
     <string name="settings_tab_info_about">情報</string>
     <string name="settings_renderer_global_renderer_title">グローバルレンダラー</string>

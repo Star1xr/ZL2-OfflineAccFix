@@ -140,6 +140,7 @@
     <string name="notification_data_jvm_service_name">Foreground Installation Service</string>
     <string name="notification_data_jvm_service_running">Installing the game via foreground service</string>
     <string name="notification_data_terracotta_message">During multiplayer sessions, the launcher uses a foreground service to display the current connection status, so notification permission is required.</string>
+    <string name="notification_jvm_running_name">JVM Keep-Alive Service</string>
     <!--  Microphone  -->
     <string name="microphone_check_title">Check Microphone Input</string>
     <string name="microphone_check_volume">Volume: %d</string>

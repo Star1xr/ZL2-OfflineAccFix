@@ -18,9 +18,6 @@
 
 package com.movtery.zalithlauncher.game.version.installed
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.path.getVersionsHome
 import com.movtery.zalithlauncher.game.version.installed.utils.parseJsonToVersionInfo
 import com.movtery.zalithlauncher.info.InfoDistributor
@@ -267,20 +264,6 @@ object VersionsManager {
             }
         }.onFailure { e ->
             lError("An exception occurred while saving the currently selected version information.", e)
-        }
-    }
-
-    @Composable
-    fun validateVersionName(
-        newName: String,
-        onError: (message: String) -> Unit
-    ): Boolean {
-        return when {
-            isVersionExists(newName, true) -> {
-                onError(stringResource(R.string.versions_manage_install_exists))
-                true
-            }
-            else -> false
         }
     }
 

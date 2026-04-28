@@ -70,6 +70,7 @@ import com.movtery.zalithlauncher.game.input.CharacterSenderStrategy
 import com.movtery.zalithlauncher.game.input.LWJGLCharSender
 import com.movtery.zalithlauncher.game.keycodes.LwjglGlfwKeycode
 import com.movtery.zalithlauncher.game.launch.GameLauncher
+import com.movtery.zalithlauncher.game.launch.GameService
 import com.movtery.zalithlauncher.game.launch.JvmLaunchInfo
 import com.movtery.zalithlauncher.game.launch.JvmLauncher
 import com.movtery.zalithlauncher.game.launch.Launcher
@@ -81,6 +82,7 @@ import com.movtery.zalithlauncher.game.multirt.RuntimesManager
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.terracotta.TerracottaVPNService
 import com.movtery.zalithlauncher.ui.base.BaseAppCompatActivity
 import com.movtery.zalithlauncher.ui.base.applyFullscreen
 import com.movtery.zalithlauncher.ui.components.rememberBoxSize
@@ -334,6 +336,9 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
         //初始化物理鼠标连接检查器
         PhysicalMouseChecker.initChecker(this)
 
+        //启动前台服务，防止后台网络中断
+        startForegroundService(Intent(this, GameService::class.java))
+
         val bundle = intent.extras ?: throw IllegalStateException("Unknown VM launch state!")
 
         vmViewModel.initSession(
@@ -343,6 +348,7 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
             eventViewModel = eventViewModel,
             gamepadViewModel = gamepadViewModel,
             exitListener = { exitCode: Int, isSignal: Boolean ->
+                stopAllService()
                 if (exitCode != 0) {
                     showExitMessage(this, exitCode, isSignal)
                 } else {
@@ -534,8 +540,19 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
     }
 
     override fun onDestroy() {
+        stopAllService()
         withHandler { onDestroy() }
         super.onDestroy()
+    }
+
+    private fun stopAllService() {
+        stopService(Intent(this, GameService::class.java))
+        if (TerracottaVPNService.isRunning()) {
+            val vpnIntent = Intent(this, TerracottaVPNService::class.java).apply {
+                action = TerracottaVPNService.ACTION_STOP
+            }
+            startForegroundService(vpnIntent)
+        }
     }
 
     @SuppressLint("RestrictedApi")

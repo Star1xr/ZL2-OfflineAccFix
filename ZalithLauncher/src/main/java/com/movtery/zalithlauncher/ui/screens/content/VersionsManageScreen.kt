@@ -95,7 +95,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
-private class VersionsScreenViewModel() : ViewModel() {
+private class VersionsScreenViewModel : ViewModel() {
     /** 版本类别分类 */
     var versionCategory by mutableStateOf(VersionCategory.ALL)
         private set

@@ -63,6 +63,7 @@ import com.movtery.zalithlauncher.utils.logging.Logger.lError
 import com.movtery.zalithlauncher.utils.logging.Logger.lInfo
 import com.movtery.zalithlauncher.utils.logging.Logger.lWarning
 import com.movtery.zalithlauncher.utils.network.downloadFromMirrorListSuspend
+import com.movtery.zalithlauncher.utils.network.withSpeedReport
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
@@ -430,17 +431,27 @@ class GameInstaller(
                             var downloadedSize: Long = 0L
                         }
                         //开始下载
-                        downloadFromMirrorListSuspend(
-                            urls = urls,
-                            outputFile = tempJarFile,
-                            sizeCallback = { downloaded ->
-                                sizeConfig.downloadedSize += downloaded
-                                task.updateProgress(
-                                    (sizeConfig.downloadedSize.toFloat() / sizeConfig.totalSize.toFloat())
-                                        .coerceIn(0f, 1f)
-                                )
+                        withSpeedReport(
+                            onSpeedReport = { bytes ->
+                                task.updateSpeed(bytes)
+                            },
+                            onClear = {
+                                task.clearSpeed()
                             }
-                        )
+                        ) { report ->
+                            downloadFromMirrorListSuspend(
+                                urls = urls,
+                                outputFile = tempJarFile,
+                                sizeCallback = { downloaded ->
+                                    sizeConfig.downloadedSize += downloaded
+                                    task.updateProgress(
+                                        (sizeConfig.downloadedSize.toFloat() / sizeConfig.totalSize.toFloat())
+                                            .coerceIn(0f, 1f)
+                                    )
+                                    report(downloaded)
+                                }
+                            )
+                        }
                     } ?: run {
                         //如果未提供下载方式，则很可能是需要复制原版的Jar文件
                         val clientFile = downloader.getVersionJarPath(clientVersion, downloader.versionsTarget)
@@ -928,12 +939,22 @@ class GameInstaller(
         modVersion: ModVersion
     ) = Task.runTask(
         id = "Download.Mods",
-        task = {
-            downloadFromMirrorListSuspend(
-                urls = modVersion.file.url.mapMCIMMirrorUrls(),
-                sha1 = modVersion.file.hashes.sha1,
-                outputFile = File(tempModsDir, modVersion.file.fileName)
-            )
+        task = { task ->
+            withSpeedReport(
+                onSpeedReport = { bytes ->
+                    task.updateSpeed(bytes)
+                },
+                onClear = {
+                    task.clearSpeed()
+                }
+            ) { report ->
+                downloadFromMirrorListSuspend(
+                    urls = modVersion.file.url.mapMCIMMirrorUrls(),
+                    sha1 = modVersion.file.hashes.sha1,
+                    outputFile = File(tempModsDir, modVersion.file.fileName),
+                    sizeCallback = report
+                )
+            }
         }
     )
 

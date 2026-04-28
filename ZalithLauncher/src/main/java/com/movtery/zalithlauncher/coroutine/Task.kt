@@ -20,6 +20,7 @@ package com.movtery.zalithlauncher.coroutine
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineDispatcher
@@ -45,6 +46,10 @@ class Task private constructor(
     var currentMessageRes by mutableStateOf<Int?>(null)
         private set
     var currentMessageArgs by mutableStateOf<Array<out Any>?>(null)
+        private set
+
+    /** 当前速率 Bytes */
+    var currentRateBytesPerSec by mutableLongStateOf(-1L)
         private set
 
     /**
@@ -93,6 +98,14 @@ class Task private constructor(
     fun updateMessage(message: Int?, vararg args: Any) {
         this.currentMessageRes = message
         this.currentMessageArgs = args
+    }
+
+    fun updateSpeed(bytes: Long) {
+        this.currentRateBytesPerSec = bytes
+    }
+
+    fun clearSpeed() {
+        this.currentRateBytesPerSec = -1L
     }
 
     override fun equals(other: Any?): Boolean = other is Task && other.id == this.id

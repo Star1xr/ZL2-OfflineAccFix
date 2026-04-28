@@ -109,10 +109,12 @@ import com.movtery.zalithlauncher.ui.theme.itemColor
 import com.movtery.zalithlauncher.ui.theme.onItemColor
 import com.movtery.zalithlauncher.utils.animation.getAnimateTween
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
+import com.movtery.zalithlauncher.utils.file.FolderFileCounter
 import com.movtery.zalithlauncher.utils.file.formatFileSize
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -146,6 +148,9 @@ private class ShadersManageViewModel(
      */
     var deleteAllOperation by mutableStateOf<DeleteAllOperation>(DeleteAllOperation.None)
 
+    /** 临时记录的光影包数量 */
+    private var packCount = FolderFileCounter(shadersDir)
+
     /**
      * 全选所有文件
      */
@@ -161,10 +166,17 @@ private class ShadersManageViewModel(
         }
     }
 
-    fun refresh() {
-        viewModelScope.launch {
+    private var job: Job? = null
+    /**
+     * @param checkCount 刷新目录内文件数量记录
+     */
+    fun refresh(
+        checkCount: Boolean = true
+    ) {
+        job = viewModelScope.launch {
             shadersState = LoadingState.Loading
             selectedPacks.clear()
+            if (checkCount) packCount.checkDir()
 
             withContext(Dispatchers.IO) {
                 try {
@@ -186,11 +198,19 @@ private class ShadersManageViewModel(
             }
 
             shadersState = LoadingState.None
+            job = null
+        }
+    }
+
+    fun checkCountAndRefresh() {
+        val isUnchecked = packCount.isUnchecked()
+        if (packCount.checkDir() && !isUnchecked && job == null) {
+            refresh(checkCount = false)
         }
     }
 
     init {
-        refresh()
+        refresh(checkCount = false)
     }
 
     fun updateFilter(name: String) {
@@ -268,6 +288,10 @@ fun ShadersManagerScreen(
         Triple(NormalNavKey.Versions.ShadersManager, versionsScreenKey, false),
     ) { isVisible ->
         val viewModel = rememberShadersManageViewModel(shadersDir, version)
+
+        LaunchedEffect(Unit) {
+            viewModel.checkCountAndRefresh()
+        }
 
         DeleteAllOperation(
             operation = viewModel.deleteAllOperation,

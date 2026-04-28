@@ -26,6 +26,7 @@ import com.movtery.zalithlauncher.game.version.download.DownloadFailedException
 import com.movtery.zalithlauncher.utils.file.formatFileSize
 import com.movtery.zalithlauncher.utils.logging.Logger.lError
 import com.movtery.zalithlauncher.utils.network.downloadFromMirrorListSuspend
+import com.movtery.zalithlauncher.utils.network.withSpeedReport
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -50,6 +51,9 @@ class ModVersionUpdater(
     private var downloadedFileCount: AtomicLong = AtomicLong(0)
     private var downloadedFileSize: AtomicLong = AtomicLong(0)
     private val downloadFailedTasks = mutableSetOf<PlatformVersion>()
+
+    /** 用于速率监测的已写入大小记录 */
+    private val mSpeedReport = AtomicLong(0L)
 
     suspend fun startDownload(task: Task) {
         downloadAll(
@@ -96,6 +100,7 @@ class ModVersionUpdater(
                                 outputFile = outputFile
                             ) { size ->
                                 downloadedFileSize.addAndGet(size)
+                                mSpeedReport.addAndGet(size)
                             }
                             //下载成功
                             downloadedFileCount.incrementAndGet()
@@ -123,7 +128,18 @@ class ModVersionUpdater(
             }
 
             try {
-                downloadJobs.joinAll()
+                withSpeedReport(
+                    onTimeReport = {
+                        val currentBytes = mSpeedReport.getAndSet(0L)
+                        task.updateSpeed(currentBytes)
+                    },
+                    onClear = {
+                        mSpeedReport.set(0L)
+                        task.clearSpeed()
+                    }
+                ) {
+                    downloadJobs.joinAll()
+                }
             } catch (e: CancellationException) {
                 downloadJobs.forEach { it.cancel("Parent cancelled", e) }
                 throw e

@@ -22,6 +22,7 @@ import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -30,9 +31,11 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,7 +58,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -85,9 +87,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.version.installed.Version
@@ -116,6 +119,8 @@ import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.utils.logging.Logger.lError
 import com.movtery.zalithlauncher.utils.string.getMessageOrToString
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -124,8 +129,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import javax.inject.Inject
 
-// 数据模型
+/**
+ * 游戏内截图信息
+ */
 data class ScreenshotInfo(
     val file: File,
     val name: String = file.nameWithoutExtension,
@@ -140,9 +148,13 @@ sealed interface ExportOperation {
     data object Ask : ExportOperation
 }
 
-private class ScreenshotsManageViewModel(
-    val screenshotDir: File
+@HiltViewModel
+class ScreenshotsManageViewModel @Inject constructor(
+    @param:ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private var screenshotDir: File? = null
+
     var filter by mutableStateOf(ScreenshotFilter(""))
         private set
 
@@ -162,21 +174,48 @@ private class ScreenshotsManageViewModel(
     var deleteAllOperation by mutableStateOf<DeleteAllOperation>(DeleteAllOperation.None)
     var exportOperation by mutableStateOf<ExportOperation>(ExportOperation.None)
 
+    /**
+     * 初始化截图文件夹
+     */
+    fun initDirectory(dir: File) {
+        if (screenshotDir != dir) {
+            screenshotDir = dir
+            refresh()
+        }
+    }
+
+    /**
+     * 全选当前已过滤的结果
+     */
     fun selectAllFiles() {
         filteredScreenshots?.forEach { shot ->
             if (!selectedShots.contains(shot)) selectedShots.add(shot)
         }
     }
 
+    /**
+     * 取消选择当前已过滤的结果
+     */
     fun clearSelected() {
         filteredScreenshots?.let {
             selectedShots.removeAll(it)
         }
     }
 
+    /**
+     * 发起删除选择的截图的请求，先警告用户
+     */
+    fun requestDeleteSelected() {
+        if (deleteAllOperation == DeleteAllOperation.None && selectedShots.isNotEmpty()) {
+            deleteAllOperation = DeleteAllOperation.Warning(selectedShots.map { it.file })
+        }
+    }
+
     private var refreshJob: Job? = null
 
     fun refresh() {
+        val dir = screenshotDir ?: return
+
         refreshJob = viewModelScope.launch {
             listState = LoadingState.Loading
             selectedShots.clear()
@@ -184,8 +223,8 @@ private class ScreenshotsManageViewModel(
             withContext(Dispatchers.IO) {
                 val tempList = mutableListOf<ScreenshotInfo>()
                 try {
-                    if (screenshotDir.exists() && screenshotDir.isDirectory) {
-                        screenshotDir.listFiles { file ->
+                    if (dir.exists() && dir.isDirectory) {
+                        dir.listFiles { file ->
                             file.isFile && file.extension.lowercase() == "png"
                         }?.forEach { file ->
                             ensureActive()
@@ -207,11 +246,9 @@ private class ScreenshotsManageViewModel(
     private var exportsJob: Job? = null
 
     fun exports(
-        context: Context,
         onSuccess: suspend () -> Unit,
         onFailed: suspend (e: Exception) -> Unit
     ) {
-        //如果不选择任何截图，则视为导出全部截图
         val infos = selectedShots.takeIf { it.isNotEmpty() } ?: allScreenshots
         exportsJob = viewModelScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
@@ -366,16 +403,6 @@ private class ScreenshotsManageViewModel(
 }
 
 @Composable
-private fun rememberScreenshotsManageViewModel(
-    screenshotDir: File,
-    version: Version
-) = viewModel(
-    key = version.toString() + "_" + VersionFolders.SCREENSHOTS.folderName
-) {
-    ScreenshotsManageViewModel(screenshotDir)
-}
-
-@Composable
 fun ScreenshotsManagerScreen(
     mainScreenKey: TitledNavKey?,
     versionsScreenKey: TitledNavKey?,
@@ -398,7 +425,15 @@ fun ScreenshotsManagerScreen(
         ),
         Triple(NormalNavKey.Versions.ScreenshotsManager, versionsScreenKey, false)
     ) { isVisible ->
-        val viewModel = rememberScreenshotsManageViewModel(screenshotDir, version)
+        val viewModel: ScreenshotsManageViewModel = hiltViewModel(
+            key = version.toString() + "_" + VersionFolders.SCREENSHOTS.folderName
+        )
+
+        LaunchedEffect(screenshotDir) {
+            //初始化截图文件夹
+            viewModel.initDirectory(screenshotDir)
+        }
+
         val context = LocalContext.current
 
         DeleteAllOperation(
@@ -416,7 +451,6 @@ fun ScreenshotsManagerScreen(
             selectedShots = viewModel.selectedShots,
             onExport = {
                 viewModel.exports(
-                    context = context,
                     onSuccess = {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(context, successToast, Toast.LENGTH_SHORT).show()
@@ -459,14 +493,7 @@ fun ScreenshotsManagerScreen(
                                 onSortByChanged = { viewModel.updateSortBy(it) },
                                 isAscending = viewModel.isAscending,
                                 onToggleSortOrder = { viewModel.updateSortOrder() },
-                                onDeleteAll = {
-                                    val screenshots = viewModel.selectedShots
-                                    if (viewModel.deleteAllOperation == DeleteAllOperation.None && screenshots.isNotEmpty()) {
-                                        viewModel.deleteAllOperation = DeleteAllOperation.Warning(
-                                            screenshots.map { it.file }
-                                        )
-                                    }
-                                },
+                                onDeleteAll = { viewModel.requestDeleteSelected() },
                                 isFilesSelected = viewModel.selectedShots.isNotEmpty(),
                                 onSelectAll = { viewModel.selectAllFiles() },
                                 onClearFilesSelected = { viewModel.clearSelected() },
@@ -634,10 +661,16 @@ private fun ScreenshotHeader(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(onClick = onDeleteAll) {
-                            Icon(painterResource(R.drawable.ic_delete_outlined), contentDescription = null)
+                            Icon(
+                                painterResource(R.drawable.ic_delete_outlined),
+                                contentDescription = null
+                            )
                         }
                         IconButton(onClick = onSelectAll) {
-                            Icon(painterResource(R.drawable.ic_select_all), contentDescription = null)
+                            Icon(
+                                painterResource(R.drawable.ic_select_all),
+                                contentDescription = null
+                            )
                         }
                         IconButton(onClick = { if (isFilesSelected) onClearFilesSelected() }) {
                             Icon(painterResource(R.drawable.ic_deselect), contentDescription = null)
@@ -674,6 +707,9 @@ private fun ScreenshotGrid(
 ) {
     list?.let { items ->
         if (items.isNotEmpty()) {
+            val context = LocalContext.current
+            val isSelectionMode = selected.isNotEmpty()
+
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 160.dp),
                 modifier = modifier,
@@ -685,11 +721,29 @@ private fun ScreenshotGrid(
                     ScreenshotItemLayout(
                         info = info,
                         selected = selected.contains(info),
-                        onClick = {
+                        isSelectionMode = isSelectionMode,
+                        onToggleSelect = {
                             if (selected.contains(info)) {
                                 removeFromSelected(info)
                             } else {
                                 addToSelected(info)
+                            }
+                        },
+                        onOpen = {
+                            try {
+                                // 唤起系统看图软件打开该图片
+                                val uri = FileProvider.getUriForFile(
+                                    context,
+                                    "${context.packageName}.provider",
+                                    info.file
+                                )
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    setDataAndType(uri, "image/png")
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                lError("Failed to open image", e)
                             }
                         }
                     )
@@ -713,13 +767,15 @@ private fun ScreenshotGrid(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ScreenshotItemLayout(
     modifier: Modifier = Modifier,
     info: ScreenshotInfo,
     selected: Boolean,
-    onClick: () -> Unit = {},
+    isSelectionMode: Boolean,
+    onToggleSelect: () -> Unit,
+    onOpen: () -> Unit,
     itemColor: Color = itemColor(),
     itemContentColor: Color = onItemColor(),
     borderColor: Color = MaterialTheme.colorScheme.primary,
@@ -736,13 +792,28 @@ private fun ScreenshotItemLayout(
         modifier = modifier
             .graphicsLayer(scaleY = scale.value, scaleX = scale.value)
             .border(width = borderWidth, color = borderColor, shape = shape),
-        onClick = onClick,
         shape = shape,
         color = itemColor,
         contentColor = itemContentColor,
     ) {
-        Box(modifier = Modifier.aspectRatio(16f / 9f)) {
-            // 使用 Coil 加载图片缩略图
+        Box(
+            modifier = Modifier
+                .aspectRatio(16f / 9f)
+                .combinedClickable(
+                    onClick = {
+                        if (isSelectionMode) {
+                            onToggleSelect()
+                        } else {
+                            onOpen()
+                        }
+                    },
+                    onLongClick = {
+                        if (!isSelectionMode) {
+                            onToggleSelect()
+                        }
+                    }
+                )
+        ) {
             AsyncImage(
                 model = info.file,
                 contentDescription = info.name,

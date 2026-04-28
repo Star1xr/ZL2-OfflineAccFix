@@ -573,23 +573,19 @@ private fun ScreenHeader(
                 }
             )
 
-            var message by remember { mutableStateOf("") }
+            val emptyError = stringResource(R.string.generic_cannot_empty)
+            val overwriteMessage = stringResource(R.string.download_game_version_overwrite, nameValue)
 
-            val isError = key(nameValue, refreshErrorCheck) {
-                val result = nameValue.isEmpty().also {
-                    message = stringResource(R.string.generic_cannot_empty)
-                } || isFilenameInvalid(nameValue) { message0 ->
-                    message = message0
-                }
-                if (!result) {
-                    if (isVersionExists(nameValue, true)) {
-                        //如果目标版本存在，则使用覆盖安装的方式进行安装
-                        message = stringResource(R.string.download_game_version_overwrite, nameValue)
-                    } else {
-                        message = ""
-                    }
-                }
-                result
+            val filenameInvalidMessage = key(nameValue) {
+                isFilenameInvalid(nameValue)
+            }
+            val isVersionOverwrite = remember(nameValue) {
+                //如果目标版本存在，则使用覆盖安装的方式进行安装
+                isVersionExists(nameValue, true)
+            }
+
+            val isError = remember(nameValue, refreshErrorCheck) {
+                nameValue.isEmpty() || filenameInvalidMessage != null
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -623,7 +619,13 @@ private fun ScreenHeader(
                     }
                 )
 
-                if (isError || message.isNotEmpty()) {
+                if (isError || isVersionOverwrite) {
+                    val message = if (isError) {
+                        filenameInvalidMessage ?: emptyError
+                    } else {
+                        overwriteMessage
+                    }
+
                     Text(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -632,7 +634,7 @@ private fun ScreenHeader(
                         color = if (isError) {
                             MaterialTheme.colorScheme.error
                         } else {
-                            Color.Unspecified
+                            MaterialTheme.colorScheme.primary
                         },
                         style = MaterialTheme.typography.labelMedium
                     )

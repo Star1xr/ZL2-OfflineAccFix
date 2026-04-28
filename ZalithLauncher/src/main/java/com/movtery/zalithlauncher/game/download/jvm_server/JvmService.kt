@@ -32,6 +32,7 @@ import com.movtery.zalithlauncher.bridge.NativeLibraryLoader
 import com.movtery.zalithlauncher.game.launch.JvmLaunchInfo
 import com.movtery.zalithlauncher.game.launch.JvmLauncher
 import com.movtery.zalithlauncher.game.launch.Launcher
+import com.movtery.zalithlauncher.notification.NOTIFICATION_ID_JVM_SERVICE
 import com.movtery.zalithlauncher.notification.NoticeProgress
 import com.movtery.zalithlauncher.notification.NotificationChannelData
 import com.movtery.zalithlauncher.path.PathManager
@@ -50,7 +51,6 @@ import java.net.InetSocketAddress
 
 class JvmService : Service() {
     private val scope = CoroutineScope(Dispatchers.Default)
-    private val notificationId: Int = 1001
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -144,12 +144,12 @@ class JvmService : Service() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
-                notificationId,
+                NOTIFICATION_ID_JVM_SERVICE,
                 notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             )
         } else {
-            startForeground(notificationId, notification)
+            startForeground(NOTIFICATION_ID_JVM_SERVICE, notification)
         }
     }
 
