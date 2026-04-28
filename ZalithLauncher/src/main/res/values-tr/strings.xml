@@ -146,7 +146,7 @@
     <string name="download_game_install_base_download_file">%1$s %2$s ana dosya indiriliyor</string>
     <string name="download_game_install_base_download_file2">%s ana dosyasını yükle</string>
     <string name="download_game_install_base_install">%s Kur</string>
-    <string name="download_game_install_base_installing">%s ön planda kuruluyor</string>
+    <string name="download_game_install_base_installing">%s Ön planda kuruluyor</string>
     <string name="download_game_install_optifine_fetch_download_url">OptiFine %s indirme bağlantısı alınıyor</string>
     <string name="download_game_install_forgelike_analyse">%s için kütüphaneler analiz ediliyor</string>
     <string name="download_game_install_forgelike_preparing_mapping_file">%s eşleme dosyası hazırlanıyor</string>
