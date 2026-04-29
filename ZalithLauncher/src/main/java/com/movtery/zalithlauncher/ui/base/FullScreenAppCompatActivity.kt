@@ -18,9 +18,9 @@
 
 package com.movtery.zalithlauncher.ui.base
 
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import androidx.annotation.CallSuper
 import androidx.compose.foundation.layout.WindowInsets
@@ -29,49 +29,34 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 abstract class FullScreenAppCompatActivity : AbstractAppCompatActivity() {
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        applyFullscreen()
+        applyFullImmersive()
     }
 
     @CallSuper
     override fun onPostResume() {
         super.onPostResume()
-        applyFullscreen()
+        applyFullImmersive()
     }
 
     @CallSuper
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
-            applyFullscreen()
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private val systemUIVisibility = (
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            )
-
-    private fun applyFullscreen() {
-        if (isInMultiWindowMode) {
-            applyDefault()
-        } else {
             applyFullImmersive()
         }
     }
 
     @Suppress("DEPRECATION")
     private fun applyFullImmersive() {
-        if (window != null) {
+        window?.let { window ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 val params = window.attributes
                 val newParams = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
@@ -81,33 +66,17 @@ abstract class FullScreenAppCompatActivity : AbstractAppCompatActivity() {
                 }
             }
 
-            window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
-            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            window.decorView.systemUiVisibility = systemUIVisibility
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun applyDefault() {
-        if (window != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val params = window.attributes
-                val newParams = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
-                if (params.layoutInDisplayCutoutMode != newParams) {
-                    params.layoutInDisplayCutoutMode = newParams
-                    window.attributes = params
-                }
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            WindowCompat.getInsetsController(window, window.decorView).apply {
+                hide(WindowInsetsCompat.Type.systemBars())
+                systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
 
-            window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
-            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN) //隐藏状态栏
-            window.decorView.systemUiVisibility = (
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            or View.SYSTEM_UI_FLAG_FULLSCREEN
-                            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    )
+            window.navigationBarColor = Color.TRANSPARENT
+            window.statusBarColor = Color.TRANSPARENT
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                window.isNavigationBarContrastEnforced = false
+            }
         }
     }
 }
