@@ -137,11 +137,12 @@ private fun ContentMenu(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
+            .padding(all = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (BuildConfig.DEBUG) {
             //debug版本关不掉的警告，防止有人把测试版当正式版用 XD
             BackgroundCard(
-                modifier = Modifier.padding(all = 12.dp),
                 shape = MaterialTheme.shapes.extraLarge
             ) {
                 Column(

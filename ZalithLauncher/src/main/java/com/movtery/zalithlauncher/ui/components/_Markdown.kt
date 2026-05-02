@@ -20,6 +20,7 @@ package com.movtery.zalithlauncher.ui.components
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
@@ -28,7 +29,10 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
+import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
+import com.movtery.zalithlauncher.ui.theme.cardColor
+import com.movtery.zalithlauncher.ui.theme.onBackgroundColor
 
 @Composable
 fun defaultMDTypography(
@@ -70,4 +74,20 @@ fun defaultMDTypography(
     list = list,
     textLink = textLink,
     table = table
+)
+
+@Composable
+fun markdownColorsOnBackground(
+    influencedByBackground: Boolean = true,
+    text: Color = onBackgroundColor(),
+    codeBackground: Color = cardColor(influencedByBackground),
+    inlineCodeBackground: Color = codeBackground,
+    dividerColor: Color = MaterialTheme.colorScheme.outlineVariant,
+    tableBackground: Color = codeBackground,
+) = markdownColor(
+    text = text,
+    codeBackground = codeBackground,
+    inlineCodeBackground = inlineCodeBackground,
+    dividerColor = dividerColor,
+    tableBackground = tableBackground
 )
