@@ -18,6 +18,7 @@ import com.movtery.zalithlauncher.utils.isInGreaterChina
 import com.movtery.zalithlauncher.utils.logging.Logger.lWarning
 import com.movtery.zalithlauncher.utils.network.fetchStringFromUrl
 import com.movtery.zalithlauncher.utils.string.isEmptyOrBlank
+import com.movtery.zalithlauncher.utils.string.toUuid
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,6 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 class HomePageViewModel : ViewModel() {
     private val _pageState = MutableStateFlow<HomePageState>(HomePageState.Loading)
@@ -48,7 +50,7 @@ class HomePageViewModel : ViewModel() {
     /**
      * 重载主页
      */
-    fun reloadPage() {
+    fun reloadPage(force: Boolean = false) {
         reloadJob?.cancel()
         reloadJob = viewModelScope.launch {
             _pageState.update { HomePageState.Loading }
@@ -62,7 +64,7 @@ class HomePageViewModel : ViewModel() {
                     _pageState.update { HomePageState.None(page) }
                 }
                 HomePageType.FromURL -> {
-                    val page = reloadPageFromURL()
+                    val page = reloadPageFromURL(force)
                     _pageState.update { HomePageState.None(page) }
                 }
             }
@@ -121,30 +123,65 @@ class HomePageViewModel : ViewModel() {
                 lWarning("Failed to extract the document homepage from Assets!", e)
             }
             genJob = null
-            reloadPage()
+            reloadPage(true)
         }
     }
 
     /**
      * 从网络地址加载启动器主页
+     * @param force 是否强制重新缓存远端主页
      */
-    private suspend fun reloadPageFromURL(): List<MarkdownBlock> = withContext(Dispatchers.IO) {
+    private suspend fun reloadPageFromURL(
+        force: Boolean = false
+    ): List<MarkdownBlock> = withContext(Dispatchers.IO) {
         val url = AllSettings.homePageURL.getValue()
-        if (url.isEmptyOrBlank()) {
-            emptyList()
-        } else {
+        if (url.isEmptyOrBlank()) return@withContext emptyList()
+
+        val url0 = url.trim()
+        val localUuid = url0.toUuid().toString().replace("-", "")
+        val localFile = File(PathManager.DIR_CACHE_HOME_PAGE, localUuid)
+
+        runCatching {
+            if (!force && localFile.exists()) {
+                val localTime = localFile.lastModified()
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - localTime <= TimeUnit.MINUTES.toMillis(30L)) {
+                    //若时间未超过半小时，则不刷新缓存
+                    //直接读取文件
+                    val content = localFile.readText()
+                    return@withContext parseMarkdownBlocks(content)
+                }
+            }
+
+            val content = fetchStringFromUrl(url)
+            //缓存主页文件
             runCatching {
-                val content = fetchStringFromUrl(url)
-                parseMarkdownBlocks(content)
+                localFile.writeText(content)
             }.onFailure { e ->
-                if (e is CancellationException) return@onFailure
-                lWarning("Failed to retrieve the homepage from the network!", e)
-            }.getOrDefault(emptyList())
+                lWarning("Failed to cache to local file!", e)
+            }
+
+            parseMarkdownBlocks(content)
+        }.getOrElse { e ->
+            if (e is CancellationException) throw e
+            lWarning("Failed to retrieve the homepage from the network!", e)
+
+            //如果远端加载失败，尝试回退到本地已有的缓存
+            if (localFile.exists()) {
+                runCatching {
+                    val content = localFile.readText()
+                    parseMarkdownBlocks(content)
+                }.onFailure { e ->
+                    lWarning("Failed to load the homepage from the cache!", e)
+                }.getOrDefault(emptyList())
+            } else {
+                emptyList()
+            }
         }
     }
 
     init {
-        reloadPage()
+        reloadPage(false)
     }
 
     override fun onCleared() {

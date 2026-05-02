@@ -213,7 +213,7 @@ class MainActivity : BaseAppCompatActivity() {
                         showDownloadPlugins(event.link)
                     }
                     is EventViewModel.Event.HomePage.Reload -> {
-                        homePageViewModel.reloadPage()
+                        homePageViewModel.reloadPage(true)
                     }
                     is EventViewModel.Event.HomePage.GenDocPage -> {
                         if (homePageViewModel.isLocalExists()) {
