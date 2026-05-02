@@ -19,13 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
-import com.mikepenz.markdown.m3.Markdown
-import com.mikepenz.markdown.m3.markdownColor
-import com.mikepenz.markdown.model.MarkdownColors
-import com.mikepenz.markdown.model.rememberMarkdownState
-import com.movtery.zalithlauncher.ui.components.defaultMDTypography
-import com.movtery.zalithlauncher.ui.components.markdownColorsOnBackground
+import com.halilibo.richtext.ui.RichTextStyle
+import com.movtery.zalithlauncher.ui.components.MarkdownView
+import com.movtery.zalithlauncher.ui.components.defaultRichTextStyle
+import com.movtery.zalithlauncher.ui.theme.itemColor
 
 @Composable
 fun CustomHome(
@@ -40,7 +37,7 @@ fun CustomHome(
     MarkdownBlocksRenderer(
         modifier = modifier,
         blocks = blocks,
-        markdownColors = markdownColorsOnBackground(), //仅父级使用
+        richTextStyle = defaultRichTextStyle(),
         onLauncherEvent = onLauncherEvent
     )
 }
@@ -54,7 +51,7 @@ fun CustomHome(
     MarkdownBlocksRenderer(
         modifier = modifier,
         blocks = blocks,
-        markdownColors = markdownColorsOnBackground(), //仅父级使用
+        richTextStyle = defaultRichTextStyle(),
         onLauncherEvent = onLauncherEvent
     )
 }
@@ -63,7 +60,7 @@ fun CustomHome(
 private fun MarkdownBlocksRenderer(
     blocks: List<MarkdownBlock>,
     modifier: Modifier = Modifier,
-    markdownColors: MarkdownColors = markdownColor(),
+    richTextStyle: RichTextStyle = defaultRichTextStyle(),
     onLauncherEvent: (String) -> Unit
 ) {
     Column(
@@ -73,7 +70,7 @@ private fun MarkdownBlocksRenderer(
             key(block.stableKey) {
                 BlockItem(
                     block = block,
-                    markdownColors = markdownColors,
+                    richTextStyle = richTextStyle,
                     onLauncherEvent = onLauncherEvent
                 )
             }
@@ -84,16 +81,14 @@ private fun MarkdownBlocksRenderer(
 @Composable
 private fun BlockItem(
     block: MarkdownBlock,
-    markdownColors: MarkdownColors = markdownColor(),
+    richTextStyle: RichTextStyle = defaultRichTextStyle(),
     onLauncherEvent: (String) -> Unit
 ) {
     when (block) {
         is MarkdownBlock.Normal -> {
-            Markdown(
-                markdownState = rememberMarkdownState(block.content),
-                typography = defaultMDTypography(),
-                colors = markdownColors,
-                imageTransformer = Coil3ImageTransformerImpl
+            MarkdownView(
+                content = block.content,
+                richTextStyle = richTextStyle
             )
         }
         is MarkdownBlock.Card -> {
@@ -104,6 +99,10 @@ private fun BlockItem(
             ) {
                 MarkdownBlocksRenderer(
                     blocks = block.content,
+                    richTextStyle = defaultRichTextStyle(
+                        influencedByBackground = false,
+                        codeBackground = itemColor(false)
+                    ),
                     onLauncherEvent = onLauncherEvent
                 )
             }
