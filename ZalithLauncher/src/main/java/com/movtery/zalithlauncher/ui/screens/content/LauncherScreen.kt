@@ -68,8 +68,11 @@ import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
+import com.movtery.zalithlauncher.ui.screens.main.custom_home.CustomHome
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
+import com.movtery.zalithlauncher.viewmodel.HomePageState
 import com.movtery.zalithlauncher.viewmodel.LaunchGameViewModel
+import com.movtery.zalithlauncher.viewmodel.LocalHomePageViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 
 @Composable
@@ -165,6 +168,35 @@ private fun ContentMenu(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
+            }
+        }
+        val homePageViewModel = LocalHomePageViewModel.current
+        val pageState by homePageViewModel.pageState.collectAsStateWithLifecycle()
+        when (val state = pageState) {
+            is HomePageState.Blank -> {}
+            is HomePageState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(all = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        LoadingIndicator()
+                        Text(
+                            text = stringResource(R.string.settings_launcher_home_page_loading),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                }
+            }
+            is HomePageState.None -> {
+                CustomHome(
+                    blocks = state.page,
+                )
             }
         }
     }

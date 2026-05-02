@@ -93,6 +93,13 @@ class EventViewModel : ViewModel() {
                 val link: String
             )
         }
+        /** 启动器主页相关 */
+        sealed interface HomePage: Event {
+            /** 重载启动器主页 */
+            data object Reload: HomePage
+            /** 生成文档主页 */
+            data object GenDocPage: HomePage
+        }
     }
 }
 
