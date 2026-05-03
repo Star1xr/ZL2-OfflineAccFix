@@ -222,7 +222,7 @@
     <string name="download_assets_source_link">소스 코드 보기</string>
     <string name="download_assets_issues_link">문제 보고</string>
     <string name="download_assets_wiki_link">위키 보기</string>
-    <string name="download_assets_release_type_release">정식</string>
+    <string name="download_assets_release_type_release">릴리스</string>
     <string name="download_assets_release_type_beta">베타</string>
     <string name="download_assets_release_type_alpha">알파</string>
     <string name="download_assets_no_installed_versions">현재 설치된 게임 버전이 없어 리소스의 다운로드 위치를 결정할 수 없습니다, 먼저 게임 버전을 설치해 주세요!</string>
