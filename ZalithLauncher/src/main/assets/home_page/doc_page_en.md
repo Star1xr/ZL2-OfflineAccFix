@@ -146,9 +146,9 @@ Inside a Row component, you can specify the `weight` parameter for each button o
 - `noFill` (optional): when `noFill` is added, the element will not be forced to fill its allocated space; its width is determined by its own content.
 
 ...row-start
-    ...button weight=(1) text="Takes 1 share"
-    ...button weight=(2) text="Takes 2 shares"
-    ...button weight=(3, noFill) text="Takes 3 shares, but no fill"
+    ...button weight=(1) text="1"
+    ...button weight=(2) text="2"
+    ...button weight=(3, noFill) text="3, noFill"
 ...row-end
 
 > If you want an element not to take weight and keep its original width, just omit the `weight` parameter.
