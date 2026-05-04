@@ -134,7 +134,6 @@ import com.movtery.zalithlauncher.utils.copyText
 import com.movtery.zalithlauncher.utils.logging.Logger.lInfo
 import com.movtery.zalithlauncher.utils.string.isEmptyOrBlank
 import com.movtery.zalithlauncher.utils.string.stripColorCodes
-import com.movtery.zalithlauncher.viewmodel.LaunchGameViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -473,8 +472,8 @@ private fun ServerDataOperation(
 fun ServerListScreen(
     mainScreenKey: TitledNavKey?,
     versionsScreenKey: TitledNavKey?,
-    launchGameViewModel: LaunchGameViewModel,
     version: Version,
+    onQuickPlay: (Version, String) -> Unit,
     backToMainScreen: () -> Unit,
 ) {
     if (!version.isValid()) {
@@ -572,7 +571,7 @@ fun ServerListScreen(
                             onRefresh = { viewModel.loadServer(it, true) },
                             onCopy = { viewModel.copy(context, it) },
                             onPlay = { address ->
-                                launchGameViewModel.quickPlayServer(version, address)
+                                onQuickPlay(version, address)
                             },
                             onEdit = { data ->
                                 viewModel.dataOperation = ServerDataOperation.EditServer(data)

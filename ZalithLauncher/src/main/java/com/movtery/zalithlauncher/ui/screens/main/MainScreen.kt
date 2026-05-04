@@ -111,7 +111,6 @@ import com.movtery.zalithlauncher.utils.festival.LocalFestivals
 import com.movtery.zalithlauncher.utils.file.formatFileSize
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
-import com.movtery.zalithlauncher.viewmodel.LaunchGameViewModel
 import com.movtery.zalithlauncher.viewmodel.LocalBackgroundViewModel
 import com.movtery.zalithlauncher.viewmodel.ModpackImportViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
@@ -120,7 +119,6 @@ import com.movtery.zalithlauncher.viewmodel.sendKeepScreen
 @Composable
 fun MainScreen(
     screenBackStackModel: ScreenBackStackViewModel,
-    launchGameViewModel: LaunchGameViewModel,
     eventViewModel: EventViewModel,
     modpackImportViewModel: ModpackImportViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
@@ -209,7 +207,6 @@ fun MainScreen(
                     modifier = Modifier.fillMaxSize(),
                     screenBackStackModel = screenBackStackModel,
                     toMainScreen = toMainScreen,
-                    launchGameViewModel = launchGameViewModel,
                     eventViewModel = eventViewModel,
                     modpackImportViewModel = modpackImportViewModel,
                     submitError = submitError
@@ -460,7 +457,6 @@ private fun NavigationUI(
     modifier: Modifier = Modifier,
     screenBackStackModel: ScreenBackStackViewModel,
     toMainScreen: () -> Unit,
-    launchGameViewModel: LaunchGameViewModel,
     eventViewModel: EventViewModel,
     modpackImportViewModel: ModpackImportViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
@@ -502,7 +498,14 @@ private fun NavigationUI(
                     LauncherScreen(
                         backStackViewModel = screenBackStackModel,
                         navigateToVersions = navigateToVersions,
-                        launchGameViewModel = launchGameViewModel
+                        onLaunchGame = {
+                            eventViewModel.sendEvent(
+                                EventViewModel.Event.Launch.Main
+                            )
+                        },
+                        onOpenLink = {
+                            eventViewModel.sendEvent(EventViewModel.Event.OpenLink(it))
+                        },
                     )
                 }
                 entry<NestedNavKey.Settings> { key ->
@@ -565,7 +568,6 @@ private fun NavigationUI(
                         onExportModpack = {
                             navigateToExport(key.version)
                         },
-                        launchGameViewModel = launchGameViewModel,
                         eventViewModel = eventViewModel,
                         submitError = submitError
                     )

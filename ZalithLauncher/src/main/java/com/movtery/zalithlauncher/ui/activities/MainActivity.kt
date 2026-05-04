@@ -43,6 +43,7 @@ import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.control.ControlManager
+import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.notification.NotificationManager
 import com.movtery.zalithlauncher.path.URL_SUPPORT
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -212,6 +213,17 @@ class MainActivity : BaseAppCompatActivity() {
                     is EventViewModel.Event.DownloadPlugins -> {
                         showDownloadPlugins(event.link)
                     }
+                    is EventViewModel.Event.Launch.Main -> {
+                        launchGameViewModel.tryLaunch(
+                            VersionsManager.currentVersion.value
+                        )
+                    }
+                    is EventViewModel.Event.Launch.PlayServer -> {
+                        launchGameViewModel.quickPlayServer(event.version, event.address)
+                    }
+                    is EventViewModel.Event.Launch.PlaySave -> {
+                        launchGameViewModel.quickPlaySave(event.version, event.saveName)
+                    }
                     is EventViewModel.Event.HomePage.Reload -> {
                         homePageViewModel.reloadPage(true)
                     }
@@ -255,7 +267,6 @@ class MainActivity : BaseAppCompatActivity() {
                     ) {
                         MainScreen(
                             screenBackStackModel = screenBackStackModel,
-                            launchGameViewModel = launchGameViewModel,
                             eventViewModel = eventViewModel,
                             modpackImportViewModel = modpackImportViewModel,
                             submitError = {
