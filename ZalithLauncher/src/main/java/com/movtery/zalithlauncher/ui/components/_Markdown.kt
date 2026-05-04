@@ -19,6 +19,9 @@
 package com.movtery.zalithlauncher.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -87,10 +90,14 @@ fun defaultRichTextStyle(
             }
         },
         codeBlockStyle = CodeBlockStyle(
-            modifier = Modifier.background(
-                color = codeBackground,
-                shape = MaterialTheme.shapes.small
-            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = codeBackground,
+                    shape = MaterialTheme.shapes.small
+                ).horizontalScroll(
+                    state = rememberScrollState()
+                ),
             textStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
             padding = 8.sp
         ),

@@ -250,9 +250,18 @@ private val blockPattern = Regex(
 fun parseMarkdownBlocks(
     content: String,
 ): List<MarkdownBlock> {
+    var inCodeBlock = false
     val cleaned = content.lineSequence()
-        //清洗注释行
-        .filterNot { it.trimStart().startsWith("//") }
+        .filter { line ->
+            val trimmed = line.trimStart()
+            if (trimmed.startsWith("```")) {
+                inCodeBlock = !inCodeBlock
+                return@filter true
+            }
+            if (inCodeBlock) return@filter true
+            //清洗掉在代码框之外的注释行
+            !trimmed.startsWith("//")
+        }
         .joinToString("\n")
         .replace(Regex("<br\\s*/?>", RegexOption.IGNORE_CASE), "\u2028")
 
