@@ -423,6 +423,7 @@ class MainActivity : BaseAppCompatActivity() {
                     }
                 }
             }
+            "refresh_page" -> homePageViewModel.reloadPage(true)
         }
     }
 
