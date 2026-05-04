@@ -30,7 +30,7 @@ import com.movtery.zalithlauncher.ui.theme.itemColor
 fun LazyListScope.customHomePage(
     blocks: List<MarkdownBlock>,
     richTextStyle: RichTextStyle,
-    onLauncherEvent: (String) -> Unit = {}
+    onEvent: (MarkdownBlock.Button.Event) -> Unit = {}
 ) {
     items(
         items = blocks,
@@ -40,7 +40,7 @@ fun LazyListScope.customHomePage(
         BlockItem(
             block = block,
             richTextStyle = richTextStyle,
-            onLauncherEvent = onLauncherEvent
+            onEvent = onEvent
         )
     }
 }
@@ -50,7 +50,7 @@ private fun MarkdownInnerRenderer(
     blocks: List<MarkdownBlock>,
     modifier: Modifier = Modifier,
     richTextStyle: RichTextStyle = defaultRichTextStyle(),
-    onLauncherEvent: (String) -> Unit
+    onEvent: (MarkdownBlock.Button.Event) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
@@ -60,7 +60,7 @@ private fun MarkdownInnerRenderer(
                 BlockItem(
                     block = block,
                     richTextStyle = richTextStyle,
-                    onLauncherEvent = onLauncherEvent
+                    onEvent = onEvent
                 )
             }
         }
@@ -73,7 +73,7 @@ private fun BlockItem(
     modifier: Modifier = Modifier,
     inRow: Boolean = false,
     richTextStyle: RichTextStyle = defaultRichTextStyle(),
-    onLauncherEvent: (String) -> Unit
+    onEvent: (MarkdownBlock.Button.Event) -> Unit
 ) {
     when (block) {
         is MarkdownBlock.Normal -> {
@@ -96,7 +96,7 @@ private fun BlockItem(
                         influencedByBackground = false,
                         codeBackground = itemColor(false)
                     ),
-                    onLauncherEvent = onLauncherEvent
+                    onEvent = onEvent
                 )
             }
         }
@@ -106,7 +106,7 @@ private fun BlockItem(
                 text = block.text,
                 event = block.event,
                 type = block.style,
-                onLauncherEvent = onLauncherEvent
+                onEvent = onEvent
             )
         }
         is MarkdownBlock.Image -> {
@@ -136,7 +136,7 @@ private fun BlockItem(
                         modifier = childModifier,
                         inRow = true,
                         richTextStyle = richTextStyle,
-                        onLauncherEvent = onLauncherEvent
+                        onEvent = onEvent
                     )
                 }
             }
@@ -174,23 +174,24 @@ sealed interface MarkdownBlock {
     /**
      * 一个Button组件
      * @param text 必须携带的文本内容组件，按钮的文本内容
-     * @param event 可选的按钮执行事件组件，目前支持以下事件
-     * ``` text
-     * url=实际要访问链接内容
-     * 一个网页链接访问事件，点击按钮后，在浏览器内打开该链接
-     *
-     * launcher=启动器对应事件tag
-     * 启动器事件，启动器读取事件tag并触发对应事件
-     * ```
+     * @param event 可选的按钮执行事件组件
      * @param style 该按钮的样式
      */
     data class Button(
         val text: String,
-        val event: String?,
+        val event: Event?,
         val style: HomeButtonType,
         override val params: String
     ) : MarkdownBlock {
         override val stableKey: Any get() = "btn_${text}_${event}_${style}_${params.hashCode()}"
+
+        /**
+         * 按钮事件
+         */
+        data class Event(
+            val key: String,
+            val data: String? = null
+        )
     }
 
     /**
@@ -435,6 +436,7 @@ private fun findNestedClosingTag(
 
 private val buttonTextRegex = Regex("""text\s*=\s*"([^"]*)"""")
 private val buttonEventRegex = Regex("""event\s*=\s*"([^"]*)"""")
+private val buttonEventDataRegex = Regex("""^([^\s{]+)(?:\s*\{([\s\S]*)\})?$""")
 private fun parseButton(
     styleSuffix: String,
     params: String
@@ -446,7 +448,13 @@ private fun parseButton(
         else -> HomeButtonType.Filled
     }
     val text = buttonTextRegex.find(params)?.groupValues?.get(1) ?: return null
-    val event = buttonEventRegex.find(params)?.groupValues?.get(1)
+    val eventValue = buttonEventRegex.find(params)?.groupValues?.get(1)
+    val event = eventValue?.let { eventValue0 ->
+        val value = buttonEventDataRegex.find(eventValue0) ?: return@let null
+        val eventKey = value.groupValues.getOrNull(1) ?: return@let null
+        val eventData = value.groupValues.getOrNull(2)
+        MarkdownBlock.Button.Event(eventKey, eventData)
+    }
     return MarkdownBlock.Button(
         text = text,
         event = event,

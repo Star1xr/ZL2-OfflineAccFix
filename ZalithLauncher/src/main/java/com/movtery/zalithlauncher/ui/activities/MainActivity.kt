@@ -43,7 +43,6 @@ import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.control.ControlManager
-import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.notification.NotificationManager
 import com.movtery.zalithlauncher.path.URL_SUPPORT
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -58,6 +57,7 @@ import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
 import com.movtery.zalithlauncher.ui.theme.feativals.FestivalEffects
 import com.movtery.zalithlauncher.upgrade.TooFrequentOperationException
 import com.movtery.zalithlauncher.utils.compareLangTag
+import com.movtery.zalithlauncher.utils.copyText
 import com.movtery.zalithlauncher.utils.festival.getTodayFestivals
 import com.movtery.zalithlauncher.utils.isChinese
 import com.movtery.zalithlauncher.utils.logging.Logger.lInfo
@@ -173,36 +173,12 @@ class MainActivity : BaseAppCompatActivity() {
                     }
                     is EventViewModel.Event.OpenLink -> {
                         val url = event.url
-                        lifecycleScope.launch(Dispatchers.Main) {
+                        withContext(Dispatchers.Main) {
                             this@MainActivity.openLink(url)
                         }
                     }
                     is EventViewModel.Event.CheckUpdate -> {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            try {
-                                val success = launcherUpgradeViewModel.checkManually(
-                                    onInProgress = {
-                                        withContext(Dispatchers.Main) {
-                                            Toast.makeText(this@MainActivity, getString(R.string.generic_in_progress), Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                    onIsLatest = {
-                                        withContext(Dispatchers.Main) {
-                                            Toast.makeText(this@MainActivity, getString(R.string.upgrade_is_latest), Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                )
-                                if (!success) throw RuntimeException()
-                            } catch (_: TooFrequentOperationException) {
-                                //太频繁了
-                                return@launch
-                            } catch (_: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    Toast.makeText(this@MainActivity, getString(R.string.upgrade_get_remote_failed), Toast.LENGTH_SHORT).show()
-                                }
-                                return@launch
-                            }
-                        }
+                        checkUpdate()
                     }
                     is EventViewModel.Event.KeepScreen -> {
                         keepScreen(event.on)
@@ -214,9 +190,7 @@ class MainActivity : BaseAppCompatActivity() {
                         showDownloadPlugins(event.link)
                     }
                     is EventViewModel.Event.Launch.Main -> {
-                        launchGameViewModel.tryLaunch(
-                            VersionsManager.currentVersion.value
-                        )
+                        launchGameViewModel.tryLaunch()
                     }
                     is EventViewModel.Event.Launch.PlayServer -> {
                         launchGameViewModel.quickPlayServer(event.version, event.address)
@@ -236,6 +210,10 @@ class MainActivity : BaseAppCompatActivity() {
                         } else {
                             homePageViewModel.genDocPage(this@MainActivity)
                         }
+                    }
+                    is EventViewModel.Event.HomePage.Event -> {
+                        val event0 = event.event
+                        handleHomePageEvent(event0.key, event0.data)
                     }
                     else -> {
                         //忽略
@@ -383,6 +361,69 @@ class MainActivity : BaseAppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleImportIfNeeded(intent)
+    }
+
+    /**
+     * 检查启动器更新
+     */
+    private fun checkUpdate() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val success = launcherUpgradeViewModel.checkManually(
+                    onInProgress = {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@MainActivity, getString(R.string.generic_in_progress), Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    onIsLatest = {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@MainActivity, getString(R.string.upgrade_is_latest), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+                if (!success) throw RuntimeException()
+            } catch (_: TooFrequentOperationException) {
+                //太频繁了
+                return@launch
+            } catch (_: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, getString(R.string.upgrade_get_remote_failed), Toast.LENGTH_SHORT).show()
+                }
+                return@launch
+            }
+        }
+    }
+
+    /**
+     * 处理自定义主页的事件
+     */
+    private suspend fun handleHomePageEvent(
+        key: String,
+        data: String?
+    ) {
+        when (key) {
+            "url" -> {
+                if (data != null) {
+                    withContext(Dispatchers.Main) {
+                        this@MainActivity.openLink(data)
+                    }
+                }
+            }
+            "check_update" -> checkUpdate()
+            "launch_game" -> launchGameViewModel.tryLaunch()
+            "copy" -> {
+                if (data != null) {
+                    withContext(Dispatchers.Main) {
+                        copyText(
+                            null,
+                            data,
+                            this@MainActivity,
+                            showToast = true
+                        )
+                    }
+                }
+            }
+        }
     }
 
     /**

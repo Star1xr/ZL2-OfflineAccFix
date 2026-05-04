@@ -66,8 +66,8 @@ contentPadding=(4, 4, 12, 12)
 创建一个可以点击的按钮
 
 **语法：**
-...button text="访问哔哩哔哩" event="url=https://www.bilibili.com/"
-...button-outlined text="检查更新" event="launcher=check_update"
+...button text="访问哔哩哔哩" event="url {https://www.bilibili.com/}"
+...button-outlined text="检查更新" event="check_update"
 
 **按钮样式：**
 - `...button`: 填充样式
@@ -81,9 +81,11 @@ contentPadding=(4, 4, 12, 12)
 
 **参数说明：**
 - `text`: 按钮显示的文字，必填，值需使用双引号包裹
-- `event`: 触发的事件，可选，值需使用双引号包裹
-    - `url=...`: 在浏览器中打开链接
-    - `launcher=...`: 触发启动器的某些事件
+- `event`: 触发的事件，可选，值需使用双引号包裹，使用花括号包裹事件数据
+    - `url{...}`: 在浏览器中打开链接
+    - `check_update`: 触发启动器检查更新
+    - `launch_game`: 启动当前选中的版本
+    - `copy{...}`: 复制指定内容
 
 ---
 
@@ -134,8 +136,11 @@ contentPadding=(4, 4, 12, 12)
       - 示例：
 ...row-start
   ...button text="按钮1" weight=(1)
-  ...button text="按钮2" weight=(2, noFill)
-  ...image url="https://www.baidu.com/img/flexible/logo/pc/result.png" weight=(2)
+  ...button text="按钮2" weight=(1)
+...row-end
+...row-start
+  ...button text="按钮1" weight=(1)
+  ...button text="按钮2" weight=(1, noFill)
 ...row-end
 
 ---

@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 
 enum class HomeButtonType {
@@ -27,30 +26,14 @@ enum class HomeButtonType {
 @Composable
 fun CustomHomeButton(
     text: String,
-    event: String?,
+    event: MarkdownBlock.Button.Event?,
     type: HomeButtonType,
-    onLauncherEvent: (String) -> Unit,
+    onEvent: (MarkdownBlock.Button.Event) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uriHandler = LocalUriHandler.current
-
     val onClick: () -> Unit = {
         event?.let { e ->
-            when {
-                e.startsWith("url=") -> {
-                    val url = e.substringAfter("url=")
-                    runCatching {
-                        uriHandler.openUri(url)
-                    }
-                }
-                e.startsWith("launcher=") -> {
-                    val action = e.substringAfter("launcher=")
-                    onLauncherEvent(action)
-                }
-                else -> {
-                    //忽略无法解析的事件
-                }
-            }
+            onEvent(e)
         }
     }
 

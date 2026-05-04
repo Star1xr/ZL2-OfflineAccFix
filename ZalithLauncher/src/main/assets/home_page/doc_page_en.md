@@ -1,12 +1,12 @@
 # Custom Homepage User Guide!
 
 Welcome to Zalith Launcher2's custom homepage! You can use **Markdown** syntax to write your homepage!   
-In addition to standard Markdown, you can use the following extension components to enrich your homepage.
+In addition to standard Markdown, you can also use the following extension components to enrich your homepage.
 
 ### Extension Rules
 - **Comments**:
     - Lines starting with `//` are ignored. You can use comments to explain certain content.
-    - However, comment lines inside Markdown code blocks will NOT be ignored.
+    - However, comment lines inside Markdown code blocks are NOT ignored.
 - **Components**:
     - Extension components start with `...`, e.g. `...button`.
     - Components support attributes to control appearance or behavior. After a space on the component line, you can fill in the corresponding attributes.
@@ -16,7 +16,7 @@ In addition to standard Markdown, you can use the following extension components
 ---
 
 ### Card Component
-Used to wrap content inside a container with background and rounded corners.
+Used to wrap content inside a container with a background and rounded corners.
 
 **Syntax:**
 ...card-start title="My Card" shape=large contentPadding=(16, 12)
@@ -66,8 +66,8 @@ contentPadding=(4, 4, 12, 12)
 Creates a clickable button.
 
 **Syntax:**
-...button text="Visit YouTube" event="url=https://www.youtube.com/"
-...button-outlined text="Check for updates" event="launcher=check_update"
+...button text="Visit YouTube" event="url {https://www.youtube.com/}"
+...button-outlined text="Check for updates" event="check_update"
 
 **Button styles:**
 - `...button`: Filled style
@@ -81,9 +81,11 @@ Creates a clickable button.
 
 **Parameter description:**
 - `text`: The text displayed on the button, required. The value must be wrapped in double quotes.
-- `event`: The event to trigger, optional. The value must be wrapped in double quotes.
-    - `url=...`: Opens a link in the browser.
-    - `launcher=...`: Triggers certain launcher events.
+- `event`: The event to trigger, optional. The value must be wrapped in double quotes, and event data is wrapped in curly braces.
+    - `url{...}`: Opens a link in the browser.
+    - `check_update`: Triggers the launcher to check for updates.
+    - `launch_game`: Launches the currently selected version.
+    - `copy{...}`: Copies the specified content.
 
 ---
 
@@ -131,11 +133,14 @@ This component aligns with the Row component in Jetpack Compose.
     - You can specify a weight value (supports integers and decimals), and the child's width will be allocated according to the actual width of the homepage.
     - If you add the `noFill` configuration, the component will take the width corresponding to that weight, but it will not actually fill the allocated area.
     - The value of this attribute has no unit; it only represents a proportion.
-      - Example:
+      - Examples:
 ...row-start
   ...button text="Button 1" weight=(1)
-  ...button text="Button 2" weight=(2, noFill)
-  ...image url="https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg" weight=(2)
+  ...button text="Button 2" weight=(1)
+...row-end
+...row-start
+  ...button text="Button 1" weight=(1)
+  ...button text="Button 2" weight=(1, noFill)
 ...row-end
 
 ---

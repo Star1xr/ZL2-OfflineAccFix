@@ -71,6 +71,7 @@ import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
+import com.movtery.zalithlauncher.ui.screens.main.custom_home.MarkdownBlock
 import com.movtery.zalithlauncher.ui.screens.main.custom_home.customHomePage
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.viewmodel.HomePageState
@@ -83,6 +84,7 @@ fun LauncherScreen(
     navigateToVersions: (Version) -> Unit,
     onLaunchGame: () -> Unit,
     onOpenLink: (String) -> Unit,
+    onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
 ) {
     BaseScreen(
         screenKey = NormalNavKey.LauncherMain,
@@ -99,8 +101,9 @@ fun LauncherScreen(
                 }
             ) {
                 ContentMenu(
+                    modifier = Modifier.weight(7f),
                     isVisible = isVisible,
-                    modifier = Modifier.weight(7f)
+                    onHomePageEvent = onHomePageEvent
                 )
             }
 
@@ -139,6 +142,7 @@ fun LauncherScreen(
 @Composable
 private fun ContentMenu(
     isVisible: Boolean,
+    onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val yOffset by swapAnimateDpAsState(
@@ -214,9 +218,7 @@ private fun ContentMenu(
                 customHomePage(
                     blocks = state.page,
                     richTextStyle = richTextStyle,
-                    onLauncherEvent = {
-
-                    }
+                    onEvent = onHomePageEvent
                 )
             }
         }

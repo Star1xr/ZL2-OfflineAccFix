@@ -506,6 +506,9 @@ private fun NavigationUI(
                         onOpenLink = {
                             eventViewModel.sendEvent(EventViewModel.Event.OpenLink(it))
                         },
+                        onHomePageEvent = { event ->
+                            eventViewModel.sendEvent(EventViewModel.Event.HomePage.Event(event))
+                        }
                     )
                 }
                 entry<NestedNavKey.Settings> { key ->
