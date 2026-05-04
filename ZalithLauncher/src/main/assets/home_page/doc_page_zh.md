@@ -1,191 +1,169 @@
 # 自定义主页使用指南！
 
 欢迎使用 Zalith Launcher2 的自定义主页！你可以使用 **Markdown** 语法来编写主页！  
-就像这个主页一样，你可以参考它的写法，相信你能看懂~
+除了标准 Markdown 外，你还可以使用以下扩展组件来丰富你的主页
 
-除了标准 Markdown 语法外，我们还提供了一系列**扩展组件**，让界面更丰富、布局更灵活！
+### 扩展规则
+- **注释**:
+    - 以 `//` 开头的行都会被忽略，你可以使用注释来对某些内容进行解释说明
+    - 但 Markdown 代码块中的注释行不会被忽略
+- **组件**:
+    - 扩展组件以 `...` 开头，例如 `...button`
+    - 组件支持使用属性，来控制外观或者行为，在组件行空一格开始，可填写对应的属性
 
----
-
-## 注释
-
-在源码中添加注释，可以解释某些内容的用途 ~~（防止自己看不懂XD）~~  
-注释在渲染时会被**完全忽略**，不会显示在界面上
-
-**正确示例：**  
-// 这是一个单行注释，不会显示在界面上
-  // 缩进后的注释同样有效
-随便写点内容，注释被忽略了~  
-
-
-**错误示例：**  
-这行不是注释 // 这后面的文字会被当作普通文本渲染，因为 // 必须在行首
-
+//这是一行注释，你只能在编辑文件的时候看见我！
 
 ---
 
-## 卡片
-卡片是**内容分组容器**，内部支持完整的 Markdown 语法
+### 卡片组件
+用于将内容包裹在一个有背景和圆角的容器中
 
-
-### 基础卡片
-
-...card-start title="最简单的卡片"
-这是一个最简单的卡片，仅包含标题和一段文本 ~~（废话）~~
+**语法：**
+...card-start title="我的卡片" shape=large contentPadding=(16, 12)
+这里是卡片内部的内容，支持标准 **Markdown**
 ...card-end
 
-### 支持的属性
-
-| 属性               | 说明                                                                                                           | 示例                                                                                 |
-|------------------|--------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| `title`          | 卡片标题。留空 `""` 则不显示标题栏                                                                                         | `title="欢迎页"`                                                                      |
-| `contentPadding` | 内边距（单位 dp）<br>支持 1、2 或 4 个值，分别代表：(所有方向的边距)、(水平内边距, 垂直内边距)、(左内边距, 上内边距, 右内边距, 下内边距)                           | `contentPadding=(12)`<br>`contentPadding=(8, 16)`<br>`contentPadding=(4, 8, 4, 8)` |
-| `shape`          | 圆角大小<br>可选预设值：`extraSmall`, `small`, `medium`, `large`, `extraLarge`<br>或直接指定 `12dp`<br>或百分比 `50%`，表示 50% 圆角 | `shape=large`<br>`shape=16dp`<br>`shape=50%`                                       |
-
-...card-start title="示例卡片" shape=large contentPadding=(10)
-这里是卡片内部，你可以使用 **加粗**、*斜体* 等 Markdown 语法
-
-- **title**：卡片标题，留空则不显示标题块
-- **contentPadding**：内边距
-- **shape**：圆角样式，支持 Material 预定义值、dp 数值或百分比
+**参数说明：**
+- `title`: 卡片标题，可选，不存在或不填写时，卡片会不显示标题块
+...card-start title="示例"
+这个卡片展示了如何**配置标题**
+...card-end
+- `shape`: 圆角大小，可选
+    - 支持使用预设大小，由 MaterialTheme 提供：`extraSmall`, `small`, `medium`, `large`, `extraLarge`
+    - 可以使用具体的数值来控制圆角大小：`12dp`，支持整数小数
+    - 可以使用百分比圆角大小，如：`20%`，仅支持整数百分比
+    - 由于该属性的数值是区分单位的，所以必须带上单位，否则该属性不生效
+...card-start title="形状示例" shape=medium
+中等圆角的卡片！
 ...card-end
 
-> **注意**：卡片内部不能嵌套卡片，否则内部卡片会被当作普通文本渲染
+...card-start title="形状示例" shape=4dp
+4dp 圆角的卡片！
+...card-end
+
+...card-start title="形状示例" shape=20%
+20% 圆角的卡片！
+...card-end
+- `contentPadding`: 控制卡片的内边距
+    - 格式：`(all)`, `(horizontal, vertical)`, `(left, top, right, bottom)`，支持整数、小数
+    - 由于该属性的数值的单位只能是 `dp`，所以此处无需带上单位，否则该属性不生效
+...card-start title="内容内边距示例" contentPadding=(12)
+contentPadding=(12)
+...card-end
+
+...card-start title="内容内边距示例" contentPadding=(12, 8)
+contentPadding=(12, 8)
+...card-end
+
+...card-start title="内容内边距示例" contentPadding=(4, 4, 12, 12)
+contentPadding=(4, 4, 12, 12)
+...card-end
+
 
 ---
 
-## 按钮
-按钮用于触发交互事件，也可以只做展示
+### 按钮组件
+创建一个可以点击的按钮
 
-### 基础语法
-
-按钮必须包含 `text`，`event` 可选：
-...button text="纯展示按钮"
+**语法：**
 ...button text="访问哔哩哔哩" event="url=https://www.bilibili.com/"
-...button text="检查更新" event="launcher=check_update"
+...button-outlined text="检查更新" event="launcher=check_update"
 
-- **url**：在系统浏览器中打开指定链接  
-- **launcher**：触发启动器内部定义的事件标签  
-
-### 按钮样式
-
-我们提供四种 Material Design 3 按钮样式：
-...button text="默认样式"
-...button-outlined text="轮廓样式"
+**按钮样式：**
+- `...button`: 填充样式
+...button text="填充样式"
+- `...button-outlined`: 外框样式
+...button-outlined text="外框样式"
+- `...button-filled-tonal`: 色调填充样式
 ...button-filled-tonal text="色调填充样式"
-...button-text text="文本样式"
+- `...button-text`: 纯文字样式
+...button-text text="纯文字样式"
 
-样式通过 `...button` 的后缀指定：
-- 无后缀 → 填充样式（Filled）
-- `-outlined` → 轮廓样式（Outlined）
-- `-filled-tonal` → 色调填充样式（FilledTonal）
-- `-text` → 纯文本样式（Text）
+**参数说明：**
+- `text`: 按钮显示的文字，必填，值需使用双引号包裹
+- `event`: 触发的事件，可选，值需使用双引号包裹
+    - `url=...`: 在浏览器中打开链接
+    - `launcher=...`: 触发启动器的某些事件
 
 ---
 
-## 横向布局（Row）
-使用 `Row` 组件可以将内部的**按钮和图片**水平排列，避免默认的竖向布局
+### 横向布局 (`Row`)
+将多个组件（目前仅限按钮和图片）横向排版  
+这个组件对齐的是 Jetpack Compose 中的 Row 组件
 
-### 基础用法
-
-...row-start
-    //对的我们可以对子组件进行行首缩进！
-    //不缩进也没关系，只是护眼
-    //以及，想缩进多少空格都可以
-    ...button text="按钮1"
-    ...button-outlined text="按钮2"
+**语法：**
+...row-start horizontal=spacedBy(8) vertical=Center
+    ...button text="按钮1" weight=(1)
+    ...button text="按钮2" weight=(1)
 ...row-end
 
-### Row 详细配置
-Row 支持两个主要属性，与 Jetpack Compose 原生的 Row 组件对齐：
-
-#### 1. `horizontal`（水平分布）
-
-**常规值：**
-- `Start`（默认）
-- `Center`
-- `End`
-- `SpaceBetween`
-- `SpaceAround`
-- `SpaceEvenly`
-
-...row-start horizontal=SpaceBetween
-    ...button text="左"
-    ...button text="中"
-    ...button text="右"
+**参数说明：**
+- `horizontal`: 水平排列参数
+    - 可使用的排列方式：`Start`, `Center`, `End`, `SpaceEvenly`, `SpaceBetween`, `SpaceAround`
+    - 可使用 `spacedBy` 控制子项之间的距离：
+        - 仅控制距离：`spacedBy(12)`，支持整数、小数
+        - 控制距离的同时，控制水平排列方式：`spacedBy(12, Start)`，此处仅支持使用值：`Start`, `Center`, `End`
+        - 该属性的数值的单位只能是 `dp`，所以此处无需带上单位，否则该属性不生效
+    - 示例：
+...row-start horizontal=Start
+...button text="Start"
+...button text="Start"
 ...row-end
 
-**带间距的分布：**
 ...row-start horizontal=spacedBy(12)
-    ...button text="按钮A"
-    ...button text="按钮B"
+...button text="spacedBy(12)"
+...button text="spacedBy(12)"
 ...row-end
 
-你还可以指定水平对齐方式（`Start`、`Center`、`End`）：
 ...row-start horizontal=spacedBy(12, End)
-    ...button text="位于末尾，且间距12"
-    ...image url="https://www.baidu.com/img/flexible/logo/pc/result.png" width=20%
+...button text="spacedBy(12, End)"
+...button text="spacedBy(12, End)"
 ...row-end
-
-#### 2. `vertical`（垂直对齐）
-
-- `Top`（默认）
-- `Center`
-- `Bottom`
-
+- `vertical`: 垂直对齐
+    - 可使用的排列方式：`Top`, `Center` (或更符合语义的 `CenterVertically`), `Bottom`
+    - 垂直居中示例：
 ...row-start vertical=Center
-    ...button text="垂直居中"
-    ...image url="https://www.baidu.com/img/flexible/logo/pc/result.png" width=10%
+...button text="Center"
+...image url="https://www.baidu.com/img/flexible/logo/pc/result.png" width=10%
 ...row-end
-
-### 权重（Weight）
-让子元素按比例占满剩余空间  
-在 Row 组件内部，你可以为每个按钮或图片指定 `weight` 参数，控制它们在剩余空间中的占比
-
-- 语法：`weight=(权重值)` 或 `weight=(权重值, noFill)`
-- `权重值`：一个小数或者整数，例如 `1`、`2.5`
-- `noFill`（可选）：加上 `noFill` 后该元素不会强制填满分配的空间，由自身内容决定宽度
-
+- **子项属性 `weight`**:
+    - 这是仅在 Row 组件内部可使用的属性，用于分配子组件的宽度
+    - 可填写具体的权重值，将会根据主页的实际宽度为子组件分配宽度，支持整数、小数
+    - 若添加 `noFill` 配置，则会使组件占有该权重的宽度，但组件并不会真的填满该区域
+    - 该属性的数值没有单位，仅表示比例
+      - 示例：
 ...row-start
-    ...button weight=(1) text="占1份"
-    ...button weight=(2) text="占2份"
-    ...button weight=(3, noFill) text="占3份，但不填充"
+  ...button text="按钮1" weight=(1)
+  ...button text="按钮2" weight=(2, noFill)
+  ...image url="https://www.baidu.com/img/flexible/logo/pc/result.png" weight=(2)
 ...row-end
 
-> 如果希望某个元素不占权重、保持原始宽度，就不要写 `weight` 参数
-
 ---
 
-## 图片组件
-增强的图片组件，支持**百分比宽度**和**固定 DP 宽度**，还可以自定义圆角
+### 图片组件
+虽然 Markdown 已经包括了定义图片的语法，但它可操作性太小，例如无法调整位置、宽度等  
+我们可以使用高级卡片组件来解决这个痛点
 
-### 支持的属性
+**语法：**
+...image url="https://picsum.photos/400" width=40% shape=12dp
 
-| 属性      | 说明                  | 示例                                                            |
-|---------|---------------------|---------------------------------------------------------------|
-| `url`   | 图片链接，这个属性是必填项       | `url="https://www.baidu.com/img/flexible/logo/pc/result.png"` |
-| `width` | 宽度：数字（单位 dp）或百分比字符串 | `width=150`<br>`width=50%`                                    |
-| `shape` | 圆角，用法同卡片            | `shape=medium`<br>`shape=20dp`<br>`shape=50%`                 |
-
-### 示例
-
-宽度：50% 占主页整体宽度的 50%  
-形状：medium 中等的圆角  
-...image url="https://picsum.photos/300/200" width=50% shape=medium
-宽度：48 大小为 48dp    
-形状：50 百分比圆角，圆形  
-...image url="https://picsum.photos/300/200" width=48 shape=50%
-
-
----
+**参数说明：**
+- `url`: 图片链接，必填
+- `width`: 图片的宽度，可选
+    - 可使用百分比宽度，会根据主页的实际宽度计算：`50%`，仅支持整数百分比
+    - 可使用 DP 单位来设置更具体的宽度：`200dp`，支持整数、小数
+    - 由于该属性的数值是区分单位的，所以必须带上单位，否则该属性不生效
+    - 示例：
+...image url="https://picsum.photos/500" width=50%
+...image url="https://picsum.photos/600" width=120dp
+- `shape`: 图片的圆角大小，与卡片的形状参数一致
+- `weight`: 权重，仅在 Row 组件内部可用，且配置 `weight` 后，`width` 会被完全忽略
 
 ## 注意事项
-- 卡片禁止嵌套，否则内部卡片会被当作普通文本  
-- Row 内部目前只支持按钮和图片
-- 权重（weight）仅对 Row 内的子元素有效，并且必须写在对应子组件的同一行参数中  
-- 标签必须成对出现：`...card-start` 与 `...card-end`、`...row-start` 与 `...row-end` 必须配对  
-- 扩展组件不能嵌入标准 Markdown 容器：扩展组件相对独立，并没有彻底融入 Markdown 语法，例如无法将 `...card-start` 写在 Markdown 的列表项或引用块内部  
-- 图片加载依赖网络，请确保图片链接可访问  
+- 卡片禁止嵌套，否则内部卡片会被当作普通文本
+- 标签必须成对出现：`...card-start` 与 `...card-end`、`...row-start` 与 `...row-end` 必须配对
+- 扩展组件不能嵌入标准 Markdown 容器：扩展组件相对独立，并没有彻底融入 Markdown 语法，例如无法将 `...image` 写在 Markdown 的代码块或表格内部
+- 图片加载依赖网络，请确保图片链接可访问
 
 虽然我们提供了丰富的扩展组件，但整个主页仍然基于 **Markdown**  
 如果你还不熟悉标准 Markdown 语法，建议先花几分钟学习一下，真的很好学！  

@@ -143,14 +143,14 @@ private fun ContentMenu(
         modifier = modifier
             .fillMaxSize()
             .offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
-        verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(all = 12.dp)
     ) {
         if (BuildConfig.DEBUG) {
             item {
                 //debug版本关不掉的警告，防止有人把测试版当正式版用 XD
                 BackgroundCard(
-                    shape = MaterialTheme.shapes.extraLarge
+                    shape = MaterialTheme.shapes.extraLarge,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),

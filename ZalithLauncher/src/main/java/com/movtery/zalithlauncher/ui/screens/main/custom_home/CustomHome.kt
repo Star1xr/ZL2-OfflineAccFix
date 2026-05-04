@@ -456,7 +456,7 @@ private fun parseButton(
 }
 
 private val horizontalRegex = Regex("""horizontal\s*=\s*(spacedBy\([^)]*\)|[^\s\t\n]+)""")
-private val spacedByRegex = Regex("""spacedBy\(\s*(\d+)(?:\.dp)?\s*(?:,\s*(\w+))?\s*\)""")
+private val spacedByRegex = Regex("""spacedBy\(\s*(\d+(?:\.\d+)?)\s*(?:,\s*(\w+))?\s*\)""")
 
 private fun parseHorizontalArrangement(
     params: String,
@@ -465,7 +465,7 @@ private fun parseHorizontalArrangement(
 
     if (horizontalValue != null) {
         spacedByRegex.find(horizontalValue)?.let { match ->
-            val space = match.groupValues[1].toIntOrNull() ?: 0
+            val space = match.groupValues[1].toFloatOrNull() ?: 0f
             val alignment = when (match.groupValues[2]) {
                 "Start" -> Alignment.Start
                 "End" -> Alignment.End
@@ -530,13 +530,22 @@ private fun parseShape(params: String): Shape? {
     }
 }
 
-private val paddingRegex = Regex("""contentPadding\s*=\s*\(([\d\s,]+)\)""")
+private val paddingRegex = Regex("""contentPadding\s*=\s*\(([\d.\s,]+)\)""")
 private fun parseCardPadding(params: String): PaddingValues? {
     val match = paddingRegex.find(params) ?: return null
-    val values = match.groupValues[1].split(",").map { it.trim().toIntOrNull() ?: 0 }
+    val values = match.groupValues[1]
+        .split(",")
+        .map {
+            it.trim().toFloatOrNull() ?: 0f
+        }
     return when (values.size) {
-        1 -> PaddingValues(values[0].dp)
-        2 -> PaddingValues(horizontal = values[0].dp, vertical = values[1].dp)
+        1 -> PaddingValues(
+            all = values[0].dp
+        )
+        2 -> PaddingValues(
+            horizontal = values[0].dp,
+            vertical = values[1].dp
+        )
         4 -> PaddingValues(
             start = values[0].dp,
             top = values[1].dp,
@@ -548,16 +557,20 @@ private fun parseCardPadding(params: String): PaddingValues? {
 }
 
 private val urlRegex = Regex("""url\s*=\s*"([^"]*)"""")
-private val widthRegex = Regex("""width\s*=\s*(\d+%?)""")
+private val widthRegex = Regex("""width\s*=\s*(\d+%|\d+(?:\.\d+)?dp)""")
 private fun parseImage(params: String): MarkdownBlock.Image? {
     val url = urlRegex.find(params)?.groupValues?.get(1) ?: return null
     val widthParam = widthRegex.find(params)?.groupValues?.get(1)?.let { w ->
         when {
             w.endsWith("%") -> {
-                val percent = w.dropLast(1).toFloatOrNull() ?: 100f
-                MarkdownBlock.Image.Width.Percent((percent / 100f).coerceIn(0f, 1f))
+                val percent = w.dropLast(1).toIntOrNull() ?: 100
+                MarkdownBlock.Image.Width.Percent((percent.toFloat() / 100f).coerceIn(0f, 1f))
             }
-            else -> w.toIntOrNull()?.let { MarkdownBlock.Image.Width.DP(it.dp) }
+            w.endsWith("dp") -> {
+                val value = w.dropLast(2).toFloatOrNull() ?: 0f
+                MarkdownBlock.Image.Width.DP(value.dp)
+            }
+            else -> return null
         }
     }
 
