@@ -174,7 +174,7 @@ Row 支持两个主要属性，与 Jetpack Compose 原生的 Row 组件对齐：
 ...image url="https://picsum.photos/300/200" width=50% shape=medium
 宽度：48 大小为 48dp    
 形状：50 百分比圆角，圆形  
-...image url="icon.png" width=48 shape=50
+...image url="https://picsum.photos/300/200" width=48 shape=50
 
 
 ---

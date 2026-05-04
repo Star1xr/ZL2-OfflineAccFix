@@ -173,7 +173,7 @@ Shape: medium corner radius
 ...image url="https://picsum.photos/300/200" width=50% shape=medium
 Width: 48 (size 48dp)  
 Shape: 50% radius, circle  
-...image url="icon.png" width=48 shape=50
+...image url="https://picsum.photos/300/200" width=48 shape=50
 
 ---
 
