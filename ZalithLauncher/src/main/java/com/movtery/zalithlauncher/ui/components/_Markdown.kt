@@ -34,6 +34,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.halilibo.richtext.commonmark.Markdown
+import com.halilibo.richtext.markdown.AstBlockNodeComposer
+import com.halilibo.richtext.markdown.BasicMarkdown
+import com.halilibo.richtext.markdown.node.AstNode
 import com.halilibo.richtext.ui.CodeBlockStyle
 import com.halilibo.richtext.ui.RichTextStyle
 import com.halilibo.richtext.ui.TableStyle
@@ -52,6 +55,24 @@ fun MarkdownView(
         style = richTextStyle
     ) {
         Markdown(content = content)
+    }
+}
+
+@Composable
+fun MarkdownView(
+    node: AstNode,
+    modifier: Modifier = Modifier,
+    astBlockNodeComposer: AstBlockNodeComposer? = null,
+    richTextStyle: RichTextStyle = defaultRichTextStyle(),
+) {
+    RichText(
+        modifier = modifier,
+        style = richTextStyle
+    ) {
+        BasicMarkdown(
+            astNode = node,
+            astBlockNodeComposer = astBlockNodeComposer
+        )
     }
 }
 

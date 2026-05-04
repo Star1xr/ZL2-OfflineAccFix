@@ -10,55 +10,43 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.halilibo.richtext.markdown.node.AstNode
 import com.halilibo.richtext.ui.RichTextStyle
 import com.movtery.zalithlauncher.ui.components.MarkdownView
 import com.movtery.zalithlauncher.ui.components.defaultRichTextStyle
 import com.movtery.zalithlauncher.ui.theme.itemColor
 
-@Composable
-fun CustomHome(
-    content: String,
-    modifier: Modifier = Modifier,
-    onLauncherEvent: (String) -> Unit = {}
-) {
-    val blocks = remember(content) {
-        parseMarkdownBlocks(content)
-    }
-
-    MarkdownBlocksRenderer(
-        modifier = modifier,
-        blocks = blocks,
-        richTextStyle = defaultRichTextStyle(),
-        onLauncherEvent = onLauncherEvent
-    )
-}
-
-@Composable
-fun CustomHome(
+fun LazyListScope.customHomePage(
     blocks: List<MarkdownBlock>,
-    modifier: Modifier = Modifier,
+    richTextStyle: RichTextStyle,
     onLauncherEvent: (String) -> Unit = {}
 ) {
-    MarkdownBlocksRenderer(
-        modifier = modifier,
-        blocks = blocks,
-        richTextStyle = defaultRichTextStyle(),
-        onLauncherEvent = onLauncherEvent
-    )
+    items(
+        items = blocks,
+        key = { it.stableKey },
+        contentType = { it::class }
+    ) { block ->
+        BlockItem(
+            block = block,
+            richTextStyle = richTextStyle,
+            onLauncherEvent = onLauncherEvent
+        )
+    }
 }
 
 @Composable
-private fun MarkdownBlocksRenderer(
+private fun MarkdownInnerRenderer(
     blocks: List<MarkdownBlock>,
     modifier: Modifier = Modifier,
     richTextStyle: RichTextStyle = defaultRichTextStyle(),
@@ -90,7 +78,7 @@ private fun BlockItem(
     when (block) {
         is MarkdownBlock.Normal -> {
             MarkdownView(
-                content = block.content,
+                node = block.astNode,
                 modifier = modifier,
                 richTextStyle = richTextStyle
             )
@@ -102,7 +90,7 @@ private fun BlockItem(
                 shape = parseShape(block.params),
                 contentPadding = parseCardPadding(block.params)
             ) {
-                MarkdownBlocksRenderer(
+                MarkdownInnerRenderer(
                     blocks = block.content,
                     richTextStyle = defaultRichTextStyle(
                         influencedByBackground = false,
@@ -164,8 +152,8 @@ sealed interface MarkdownBlock {
     /**
      * 普通的Markdown内容
      */
-    data class Normal(val content: String) : MarkdownBlock {
-        override val stableKey: Any get() = content.hashCode()
+    data class Normal(val astNode: AstNode) : MarkdownBlock {
+        override val stableKey: Any get() = astNode.hashCode()
         override val params: String get() = ""
     }
 
@@ -249,6 +237,7 @@ private val blockPattern = Regex(
  */
 fun parseMarkdownBlocks(
     content: String,
+    parseMarkdown: (String) -> AstNode,
 ): List<MarkdownBlock> {
     var inCodeBlock = false
     val cleaned = content.lineSequence()
@@ -265,7 +254,10 @@ fun parseMarkdownBlocks(
         .joinToString("\n")
         .replace(Regex("<br\\s*/?>", RegexOption.IGNORE_CASE), "\u2028")
 
-    return parseMarkdownBlocksInternal(cleaned)
+    return parseMarkdownBlocksInternal(
+        cleared = cleaned,
+        parseMarkdown = parseMarkdown
+    )
 }
 
 
@@ -273,8 +265,9 @@ private val titleRegex = Regex("""title\s*=\s*"([^"]*)"""")
 private val rowEndPattern = Regex("(?m)^[ \t]*\\.\\.\\.row-end")
 private fun parseMarkdownBlocksInternal(
     cleared: String,
+    parseMarkdown: (String) -> AstNode,
     allowCard: Boolean = true,
-    allowRow: Boolean = true
+    allowRow: Boolean = true,
 ): List<MarkdownBlock> {
     val blocks = mutableListOf<MarkdownBlock>()
 
@@ -285,7 +278,7 @@ private fun parseMarkdownBlocksInternal(
             //没有更多匹配，添加剩余内容
             val remaining = cleared.substring(lastIndex).trim()
             if (remaining.isNotEmpty()) {
-                blocks.add(MarkdownBlock.Normal(content = remaining))
+                blocks.add(MarkdownBlock.Normal(astNode = parseMarkdown(remaining)))
             }
             break
         }
@@ -294,7 +287,7 @@ private fun parseMarkdownBlocksInternal(
         if (match.range.first > lastIndex) {
             val text = cleared.substring(lastIndex, match.range.first).trim()
             if (text.isNotEmpty()) {
-                blocks.add(MarkdownBlock.Normal(content = text))
+                blocks.add(MarkdownBlock.Normal(astNode = parseMarkdown(text)))
             }
         }
 
@@ -323,6 +316,7 @@ private fun parseMarkdownBlocksInternal(
                             params = params,
                             content = parseMarkdownBlocksInternal(
                                 cleared = innerContent,
+                                parseMarkdown = parseMarkdown,
                                 allowCard = false, //不允许内部嵌套卡片组件
                                 allowRow = true
                             )
@@ -331,7 +325,11 @@ private fun parseMarkdownBlocksInternal(
                     lastIndex = closingRange.last + 1
                 } else {
                     //如果没找到匹配的结束标记，则将此开始标记视为Markdown
-                    blocks.add(MarkdownBlock.Normal(match.value))
+                    blocks.add(
+                        MarkdownBlock.Normal(
+                            astNode = parseMarkdown(match.value)
+                        )
+                    )
                     lastIndex = match.range.last + 1
                 }
             }
@@ -347,6 +345,7 @@ private fun parseMarkdownBlocksInternal(
 
                     val children = parseMarkdownBlocksInternal(
                         cleared = innerContent,
+                        parseMarkdown = parseMarkdown,
                         allowCard = false,
                         allowRow = false
                     ).filter { it is MarkdownBlock.Button || it is MarkdownBlock.Image }
@@ -361,7 +360,11 @@ private fun parseMarkdownBlocksInternal(
                     )
                     lastIndex = closingMatch.range.last + 1
                 } else {
-                    blocks.add(MarkdownBlock.Normal(match.value))
+                    blocks.add(
+                        MarkdownBlock.Normal(
+                            astNode = parseMarkdown(match.value)
+                        )
+                    )
                     lastIndex = match.range.last + 1
                 }
             }
@@ -386,7 +389,11 @@ private fun parseMarkdownBlocksInternal(
 
             else -> {
                 //如果是标记但当前上下文不允许（比如卡片嵌套），则视为普通Markdown
-                blocks.add(MarkdownBlock.Normal(match.value))
+                blocks.add(
+                    MarkdownBlock.Normal(
+                        astNode = parseMarkdown(match.value)
+                    )
+                )
                 lastIndex = match.range.last + 1
             }
         }

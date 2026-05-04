@@ -6,6 +6,9 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.halilibo.richtext.commonmark.CommonMarkdownParseOptions
+import com.halilibo.richtext.commonmark.CommonmarkAstNodeParser
+import com.halilibo.richtext.markdown.node.AstNode
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.context.copyAssetFile
 import com.movtery.zalithlauncher.path.PathManager
@@ -32,6 +35,13 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 class HomePageViewModel : ViewModel() {
+    private val nodeParser = CommonmarkAstNodeParser(
+        options = CommonMarkdownParseOptions.Default
+    )
+    private fun parseMarkdown(content: String): AstNode {
+        return nodeParser.parse(content)
+    }
+
     private val _pageState = MutableStateFlow<HomePageState>(HomePageState.Loading)
     /** 启动器主页状态 */
     val pageState = _pageState.asStateFlow()
@@ -85,7 +95,7 @@ class HomePageViewModel : ViewModel() {
             withContext(Dispatchers.IO) {
                 runCatching {
                     val content = file.readText()
-                    parseMarkdownBlocks(content)
+                    parseMarkdownBlocks(content, ::parseMarkdown)
                 }.onFailure { e ->
                     if (e is CancellationException) return@onFailure
                     lWarning("Failed to load the homepage from the local device!", e)
@@ -149,7 +159,7 @@ class HomePageViewModel : ViewModel() {
                     //若时间未超过半小时，则不刷新缓存
                     //直接读取文件
                     val content = localFile.readText()
-                    return@withContext parseMarkdownBlocks(content)
+                    return@withContext parseMarkdownBlocks(content, ::parseMarkdown)
                 }
             }
 
@@ -161,7 +171,7 @@ class HomePageViewModel : ViewModel() {
                 lWarning("Failed to cache to local file!", e)
             }
 
-            parseMarkdownBlocks(content)
+            parseMarkdownBlocks(content, ::parseMarkdown)
         }.getOrElse { e ->
             if (e is CancellationException) throw e
             lWarning("Failed to retrieve the homepage from the network!", e)
@@ -170,7 +180,7 @@ class HomePageViewModel : ViewModel() {
             if (localFile.exists()) {
                 runCatching {
                     val content = localFile.readText()
-                    parseMarkdownBlocks(content)
+                    parseMarkdownBlocks(content, ::parseMarkdown)
                 }.onFailure { e ->
                     lWarning("Failed to load the homepage from the cache!", e)
                 }.getOrDefault(emptyList())

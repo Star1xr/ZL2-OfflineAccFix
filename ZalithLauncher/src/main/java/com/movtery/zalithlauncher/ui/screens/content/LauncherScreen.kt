@@ -34,8 +34,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,11 +63,12 @@ import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.MarqueeText
 import com.movtery.zalithlauncher.ui.components.ScalingActionButton
+import com.movtery.zalithlauncher.ui.components.defaultRichTextStyle
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
-import com.movtery.zalithlauncher.ui.screens.main.custom_home.CustomHome
+import com.movtery.zalithlauncher.ui.screens.main.custom_home.customHomePage
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.viewmodel.HomePageState
 import com.movtery.zalithlauncher.viewmodel.LaunchGameViewModel
@@ -135,67 +135,74 @@ private fun ContentMenu(
         swapIn = isVisible
     )
 
-    Column(
+    val homePageViewModel = LocalHomePageViewModel.current
+    val pageState by homePageViewModel.pageState.collectAsStateWithLifecycle()
+    val richTextStyle = defaultRichTextStyle()
+
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
-            .padding(all = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(all = 12.dp)
     ) {
         if (BuildConfig.DEBUG) {
-            //debug版本关不掉的警告，防止有人把测试版当正式版用 XD
-            BackgroundCard(
-                shape = MaterialTheme.shapes.extraLarge
-            ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.generic_warning),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = stringResource(R.string.launcher_version_debug_warning, InfoDistributor.LAUNCHER_NAME),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        modifier = Modifier
-                            .alpha(0.8f)
-                            .align(Alignment.End),
-                        text = stringResource(R.string.launcher_version_debug_warning_cant_close),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-        }
-        val homePageViewModel = LocalHomePageViewModel.current
-        val pageState by homePageViewModel.pageState.collectAsStateWithLifecycle()
-        when (val state = pageState) {
-            is HomePageState.Blank -> {}
-            is HomePageState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(all = 24.dp),
-                    contentAlignment = Alignment.Center
+            item {
+                //debug版本关不掉的警告，防止有人把测试版当正式版用 XD
+                BackgroundCard(
+                    shape = MaterialTheme.shapes.extraLarge
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        LoadingIndicator()
                         Text(
-                            text = stringResource(R.string.settings_launcher_home_page_loading),
-                            style = MaterialTheme.typography.labelMedium,
+                            text = stringResource(R.string.generic_warning),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = stringResource(R.string.launcher_version_debug_warning, InfoDistributor.LAUNCHER_NAME),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            modifier = Modifier
+                                .alpha(0.8f)
+                                .align(Alignment.End),
+                            text = stringResource(R.string.launcher_version_debug_warning_cant_close),
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
             }
+        }
+
+        when (val state = pageState) {
+            is HomePageState.Blank -> {}
+            is HomePageState.Loading -> {
+                item(key = "homepage_loading_box") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            LoadingIndicator()
+                            Text(
+                                text = stringResource(R.string.settings_launcher_home_page_loading),
+                                style = MaterialTheme.typography.labelMedium,
+                            )
+                        }
+                    }
+                }
+            }
             is HomePageState.None -> {
-                CustomHome(
+                customHomePage(
                     blocks = state.page,
+                    richTextStyle = richTextStyle
                 )
             }
         }
