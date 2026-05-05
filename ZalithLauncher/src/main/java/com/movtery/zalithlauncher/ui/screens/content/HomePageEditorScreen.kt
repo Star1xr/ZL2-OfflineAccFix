@@ -58,10 +58,11 @@ fun HomePageEditorScreen(
             val scheme = remember(isDark) {
                 if (isDark) SchemeIDEADark() else SchemeIDEALight()
             }
+            val language = remember { MarkdownLanguage(true) }
 
             SoraEditor(
                 state = editorState,
-                language = MarkdownLanguage(true),
+                language = language,
                 scheme = scheme,
                 onSaveClick = {
                     homePageViewModel.localEditorSave(context)

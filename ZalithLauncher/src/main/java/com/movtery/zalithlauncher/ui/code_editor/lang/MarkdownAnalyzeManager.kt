@@ -58,6 +58,11 @@ class MarkdownAnalyzeManager(
         """^(\s*)(\.\.\.(?:card-start|card-end|row-start|row-end|column-start|column-end|button(?:-outlined|-filled-tonal|-text)?|image))(\s+.*)?$"""
     )
 
+    private val headerRegex = Regex("^#{1,6}\\s+")
+    private val listRegex = Regex("^\\s*([-*+]|\\d+\\.)\\s+")
+    private val quoteRegex = Regex("^\\s*>")
+    private val inlineRegex = Regex("(\\*\\*.*?\\*\\*)|(__.*?__)|(\\*.*?\\*)|(_.*?_)|(`.*?`)|(\\[.*?]\\(.*?\\))")
+
     override fun analyze(text: StringBuilder, delegate: Delegate<Any?>): Styles {
         val builder = MappedSpans.Builder()
         val lines = text.toString().split("\n")
@@ -162,27 +167,26 @@ class MarkdownAnalyzeManager(
             }
 
             // Markdown 标题
-            val headerMatch = Regex("^#{1,6}\\s+").find(line)
+            val headerMatch = headerRegex.find(line)
             if (headerMatch != null) {
                 builder.add(lineIndex, SpanFactory.obtainNoExt(0, headerStyle))
                 builder.add(lineIndex, SpanFactory.obtainNoExt(headerMatch.range.last + 1, normalStyle))
                 continue
             }
             // Markdown 列表项符号
-            val listMatch = Regex("^\\s*([-*+]|\\d+\\.)\\s+").find(line)
+            val listMatch = listRegex.find(line)
             if (listMatch != null) {
                 builder.add(lineIndex, SpanFactory.obtainNoExt(listMatch.range.first, operatorStyle))
                 builder.add(lineIndex, SpanFactory.obtainNoExt(listMatch.range.last + 1, normalStyle))
             }
             // Markdown 区块引用
-            val quoteMatch = Regex("^\\s*>").find(line)
+            val quoteMatch = quoteRegex.find(line)
             if (quoteMatch != null) {
                 builder.add(lineIndex, SpanFactory.obtainNoExt(quoteMatch.range.first, quoteStyle))
                 builder.add(lineIndex, SpanFactory.obtainNoExt(quoteMatch.range.last + 1, normalStyle))
             }
 
             // Markdown 内联样式（粗体、斜体、链接、行内代码）
-            val inlineRegex = Regex("(\\*\\*.*?\\*\\*)|(__.*?__)|(\\*.*?\\*)|(_.*?_)|(`.*?`)|(\\[.*?]\\(.*?\\))")
             inlineRegex.findAll(line).forEach { m ->
                 val style = when {
                     m.value.startsWith("**") || m.value.startsWith("__") -> boldStyle

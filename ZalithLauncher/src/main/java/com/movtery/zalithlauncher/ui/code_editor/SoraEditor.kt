@@ -118,13 +118,16 @@ fun SoraEditor(
                             }.also { view = it }
                         },
                         update = { view ->
+                            if (view.text != state.content) {
+                                view.setText(state.content, true, null)
+                            }
                             if (view.editorLanguage != language) {
                                 view.setEditorLanguage(language)
                             }
                             if (view.isEditable == isReadOnly) {
                                 view.isEditable = !isReadOnly
                             }
-                            if (view.colorScheme::class != scheme::class) {
+                            if (view.colorScheme !== scheme) {
                                 view.colorScheme = scheme
                             }
                         },

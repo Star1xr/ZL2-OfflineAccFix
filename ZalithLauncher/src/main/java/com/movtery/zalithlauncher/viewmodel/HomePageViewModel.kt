@@ -171,13 +171,15 @@ class HomePageViewModel : ViewModel() {
         localEditorJob = viewModelScope.launch {
             _editorState.update { EditorState.Loading }
             //加载本地主页文件
-            val content = runCatching {
-                if (localPageFile.exists()) {
-                    localPageFile.readText()
-                } else {
-                    ""
-                }
-            }.getOrDefault("")
+            val content = withContext(Dispatchers.IO) {
+                runCatching {
+                    if (localPageFile.exists()) {
+                        localPageFile.readText()
+                    } else {
+                        ""
+                    }
+                }.getOrDefault("")
+            }
             val soraContent = Content(content)
             _editorState.update {
                 EditorState.Success(soraContent)
@@ -194,9 +196,9 @@ class HomePageViewModel : ViewModel() {
     ) {
         val state = _editorState.value
         if (state !is EditorState.Success) return
+        val content = state.content.toString()
         saveEditorJob?.cancel()
         saveEditorJob = viewModelScope.launch(Dispatchers.IO) {
-            val content = state.content.toString()
             runCatching {
                 localPageFile.writeText(content)
 
@@ -207,11 +209,11 @@ class HomePageViewModel : ViewModel() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+                reloadPage(true)
             }.onFailure { e ->
                 lWarning("Failed to save the homepage to the local file!", e)
             }
 
-            reloadPage(true)
             saveEditorJob = null
         }
     }
