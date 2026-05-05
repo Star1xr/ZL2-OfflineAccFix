@@ -60,6 +60,7 @@ contentPadding=(4, 4, 12, 12)
 ...card-end
 
 > The card component does not support `width` and `weight` attributes; its width always follows the homepage width.
+> The card component is non-composable; it cannot be placed inside layout components (Row/Column).
 
 ---
 

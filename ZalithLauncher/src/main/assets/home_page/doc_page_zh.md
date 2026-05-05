@@ -60,6 +60,7 @@ contentPadding=(4, 4, 12, 12)
 ...card-end
 
 > 卡片组件不支持 `width` 和 `weight` 属性，其宽度始终跟随主页宽度
+> 卡片组件为不可组合组件，它不能被装进布局组件（Row/Column）中
 
 ---
 
