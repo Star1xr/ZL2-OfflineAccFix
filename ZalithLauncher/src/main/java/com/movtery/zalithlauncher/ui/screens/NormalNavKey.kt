@@ -67,6 +67,13 @@ sealed interface NormalNavKey : TitledNavKey {
         override val title: Int = R.string.terracotta_terracotta
     }
 
+    /** 查看日志屏幕 */
+    @Serializable data class LogView(
+        val logPath: String
+    ) : NormalNavKey {
+        override val title: Int = R.string.versions_overview_log
+    }
+
     /** 设置嵌套子屏幕 */
     sealed interface Settings : NormalNavKey {
         /** 渲染器设置屏幕 */
