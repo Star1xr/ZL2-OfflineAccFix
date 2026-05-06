@@ -18,56 +18,132 @@
 
 package com.movtery.zalithlauncher.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
-import com.mikepenz.markdown.m3.markdownTypography
+import com.halilibo.richtext.commonmark.Markdown
+import com.halilibo.richtext.markdown.AstBlockNodeComposer
+import com.halilibo.richtext.markdown.BasicMarkdown
+import com.halilibo.richtext.markdown.node.AstNode
+import com.halilibo.richtext.ui.CodeBlockStyle
+import com.halilibo.richtext.ui.RichTextStyle
+import com.halilibo.richtext.ui.TableStyle
+import com.halilibo.richtext.ui.material3.RichText
+import com.halilibo.richtext.ui.string.RichTextStringStyle
+import com.movtery.zalithlauncher.ui.theme.cardColor
 
 @Composable
-fun defaultMDTypography(
-    h1: TextStyle = MaterialTheme.typography.titleLarge, //22sp
-    h2: TextStyle = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
-    h3: TextStyle = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
-    h4: TextStyle = MaterialTheme.typography.titleMedium, //16sp
-    h5: TextStyle = MaterialTheme.typography.titleMedium.copy(fontSize = 15.sp), //15sp
-    h6: TextStyle = MaterialTheme.typography.titleSmall, //14sp
-    text: TextStyle = MaterialTheme.typography.bodyMedium,
-    code: TextStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
-    inlineCode: TextStyle = text.copy(fontFamily = FontFamily.Monospace),
-    quote: TextStyle = MaterialTheme.typography.bodyMedium.plus(SpanStyle(fontStyle = FontStyle.Italic)),
-    paragraph: TextStyle = MaterialTheme.typography.bodyMedium,
-    ordered: TextStyle = MaterialTheme.typography.bodyMedium,
-    bullet: TextStyle = MaterialTheme.typography.bodyMedium,
-    list: TextStyle = MaterialTheme.typography.bodyMedium,
-    textLink: TextLinkStyles = TextLinkStyles(
-        style = SpanStyle(
-            color = MaterialTheme.colorScheme.primary,
-            textDecoration = TextDecoration.Underline,
-            fontWeight = FontWeight.Bold
-        ),
-        pressedStyle = SpanStyle(
-            color = MaterialTheme.colorScheme.primary,
-            background = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f),
-            textDecoration = TextDecoration.Underline,
-            fontWeight = FontWeight.Bold
+fun MarkdownView(
+    content: String,
+    modifier: Modifier = Modifier,
+    richTextStyle: RichTextStyle = defaultRichTextStyle(),
+) {
+    RichText(
+        modifier = modifier,
+        style = richTextStyle
+    ) {
+        Markdown(content = content)
+    }
+}
+
+@Composable
+fun MarkdownView(
+    node: AstNode,
+    modifier: Modifier = Modifier,
+    astBlockNodeComposer: AstBlockNodeComposer? = null,
+    richTextStyle: RichTextStyle = defaultRichTextStyle(),
+) {
+    RichText(
+        modifier = modifier,
+        style = richTextStyle
+    ) {
+        BasicMarkdown(
+            astNode = node,
+            astBlockNodeComposer = astBlockNodeComposer
         )
-    ),
-    table: TextStyle = text,
-) = markdownTypography(
-    h1 = h1, h2 = h2, h3 = h3, h4 = h4, h5 = h5, h6 = h6,
-    text = text, code = code, inlineCode = inlineCode,
-    quote = quote,
-    paragraph = paragraph,
-    ordered = ordered,
-    bullet = bullet,
-    list = list,
-    textLink = textLink,
-    table = table
-)
+    }
+}
+
+@Composable
+fun defaultRichTextStyle(
+    influencedByBackground: Boolean = true,
+    codeBackground: Color = cardColor(influencedByBackground),
+): RichTextStyle {
+    return RichTextStyle(
+        headingStyle = { level, textStyle ->
+            when (level) {
+                0 -> TextStyle(
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                1 -> TextStyle(
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                2 -> TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                3 -> TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                4 -> TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                5 -> TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                else -> textStyle
+            }
+        },
+        codeBlockStyle = CodeBlockStyle(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = codeBackground,
+                    shape = MaterialTheme.shapes.small
+                ).horizontalScroll(
+                    state = rememberScrollState()
+                ),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
+            padding = 8.sp
+        ),
+        tableStyle = TableStyle(
+            borderColor = MaterialTheme.colorScheme.outlineVariant,
+        ),
+        stringStyle = RichTextStringStyle(
+            linkStyle = TextLinkStyles(
+                style = SpanStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    textDecoration = TextDecoration.Underline,
+                    fontWeight = FontWeight.Bold
+                ),
+                pressedStyle = SpanStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    background = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f),
+                    textDecoration = TextDecoration.Underline,
+                    fontWeight = FontWeight.Bold
+                )
+            ),
+            codeStyle = SpanStyle(
+                fontFamily = FontFamily.Monospace,
+                background = codeBackground
+            )
+        )
+    )
+}

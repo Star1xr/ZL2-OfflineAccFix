@@ -102,7 +102,6 @@ import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.utils.logging.Logger.lError
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
-import com.movtery.zalithlauncher.viewmodel.LaunchGameViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.Dispatchers
@@ -195,7 +194,6 @@ fun VersionSettingsScreen(
     backScreenViewModel: ScreenBackStackViewModel,
     backToMainScreen: () -> Unit,
     onExportModpack: () -> Unit,
-    launchGameViewModel: LaunchGameViewModel,
     eventViewModel: EventViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
@@ -256,7 +254,6 @@ fun VersionSettingsScreen(
                 },
                 backToMainScreen = backToMainScreen,
                 onExport = onExportModpack,
-                launchGameViewModel = launchGameViewModel,
                 version = key.version,
                 eventViewModel = eventViewModel,
                 submitError = submitError
@@ -370,7 +367,6 @@ private fun NavigationUI(
     onCurrentKeyChange: (TitledNavKey?) -> Unit,
     backToMainScreen: () -> Unit,
     onExport: () -> Unit,
-    launchGameViewModel: LaunchGameViewModel,
     version: Version,
     eventViewModel: EventViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
@@ -460,12 +456,19 @@ private fun NavigationUI(
                     SavesManagerScreen(
                         mainScreenKey = mainScreenKey,
                         versionsScreenKey = versionsScreenKey,
-                        launchGameViewModel = launchGameViewModel,
                         version = version,
                         backToMainScreen = backToMainScreen,
                         swapToDownload = {
                             backScreenViewModel.navigateToDownload(
                                 targetScreen = backScreenViewModel.downloadSavesScreen
+                            )
+                        },
+                        onQuickPlay = { version, saveName ->
+                            eventViewModel.sendEvent(
+                                EventViewModel.Event.Launch.PlaySave(
+                                    version = version,
+                                    saveName = saveName
+                                )
                             )
                         },
                         submitError = submitError
@@ -512,8 +515,15 @@ private fun NavigationUI(
                     ServerListScreen(
                         mainScreenKey = mainScreenKey,
                         versionsScreenKey = versionsScreenKey,
-                        launchGameViewModel = launchGameViewModel,
                         version = version,
+                        onQuickPlay = { version, address ->
+                            eventViewModel.sendEvent(
+                                EventViewModel.Event.Launch.PlayServer(
+                                    version = version,
+                                    address = address
+                                )
+                            )
+                        },
                         backToMainScreen = backToMainScreen,
                     )
                 }

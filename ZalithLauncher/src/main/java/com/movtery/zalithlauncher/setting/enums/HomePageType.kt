@@ -16,40 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
  */
 
-package com.movtery.zalithlauncher.utils.file
+package com.movtery.zalithlauncher.setting.enums
 
-import java.io.File
+import androidx.annotation.StringRes
+import com.movtery.zalithlauncher.R
 
 /**
- * 记录文件夹内文件数量
+ * 启动器主页类型
  */
-class FolderFileCounter(
-    private val dir: File
+enum class HomePageType(
+    @field:StringRes
+    val textRes: Int
 ) {
-    private var counts: Int? = null
+    /**
+     * 空白主页
+     */
+    Blank(R.string.settings_launcher_home_page_type_blank),
 
     /**
-     * 记录目录内的文件数量，并检查是否有变化
-     * @return 当前目录
+     * 从本地加载
      */
-    fun checkDir(): Boolean {
-        val tempCount = if (dir.isFile) {
-            0
-        } else {
-            dir.list()?.size ?: 0
-        }
-        val result = getRecordedCount() != tempCount
-        counts = tempCount
-        return result
-    }
+    FromLocal(R.string.settings_launcher_home_page_type_local),
 
     /**
-     * 获取上一次记录的目录内的文件数量
+     * 从网络加载
      */
-    fun getRecordedCount(): Int = counts ?: 0
-
-    /**
-     * 当前是否从未检查过文件数量
-     */
-    fun isUnchecked(): Boolean = counts == null
+    FromURL(R.string.settings_launcher_home_page_type_url)
 }

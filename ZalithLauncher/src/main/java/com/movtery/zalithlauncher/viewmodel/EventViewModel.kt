@@ -22,7 +22,9 @@ import android.net.Uri
 import android.view.KeyEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.ui.control.input.TextInputMode
+import com.movtery.zalithlauncher.ui.screens.main.custom_home.MarkdownBlock
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -69,6 +71,15 @@ class EventViewModel : ViewModel() {
             /** 关停 VPN */
             data object StopVPN : Terracotta
         }
+        /** 启动游戏相关的事件 */
+        sealed interface Launch : Event {
+            /** 主菜单的启动游戏 */
+            data object Main : Launch
+            /** 快速启动游戏并进入服务器 */
+            data class PlayServer(val version: Version, val address: String): Launch
+            /** 快速启动游戏并进入存档 */
+            data class PlaySave(val version: Version, val saveName: String): Launch
+        }
         /** 检查更新 */
         data object CheckUpdate : Event
         /** 在浏览器访问链接 */
@@ -92,6 +103,15 @@ class EventViewModel : ViewModel() {
                 val language: String,
                 val link: String
             )
+        }
+        /** 启动器主页相关 */
+        sealed interface HomePage: Event {
+            /** 重载启动器主页 */
+            data object Reload: HomePage
+            /** 生成文档主页 */
+            data object GenDocPage: HomePage
+            /** 主页触发的事件 */
+            data class Event(val event: MarkdownBlock.Button.Event): HomePage
         }
     }
 }

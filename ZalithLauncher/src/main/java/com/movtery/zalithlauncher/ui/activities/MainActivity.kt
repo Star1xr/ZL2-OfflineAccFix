@@ -30,9 +30,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -54,6 +57,7 @@ import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
 import com.movtery.zalithlauncher.ui.theme.feativals.FestivalEffects
 import com.movtery.zalithlauncher.upgrade.TooFrequentOperationException
 import com.movtery.zalithlauncher.utils.compareLangTag
+import com.movtery.zalithlauncher.utils.copyText
 import com.movtery.zalithlauncher.utils.festival.getTodayFestivals
 import com.movtery.zalithlauncher.utils.isChinese
 import com.movtery.zalithlauncher.utils.logging.Logger.lInfo
@@ -63,9 +67,12 @@ import com.movtery.zalithlauncher.utils.string.getMessageOrToString
 import com.movtery.zalithlauncher.viewmodel.BackgroundViewModel
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
+import com.movtery.zalithlauncher.viewmodel.HomePageOperation
+import com.movtery.zalithlauncher.viewmodel.HomePageViewModel
 import com.movtery.zalithlauncher.viewmodel.LaunchGameViewModel
 import com.movtery.zalithlauncher.viewmodel.LauncherUpgradeOperation
 import com.movtery.zalithlauncher.viewmodel.LauncherUpgradeViewModel
+import com.movtery.zalithlauncher.viewmodel.LocalHomePageViewModel
 import com.movtery.zalithlauncher.viewmodel.ModpackConfirmUseMobileDataOperation
 import com.movtery.zalithlauncher.viewmodel.ModpackImportOperation
 import com.movtery.zalithlauncher.viewmodel.ModpackImportViewModel
@@ -115,6 +122,11 @@ class MainActivity : BaseAppCompatActivity() {
     val launcherUpgradeViewModel: LauncherUpgradeViewModel by viewModels()
 
     /**
+     * 启动器自定义主页 ViewModel
+     */
+    val homePageViewModel: HomePageViewModel by viewModels()
+
+    /**
      * 是否开启捕获按键模式
      */
     private var isCaptureKey = false
@@ -161,36 +173,12 @@ class MainActivity : BaseAppCompatActivity() {
                     }
                     is EventViewModel.Event.OpenLink -> {
                         val url = event.url
-                        lifecycleScope.launch(Dispatchers.Main) {
+                        withContext(Dispatchers.Main) {
                             this@MainActivity.openLink(url)
                         }
                     }
                     is EventViewModel.Event.CheckUpdate -> {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            try {
-                                val success = launcherUpgradeViewModel.checkManually(
-                                    onInProgress = {
-                                        withContext(Dispatchers.Main) {
-                                            Toast.makeText(this@MainActivity, getString(R.string.generic_in_progress), Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                    onIsLatest = {
-                                        withContext(Dispatchers.Main) {
-                                            Toast.makeText(this@MainActivity, getString(R.string.upgrade_is_latest), Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                )
-                                if (!success) throw RuntimeException()
-                            } catch (_: TooFrequentOperationException) {
-                                //太频繁了
-                                return@launch
-                            } catch (_: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    Toast.makeText(this@MainActivity, getString(R.string.upgrade_get_remote_failed), Toast.LENGTH_SHORT).show()
-                                }
-                                return@launch
-                            }
-                        }
+                        checkUpdate()
                     }
                     is EventViewModel.Event.KeepScreen -> {
                         keepScreen(event.on)
@@ -200,6 +188,32 @@ class MainActivity : BaseAppCompatActivity() {
                     }
                     is EventViewModel.Event.DownloadPlugins -> {
                         showDownloadPlugins(event.link)
+                    }
+                    is EventViewModel.Event.Launch.Main -> {
+                        launchGameViewModel.tryLaunch()
+                    }
+                    is EventViewModel.Event.Launch.PlayServer -> {
+                        launchGameViewModel.quickPlayServer(event.version, event.address)
+                    }
+                    is EventViewModel.Event.Launch.PlaySave -> {
+                        launchGameViewModel.quickPlaySave(event.version, event.saveName)
+                    }
+                    is EventViewModel.Event.HomePage.Reload -> {
+                        homePageViewModel.reloadPage(true)
+                    }
+                    is EventViewModel.Event.HomePage.GenDocPage -> {
+                        if (homePageViewModel.isLocalExists()) {
+                            //如果本地主页文件已存在，则警告用户是否进行覆盖
+                            homePageViewModel.updateOperation(
+                                HomePageOperation.WarningOverwrite
+                            )
+                        } else {
+                            homePageViewModel.genDocPage(this@MainActivity)
+                        }
+                    }
+                    is EventViewModel.Event.HomePage.Event -> {
+                        val event0 = event.event
+                        handleHomePageEvent(event0.key, event0.data)
                     }
                     else -> {
                         //忽略
@@ -226,15 +240,18 @@ class MainActivity : BaseAppCompatActivity() {
                         viewModel = backgroundViewModel
                     )
 
-                    MainScreen(
-                        screenBackStackModel = screenBackStackModel,
-                        launchGameViewModel = launchGameViewModel,
-                        eventViewModel = eventViewModel,
-                        modpackImportViewModel = modpackImportViewModel,
-                        submitError = {
-                            errorViewModel.showError(it)
-                        }
-                    )
+                    CompositionLocalProvider(
+                        LocalHomePageViewModel provides homePageViewModel
+                    ) {
+                        MainScreen(
+                            screenBackStackModel = screenBackStackModel,
+                            eventViewModel = eventViewModel,
+                            modpackImportViewModel = modpackImportViewModel,
+                            submitError = {
+                                errorViewModel.showError(it)
+                            }
+                        )
+                    }
 
                     //节日彩蛋效果层
                     FestivalEffects(
@@ -316,6 +333,18 @@ class MainActivity : BaseAppCompatActivity() {
                     }
                 )
 
+                //启动器主页操作流程
+                val homePageOp by homePageViewModel.pageOp.collectAsStateWithLifecycle()
+                HomePageOperation(
+                    operation = homePageOp,
+                    onChange = {
+                        homePageViewModel.updateOperation(it)
+                    },
+                    onGenDocPage = {
+                        homePageViewModel.genDocPage(this@MainActivity)
+                    }
+                )
+
                 //检查更新操作流程
                 LauncherUpgradeOperation(
                     operation = launcherUpgradeViewModel.operation,
@@ -332,6 +361,70 @@ class MainActivity : BaseAppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleImportIfNeeded(intent)
+    }
+
+    /**
+     * 检查启动器更新
+     */
+    private fun checkUpdate() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val success = launcherUpgradeViewModel.checkManually(
+                    onInProgress = {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@MainActivity, getString(R.string.generic_in_progress), Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    onIsLatest = {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@MainActivity, getString(R.string.upgrade_is_latest), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+                if (!success) throw RuntimeException()
+            } catch (_: TooFrequentOperationException) {
+                //太频繁了
+                return@launch
+            } catch (_: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, getString(R.string.upgrade_get_remote_failed), Toast.LENGTH_SHORT).show()
+                }
+                return@launch
+            }
+        }
+    }
+
+    /**
+     * 处理自定义主页的事件
+     */
+    private suspend fun handleHomePageEvent(
+        key: String,
+        data: String?
+    ) {
+        when (key) {
+            "url" -> {
+                if (data != null) {
+                    withContext(Dispatchers.Main) {
+                        this@MainActivity.openLink(data)
+                    }
+                }
+            }
+            "check_update" -> checkUpdate()
+            "launch_game" -> launchGameViewModel.tryLaunch()
+            "copy" -> {
+                if (data != null) {
+                    withContext(Dispatchers.Main) {
+                        copyText(
+                            null,
+                            data,
+                            this@MainActivity,
+                            showToast = true
+                        )
+                    }
+                }
+            }
+            "refresh_page" -> homePageViewModel.reloadPage(true)
+        }
     }
 
     /**

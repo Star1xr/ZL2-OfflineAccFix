@@ -30,6 +30,7 @@ import coil3.gif.GifDecoder
 import coil3.memory.MemoryCache
 import coil3.request.CachePolicy
 import coil3.request.crossfade
+import coil3.svg.SvgDecoder
 import com.kyant.fishnet.Fishnet
 import com.movtery.zalithlauncher.context.refreshContext
 import com.movtery.zalithlauncher.coroutine.TaskSystem
@@ -127,7 +128,10 @@ class ZLApplication : Application(), SingletonImageLoader.Factory {
                     .directory(PathManager.DIR_IMAGE_CACHE.toOkioPath())
                     .build()
             }
-            .components { add(GifDecoder.Factory()) }
+            .components {
+                add(GifDecoder.Factory())
+                add(SvgDecoder.Factory())
+            }
             .crossfade(true)
             .build()
     }

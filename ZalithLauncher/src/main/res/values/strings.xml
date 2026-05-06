@@ -54,11 +54,13 @@
     <string name="generic_copied">Copied</string>
     <string name="generic_no_matching_items">No matching items</string>
     <string name="generic_follow_system">Follow System</string>
+    <string name="generic_edit">Edit</string>
     <!-- Page Title -->
     <string name="page_title_version_list">Version List</string>
     <string name="page_title_version_manage">Manage Versions</string>
     <string name="page_title_account_list">Account List</string>
     <string name="page_title_select_files">Select Path</string>
+    <string name="page_title_home_page_editor">Home Page Editor</string>
     <!-- Files -->
     <string name="files_browse_folder">Browse Folder</string>
     <string name="files_importing">Importing Files</string>
@@ -1028,6 +1030,17 @@
     <string name="settings_launcher_background_video_volume_summary">When the background is a video, you can adjust the volume using this option.</string>
     <string name="settings_launcher_festivals_effects_title">Persistent Festival Easter Egg Effects</string>
     <string name="settings_launcher_festivals_effects_summary">Display persistent easter egg effects during specific time periods</string>
+    <string name="settings_launcher_home_page_title">Home Page</string>
+    <string name="settings_launcher_home_page_type_blank">Blank</string>
+    <string name="settings_launcher_home_page_type_local">Load from Local</string>
+    <string name="settings_launcher_home_page_type_url">Load from URL</string>
+    <string name="settings_launcher_home_page_type_local_tip">Edit the launcher\'s local home page file. The launcher uses an extended Markdown syntax to describe the home page. After editing, click Refresh to reload the home page.</string>
+    <string name="settings_launcher_home_page_type_local_gen_doc">Generate Document</string>
+    <string name="settings_launcher_home_page_type_local_gen_doc_exists">A home page file already exists. Are you sure you want to overwrite the existing home page and regenerate the official documentation home page?</string>
+    <string name="settings_launcher_home_page_type_url_tip">Fetch the launcher home page file from the specified link and cache it, then periodically refresh and reload the home page</string>
+    <string name="settings_launcher_home_page_type_warning">Custom home pages are third-party content. The launcher does not provide any guarantee for their content. Please be cautious when accepting unfamiliar home pages!</string>
+    <string name="settings_launcher_home_page_url">Home Page Download URL:</string>
+    <string name="settings_launcher_home_page_loading">Loading Home Page</string>
     <!--  Control  -->
     <string name="control_keyboard_bind_title">Bind Key</string>
     <string name="control_keyboard_bind_summary">Press the key you want to bind on your keyboard</string>

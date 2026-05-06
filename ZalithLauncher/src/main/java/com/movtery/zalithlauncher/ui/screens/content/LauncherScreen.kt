@@ -34,8 +34,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,11 +42,14 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
@@ -64,19 +66,25 @@ import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.MarqueeText
 import com.movtery.zalithlauncher.ui.components.ScalingActionButton
+import com.movtery.zalithlauncher.ui.components.defaultRichTextStyle
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
+import com.movtery.zalithlauncher.ui.screens.main.custom_home.MarkdownBlock
+import com.movtery.zalithlauncher.ui.screens.main.custom_home.customHomePage
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
-import com.movtery.zalithlauncher.viewmodel.LaunchGameViewModel
+import com.movtery.zalithlauncher.viewmodel.HomePageState
+import com.movtery.zalithlauncher.viewmodel.LocalHomePageViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 
 @Composable
 fun LauncherScreen(
     backStackViewModel: ScreenBackStackViewModel,
     navigateToVersions: (Version) -> Unit,
-    launchGameViewModel: LaunchGameViewModel
+    onLaunchGame: () -> Unit,
+    onOpenLink: (String) -> Unit,
+    onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
 ) {
     BaseScreen(
         screenKey = NormalNavKey.LauncherMain,
@@ -85,10 +93,19 @@ fun LauncherScreen(
         Row(
             modifier = Modifier.fillMaxSize()
         ) {
-            ContentMenu(
-                isVisible = isVisible,
-                modifier = Modifier.weight(7f)
-            )
+            CompositionLocalProvider(
+                LocalUriHandler provides object : UriHandler {
+                    override fun openUri(uri: String) {
+                        onOpenLink(uri)
+                    }
+                }
+            ) {
+                ContentMenu(
+                    modifier = Modifier.weight(7f),
+                    isVisible = isVisible,
+                    onHomePageEvent = onHomePageEvent
+                )
+            }
 
             val toAccountManageScreen: () -> Unit = {
                 backStackViewModel.mainScreen.navigateTo(
@@ -113,7 +130,7 @@ fun LauncherScreen(
                     .weight(3f)
                     .fillMaxHeight()
                     .padding(top = 12.dp, end = 12.dp, bottom = 12.dp),
-                launchGameViewModel = launchGameViewModel,
+                onLaunchGame = onLaunchGame,
                 toAccountManageScreen = toAccountManageScreen,
                 toVersionManageScreen = toVersionManageScreen,
                 toVersionSettingsScreen = toVersionSettingsScreen
@@ -125,6 +142,7 @@ fun LauncherScreen(
 @Composable
 private fun ContentMenu(
     isVisible: Boolean,
+    onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val yOffset by swapAnimateDpAsState(
@@ -132,38 +150,76 @@ private fun ContentMenu(
         swapIn = isVisible
     )
 
-    Column(
+    val homePageViewModel = LocalHomePageViewModel.current
+    val pageState by homePageViewModel.pageState.collectAsStateWithLifecycle()
+    val richTextStyle = defaultRichTextStyle()
+
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
+            .offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
+        contentPadding = PaddingValues(all = 12.dp)
     ) {
         if (BuildConfig.DEBUG) {
-            //debug版本关不掉的警告，防止有人把测试版当正式版用 XD
-            BackgroundCard(
-                modifier = Modifier.padding(all = 12.dp),
-                shape = MaterialTheme.shapes.extraLarge
-            ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+            item {
+                //debug版本关不掉的警告，防止有人把测试版当正式版用 XD
+                BackgroundCard(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 ) {
-                    Text(
-                        text = stringResource(R.string.generic_warning),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = stringResource(R.string.launcher_version_debug_warning, InfoDistributor.LAUNCHER_NAME),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        modifier = Modifier
-                            .alpha(0.8f)
-                            .align(Alignment.End),
-                        text = stringResource(R.string.launcher_version_debug_warning_cant_close),
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Column(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.generic_warning),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = stringResource(R.string.launcher_version_debug_warning, InfoDistributor.LAUNCHER_NAME),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            modifier = Modifier
+                                .alpha(0.8f)
+                                .align(Alignment.End),
+                            text = stringResource(R.string.launcher_version_debug_warning_cant_close),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
+            }
+        }
+
+        when (val state = pageState) {
+            is HomePageState.Blank -> {}
+            is HomePageState.Loading -> {
+                item(key = "homepage_loading_box") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            LoadingIndicator()
+                            Text(
+                                text = stringResource(R.string.settings_launcher_home_page_loading),
+                                style = MaterialTheme.typography.labelMedium,
+                            )
+                        }
+                    }
+                }
+            }
+            is HomePageState.None -> {
+                customHomePage(
+                    blocks = state.page,
+                    richTextStyle = richTextStyle,
+                    onEvent = onHomePageEvent
+                )
             }
         }
     }
@@ -172,7 +228,7 @@ private fun ContentMenu(
 @Composable
 private fun RightMenuContent(
     modifier: Modifier = Modifier,
-    launchGameViewModel: LaunchGameViewModel,
+    onLaunchGame: () -> Unit,
     toAccountManageScreen: () -> Unit,
     toVersionManageScreen: () -> Unit,
     toVersionSettingsScreen: () -> Unit,
@@ -180,7 +236,7 @@ private fun RightMenuContent(
         innerModifier: Modifier,
         onClick: () -> Unit,
         text: @Composable RowScope.() -> Unit
-    ) -> Unit
+    ) -> Unit,
 ) {
     val account by AccountsManager.currentAccountFlow.collectAsStateWithLifecycle()
     val version by VersionsManager.currentVersion.collectAsStateWithLifecycle()
@@ -240,9 +296,7 @@ private fun RightMenuContent(
                 }
                 .padding(PaddingValues(horizontal = 12.dp)),
             {
-                launchGameViewModel.tryLaunch(
-                    VersionsManager.currentVersion.value
-                )
+                onLaunchGame()
             },
             {
                 MarqueeText(text = stringResource(R.string.main_launch_game))
@@ -254,8 +308,8 @@ private fun RightMenuContent(
 @Composable
 private fun RightMenu(
     isVisible: Boolean,
+    onLaunchGame: () -> Unit,
     modifier: Modifier = Modifier,
-    launchGameViewModel: LaunchGameViewModel,
     toAccountManageScreen: () -> Unit = {},
     toVersionManageScreen: () -> Unit = {},
     toVersionSettingsScreen: () -> Unit = {}
@@ -272,7 +326,7 @@ private fun RightMenu(
     ) {
         RightMenuContent(
             modifier = Modifier.fillMaxSize(),
-            launchGameViewModel = launchGameViewModel,
+            onLaunchGame = onLaunchGame,
             toAccountManageScreen = toAccountManageScreen,
             toVersionManageScreen = toVersionManageScreen,
             toVersionSettingsScreen = toVersionSettingsScreen

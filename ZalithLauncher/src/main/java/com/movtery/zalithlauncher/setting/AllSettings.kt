@@ -30,6 +30,7 @@ import com.movtery.zalithlauncher.info.InfoDistributor
 import com.movtery.zalithlauncher.setting.enums.AppLanguage
 import com.movtery.zalithlauncher.setting.enums.DarkMode
 import com.movtery.zalithlauncher.setting.enums.GestureActionType
+import com.movtery.zalithlauncher.setting.enums.HomePageType
 import com.movtery.zalithlauncher.setting.enums.MirrorSourceType
 import com.movtery.zalithlauncher.setting.enums.MouseControlMode
 import com.movtery.zalithlauncher.ui.control.HotbarRule
@@ -384,6 +385,16 @@ object AllSettings : SettingsRegistry() {
      * 启动器视频背景音量
      */
     val videoBackgroundVolume = intSetting("videoBackgroundVolume", 0, 0..100)
+
+    /**
+     * 启动器主页类型
+     */
+    val homePageType = enumSetting("homePageType", HomePageType.Blank)
+
+    /**
+     * 启动器网络主页下载地址
+     */
+    val homePageURL = stringSetting("homePageURL", "")
 
     /**
      * 启动器上次检查更新时，用户选择忽略的版本号

@@ -54,11 +54,13 @@
     <string name="generic_copied">已复制</string>
     <string name="generic_no_matching_items">没有符合条件的项目</string>
     <string name="generic_follow_system">跟随系统</string>
+    <string name="generic_edit">编辑</string>
     <!--  页面标题  -->
     <string name="page_title_version_list">版本列表</string>
     <string name="page_title_version_manage">管理版本</string>
     <string name="page_title_account_list">账号列表</string>
     <string name="page_title_select_files">选择路径</string>
+    <string name="page_title_home_page_editor">主页编辑器</string>
     <!--  文件  -->
     <string name="files_browse_folder">浏览目录</string>
     <string name="files_importing">导入文件中</string>
@@ -1026,6 +1028,17 @@
     <string name="settings_launcher_background_video_volume_summary">背景内容是视频时，可以通过这个选项调整音量</string>
     <string name="settings_launcher_festivals_effects_title">持续型节日彩蛋效果</string>
     <string name="settings_launcher_festivals_effects_summary">在特定时间段显示持续型彩蛋效果</string>
+    <string name="settings_launcher_home_page_title">主页</string>
+    <string name="settings_launcher_home_page_type_blank">空白</string>
+    <string name="settings_launcher_home_page_type_local">从本地加载</string>
+    <string name="settings_launcher_home_page_type_url">从网络加载</string>
+    <string name="settings_launcher_home_page_type_local_tip">编辑启动器本地的主页文件，启动器使用经过扩展的 Markdown 语法描述主页，编辑完成后，点击刷新重载主页</string>
+    <string name="settings_launcher_home_page_type_local_gen_doc">生成官方主页文档</string>
+    <string name="settings_launcher_home_page_type_local_gen_doc_exists">当前已存在主页文件，你确定要将已有的主页覆盖掉，并重新生成官方文档主页吗？</string>
+    <string name="settings_launcher_home_page_type_url_tip">从指定的链接获取启动器主页文件并缓存，定时刷新重载主页</string>
+    <string name="settings_launcher_home_page_type_warning">自定义主页属于第三方内容，启动器不对其内容做任何担保，请谨慎接收陌生的主页！</string>
+    <string name="settings_launcher_home_page_url">主页下载链接：</string>
+    <string name="settings_launcher_home_page_loading">加载主页中</string>
     <!--  控制  -->
     <string name="control_keyboard_bind_title">绑定按键</string>
     <string name="control_keyboard_bind_summary">请在您的键盘上按下想要绑定的按键</string>
