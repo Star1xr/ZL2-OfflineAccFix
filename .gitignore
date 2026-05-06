@@ -13,4 +13,4 @@ local.properties
 .store_password.txt
 .key_password.txt
 .curseforge_api.txt
-**/zalith_launcher.jks
+ZalithLauncher/zalith_launcher.jks
