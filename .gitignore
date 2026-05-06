@@ -9,8 +9,3 @@
 .externalNativeBuild
 .cxx
 local.properties
-.oauth_client_id.txt
-.store_password.txt
-.key_password.txt
-.curseforge_api.txt
-ZalithLauncher/zalith_launcher.jks
