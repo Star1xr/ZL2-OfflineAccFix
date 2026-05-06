@@ -1,8 +1,6 @@
 # Zalith Launcher 2 OFFLINE ACCOUNT FIX
 This Fork fixes offline accounts for ZL2, also i optimized the bad code. :)
 
-soon: capes/custom capes
-
 [简体中文](README_ZH_CN.md) | [繁體中文](README_ZH_TW.md)
 
 
