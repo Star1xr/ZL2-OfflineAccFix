@@ -80,7 +80,6 @@ import com.movtery.zalithlauncher.game.launch.handler.HandlerType
 import com.movtery.zalithlauncher.game.launch.handler.JVMHandler
 import com.movtery.zalithlauncher.game.multirt.RuntimesManager
 import com.movtery.zalithlauncher.game.version.installed.Version
-import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.terracotta.TerracottaVPNService
 import com.movtery.zalithlauncher.ui.base.BaseAppCompatActivity
@@ -350,7 +349,10 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
             exitListener = { exitCode: Int, isSignal: Boolean ->
                 stopAllService()
                 if (exitCode != 0) {
-                    showExitMessage(this, exitCode, isSignal)
+                    val logPath = withLauncher {
+                        getLogFile().absolutePath
+                    }
+                    showExitMessage(this@VMActivity, exitCode, isSignal, logPath)
                 } else {
                     //重启启动器
                     ProcessPhoenix.triggerRebirth(this@VMActivity)
@@ -371,7 +373,7 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
             addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) // 防止系统息屏
         }
 
-        val logFile = File(PathManager.DIR_FILES_EXTERNAL, "${withLauncher { getLogName() } }.log")
+        val logFile = withLauncher { getLogFile() }
         if (!logFile.exists() && !logFile.createNewFile()) throw IOException("Failed to create a new log file")
         LoggerBridge.start(logFile.absolutePath)
 

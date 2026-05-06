@@ -27,27 +27,39 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import com.movtery.zalithlauncher.context.readRawContent
+import androidx.navigation3.runtime.NavBackStack
 import com.movtery.zalithlauncher.setting.enums.isLauncherInDarkTheme
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.code_editor.EditorState
 import com.movtery.zalithlauncher.ui.code_editor.SoraEditor
+import com.movtery.zalithlauncher.ui.code_editor.lang.LogLanguage
 import com.movtery.zalithlauncher.ui.code_editor.scheme.SchemeIDEADark
 import com.movtery.zalithlauncher.ui.code_editor.scheme.SchemeIDEALight
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
+import com.movtery.zalithlauncher.ui.screens.TitledNavKey
+import com.movtery.zalithlauncher.ui.screens.navigateTo
 import com.movtery.zalithlauncher.utils.logging.Logger.lWarning
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 import io.github.rosemoe.sora.text.Content
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
+
+/**
+ * 导航到日志查看器
+ */
+fun NavBackStack<TitledNavKey>.navigateToLogView(
+    logPath: String,
+) = this.navigateTo(
+    screenKey = NormalNavKey.LogView(logPath = logPath),
+    useClassEquality = true
+)
 
 @Composable
-fun LicenseScreen(
-    key: NormalNavKey.License,
+fun LogViewScreen(
+    key: NormalNavKey.LogView,
     backStackViewModel: ScreenBackStackViewModel
 ) {
-    val context = LocalContext.current
     val isDark = isLauncherInDarkTheme()
 
     var editorState by remember { mutableStateOf<EditorState>(EditorState.Loading) }
@@ -56,9 +68,9 @@ fun LicenseScreen(
         editorState = EditorState.Loading
         val content = withContext(Dispatchers.IO) {
             runCatching {
-                context.readRawContent(key.raw)
+                File(key.logPath).readText()
             }.getOrElse { e ->
-                lWarning("Unable to read R.raw license", e)
+                lWarning("Unable to read log file!", e)
                 e.message
             }
         }
@@ -77,10 +89,12 @@ fun LicenseScreen(
             val scheme = remember(isDark) {
                 if (isDark) SchemeIDEADark() else SchemeIDEALight()
             }
+            val language = remember { LogLanguage() }
 
             SoraEditor(
                 state = editorState,
                 scheme = scheme,
+                language = language,
                 isReadOnly = true,
                 onSaveClick = {}
             )

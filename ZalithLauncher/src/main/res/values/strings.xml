@@ -55,6 +55,7 @@
     <string name="generic_no_matching_items">No matching items</string>
     <string name="generic_follow_system">Follow System</string>
     <string name="generic_edit">Edit</string>
+    <string name="generic_view">View</string>
     <!-- Page Title -->
     <string name="page_title_version_list">Version List</string>
     <string name="page_title_version_manage">Manage Versions</string>
@@ -649,6 +650,7 @@
     <string name="versions_overview_logs_folder">Log Folder</string>
     <string name="versions_overview_crash_report_folder">Crash Report Folder</string>
     <string name="versions_overview_cant_share_folder_message">No third-party app is available on this device to open this folder!</string>
+    <string name="versions_overview_log">Running Log</string>
     <string name="versions_config_version_settings">Version-Specific Settings</string>
     <string name="versions_config_game_settings">Game-Specific Settings</string>
     <string name="versions_config_support_settings">Additional Support Settings</string>

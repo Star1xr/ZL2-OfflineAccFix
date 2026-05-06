@@ -23,6 +23,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
+import androidx.annotation.RawRes
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.utils.file.ensureParentDirectory
 import com.movtery.zalithlauncher.utils.file.readString
@@ -143,4 +144,12 @@ fun Context.writeLocalFile(
     contentResolver.openOutputStream(newFileUri, "wt")?.use { out ->
         FileUtils.copyFile(inputFile, out)
     }
+}
+
+fun Context.readRawContent(
+    @RawRes raw: Int
+): String {
+    return resources.openRawResource(raw)
+        .bufferedReader()
+        .readText()
 }

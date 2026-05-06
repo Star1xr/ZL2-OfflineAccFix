@@ -167,6 +167,7 @@ class CrashLogsUploadViewModel: ViewModel() {
     fun cancel() {
         uploadJob?.cancel()
         uploadJob = null
+        operation = ShareLinkOperation.None
     }
 
     override fun onCleared() {
