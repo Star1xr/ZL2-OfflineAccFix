@@ -68,7 +68,7 @@ abstract class Launcher(
 
     abstract suspend fun launch(screenSize: IntSize): Int
     abstract fun chdir(): String
-    abstract fun getLogName(): String
+    abstract fun getLogFile(): File
     abstract fun exit()
 
     protected suspend fun launchJvm(
