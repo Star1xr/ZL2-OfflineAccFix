@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.game.version.installed
 
+import com.movtery.zalithlauncher.game.launch.LogName
 import com.movtery.zalithlauncher.game.path.getVersionsHome
 import com.movtery.zalithlauncher.game.version.installed.utils.parseJsonToVersionInfo
 import com.movtery.zalithlauncher.info.InfoDistributor
@@ -228,6 +229,11 @@ object VersionsManager {
      * @return 通过名称获取 Zalith 启动器版本标识文件夹
      */
     fun getZalithVersionPath(name: String) = File(getVersionPath(name), InfoDistributor.LAUNCHER_IDENTIFIER)
+
+    /**
+     * @return 游戏的上一次运行日志
+     */
+    fun getLatestLog(version: Version) = File(getZalithVersionPath(version), LogName.GAME.fileName)
 
     /**
      * @return 获取当前版本设置的图标

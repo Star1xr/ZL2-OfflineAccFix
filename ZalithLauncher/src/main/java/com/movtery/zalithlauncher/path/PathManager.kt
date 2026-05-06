@@ -20,6 +20,8 @@ package com.movtery.zalithlauncher.path
 
 import android.content.Context
 import android.os.Environment
+import com.movtery.zalithlauncher.game.launch.LogName
+import org.apache.commons.io.FileUtils
 import java.io.File
 
 class PathManager {
@@ -97,6 +99,7 @@ class PathManager {
             FILE_TERRACOTTA_LOG = File(DIR_FILES_EXTERNAL, "terracotta.log")
 
             createDirs()
+            handleLegacy()
         }
 
         private fun createDirs() {
@@ -121,6 +124,16 @@ class PathManager {
             DIR_CONTROL_LAYOUTS.mkdirs()
             DIR_TERRACOTTA.mkdirs()
             DIR_STYLES.mkdirs()
+        }
+
+        /**
+         * 处理历史遗留的旧文件
+         */
+        private fun handleLegacy() {
+            //不再支持的共用游戏运行日志
+            File(DIR_FILES_EXTERNAL, LogName.GAME.fileName).takeIf { it.exists() }?.let {
+                FileUtils.deleteQuietly(it)
+            }
         }
     }
 }

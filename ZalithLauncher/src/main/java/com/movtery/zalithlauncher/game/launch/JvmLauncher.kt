@@ -70,7 +70,9 @@ open class JvmLauncher(
         return getGameHome()
     }
 
-    override fun getLogName(): String = LogName.JVM.fileName
+    override fun getLogFile(): File = File(
+        PathManager.DIR_FILES_EXTERNAL, LogName.JVM.fileName
+    )
 
     private fun getStartupNeeded(
         screenSize: IntSize
