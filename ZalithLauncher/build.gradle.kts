@@ -62,7 +62,7 @@ android {
         create("debugBuild") {
             storeFile = file("zalith_launcher_debug.jks")
             storePassword = defaultStorePassword
-            keyAlias = "zalithkey"
+            keyAlias = "movtery_zalith_debug"
             keyPassword = defaultKeyPassword
         }
     }
