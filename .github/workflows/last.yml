@@ -1,0 +1,41 @@
+name: Build CI
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+# Otomatik GITHUB_TOKEN'a release oluşturma yetkisi veriyoruz
+permissions:
+  contents: write
+
+jobs:
+  Build:
+    uses: ./.github/workflows/build.yml
+    with:
+      variant: Release
+    secrets: inherit
+
+  Release:
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          # Build.yml içinde artifact adı neyse onu yazmalısın (Genelde 'app' veya 'release')
+          path: ./release-artifacts
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # Build numarasını kullanarak benzersiz tag oluşturur
+          tag_name: build-${{ github.run_number }}
+          name: "Release Build #${{ github.run_number }}"
+          # Tüm alt klasörlerdeki apk ve aarch dosyalarını bulur
+          files: |
+            ./release-artifacts/**/*.apk
+            ./release-artifacts/**/*aarch*
+          prerelease: true
+          generate_release_notes: true
