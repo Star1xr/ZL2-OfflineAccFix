@@ -56,7 +56,7 @@ android {
         create("releaseBuild") {
 	        storeFile = file("zalith_launcher.jks")
             storePassword = System.getenv("STORE_PASSWORD") ?: getKeyFromLocal("STORE_PASSWORD", ".store_password.txt")
-            keyAlias = "my-alias"
+            keyAlias = "zalithkey"
             keyPassword = System.getenv("KEY_PASSWORD") ?: getKeyFromLocal("KEY_PASSWORD", ".key_password.txt")
         }
         create("debugBuild") {
