@@ -55,15 +55,15 @@ android {
     signingConfigs {
         create("releaseBuild") {
             storeFile = file("zalithkey.jks")
-            storePassword = defaultStorePassword
-            keyAlias = "zalithkey"
-            keyPassword = defaultKeyPassword
-        }
-        create("debugBuild") {
-            storeFile = file("zalith_launcher_debug.jks")
             storePassword = getKeyFromLocal("RELEASE_STORE_PASSWORD")
             keyAlias = getKeyFromLocal("RELEASE_KEY_ALIAS")
             keyPassword = getKeyFromLocal("RELEASE_KEY_PASSWORD")
+        }
+        create("debugBuild") {
+            storeFile = file("zalith_launcher_debug.jks")
+            storePassword = defaultStorePassword
+            keyAlias = "zalithkey"
+            keyPassword = defaultKeyPassword
         }
     }
 
