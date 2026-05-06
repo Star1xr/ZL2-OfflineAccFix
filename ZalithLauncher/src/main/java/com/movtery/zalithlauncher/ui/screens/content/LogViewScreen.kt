@@ -32,6 +32,7 @@ import com.movtery.zalithlauncher.setting.enums.isLauncherInDarkTheme
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.code_editor.EditorState
 import com.movtery.zalithlauncher.ui.code_editor.SoraEditor
+import com.movtery.zalithlauncher.ui.code_editor.lang.LogLanguage
 import com.movtery.zalithlauncher.ui.code_editor.scheme.SchemeIDEADark
 import com.movtery.zalithlauncher.ui.code_editor.scheme.SchemeIDEALight
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
@@ -88,10 +89,12 @@ fun LogViewScreen(
             val scheme = remember(isDark) {
                 if (isDark) SchemeIDEADark() else SchemeIDEALight()
             }
+            val language = remember { LogLanguage() }
 
             SoraEditor(
                 state = editorState,
                 scheme = scheme,
+                language = language,
                 isReadOnly = true,
                 onSaveClick = {}
             )
