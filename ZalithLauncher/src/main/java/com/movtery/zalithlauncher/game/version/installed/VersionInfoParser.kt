@@ -27,29 +27,29 @@ import com.movtery.zalithlauncher.utils.logging.Logger.lDebug
 import com.movtery.zalithlauncher.utils.logging.Logger.lWarning
 import java.io.File
 
-fun getGameManifest(version: Version): GameManifest {
-    return getGameManifest(version, false)
-}
-
 /**
  * [Modified from PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher/blob/a6f3fc0/app_pojavlauncher/src/main/java/net/kdt/pojavlaunch/Tools.java#L885-L979)
  */
-fun getGameManifest(version: Version, skipInheriting: Boolean): GameManifest {
-    var gameManifest = GSON.fromJson(File(version.getVersionPath(), "${version.getVersionName()}.json").readText(), GameManifest::class.java)
-    if (!skipInheriting && gameManifest.inheritsFrom != null) {
+fun getGameManifest(
+    version: Version,
+    gameManifest: GameManifest = GSON.fromJson(File(version.getVersionPath(), "${version.getVersionName()}.json").readText(), GameManifest::class.java),
+    skipInheriting: Boolean = false
+): GameManifest {
+    var gameManifest0 = gameManifest
+    if (!skipInheriting && gameManifest0.inheritsFrom != null) {
         val inheritsManifest = run {
-            val inherits = gameManifest.inheritsFrom
+            val inherits = gameManifest0.inheritsFrom
             GSON.fromJson(File(version.getVersionsFolder()).child(inherits).child("${inherits}.json").readText(), GameManifest::class.java)
         }
         insertSafety(
             target = inheritsManifest,
-            from = gameManifest,
+            from = gameManifest0,
             "assetIndex", "assets", "id", "mainClass", "minecraftArguments", "releaseTime", "time", "type"
         )
 
         // Go through the libraries, remove the ones overridden by the custom version
         val inheritLibraryList: MutableList<Library> = ArrayList(inheritsManifest.libraries)
-        outer_loop@ for (library in gameManifest.libraries) {
+        outer_loop@ for (library in gameManifest0.libraries) {
             // Clean libraries overridden by the custom version
             val libName: String = library.name.substring(0, library.name.lastIndexOf(":"))
 
@@ -73,22 +73,22 @@ fun getGameManifest(version: Version, skipInheriting: Boolean): GameManifest {
 
 
         // Fuse libraries
-        inheritLibraryList += gameManifest.libraries
+        inheritLibraryList += gameManifest0.libraries
         inheritsManifest.libraries = inheritLibraryList
         processLibraries { inheritsManifest.libraries }
 
         // Inheriting Minecraft 1.13+ with append custom args
-        if (inheritsManifest.arguments != null && gameManifest.arguments != null) {
+        if (inheritsManifest.arguments != null && gameManifest0.arguments != null) {
             val totalArgList: MutableList<Any?> = ArrayList(inheritsManifest.arguments.game)
 
             var nskip = 0
-            for (i in 0..<gameManifest.arguments.game.size) {
+            for (i in 0..<gameManifest0.arguments.game.size) {
                 if (nskip > 0) {
                     nskip--
                     continue
                 }
 
-                var perCustomArg: Any = gameManifest.arguments.game[i]
+                var perCustomArg: Any = gameManifest0.arguments.game[i]
                 if (perCustomArg is String) {
                     var perCustomArgStr = perCustomArg
                     // Check if there is a duplicate argument on combine
@@ -96,7 +96,7 @@ fun getGameManifest(version: Version, skipInheriting: Boolean): GameManifest {
                             perCustomArgStr
                         )
                     ) {
-                        perCustomArg = gameManifest.arguments.game[i + 1]
+                        perCustomArg = gameManifest0.arguments.game[i + 1]
                         if (perCustomArg is String) {
                             perCustomArgStr = perCustomArg
                             // If the next is argument value, skip it
@@ -115,16 +115,16 @@ fun getGameManifest(version: Version, skipInheriting: Boolean): GameManifest {
             inheritsManifest.arguments.game = totalArgList
         }
 
-        gameManifest = inheritsManifest
+        gameManifest0 = inheritsManifest
     } else {
-        processLibraries { gameManifest.libraries }
+        processLibraries { gameManifest0.libraries }
     }
 
-    if (gameManifest.javaVersion?.majorVersion == 0) {
-        gameManifest.javaVersion.majorVersion = gameManifest.javaVersion.version
+    if (gameManifest0.javaVersion?.majorVersion == 0) {
+        gameManifest0.javaVersion.majorVersion = gameManifest0.javaVersion.version
     }
 
-    return gameManifest
+    return gameManifest0
 }
 
 /**

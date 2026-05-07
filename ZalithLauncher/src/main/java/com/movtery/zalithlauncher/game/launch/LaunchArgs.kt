@@ -34,7 +34,6 @@ import com.movtery.zalithlauncher.game.version.download.filterLibrary
 import com.movtery.zalithlauncher.game.version.download.getLibraryReplacement
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.game.version.installed.VersionInfo
-import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.game.version.installed.getGameManifest
 import com.movtery.zalithlauncher.game.versioninfo.models.GameManifest
 import com.movtery.zalithlauncher.info.InfoDistributor
@@ -59,17 +58,12 @@ class LaunchArgs(
     private val offlineServer: OfflineYggdrasilServer,
     private val gameDirPath: File,
     private val version: Version,
+    private val clientJar: File,
     private val gameManifest: GameManifest,
     private val runtime: Runtime,
     private val readAssetsFile: (path: String) -> String,
     private val getCacioJavaArgs: (isJava8: Boolean) -> List<String>
 ) {
-    //fix: 一些定制端需要依赖原版客户端
-    val clientJar = gameManifest.inheritsFrom?.let { inheritsFrom ->
-        //FIXME: 依赖的是一个原版ID的版本，但这个版本可能是用户自行安装的，只是版本名称与ID一致，不保证客户端真的是对应版本
-        VersionsManager.getVersion(inheritsFrom)?.getClientJar()
-    } ?: version.getClientJar()
-
     fun getAllArgs(): List<String> {
         val argsList: MutableList<String> = ArrayList()
 
@@ -221,7 +215,7 @@ class LaunchArgs(
     }
 
     private fun getMinecraftJVMArgs(): Array<String> {
-        val gameManifest1 = getGameManifest(version, true)
+        val gameManifest1 = getGameManifest(version, skipInheriting = true)
 
 //        // Parse Forge 1.17+ additional JVM Arguments
 //        if (versionInfo.inheritsFrom == null || versionInfo.arguments == null || versionInfo.arguments.jvm == null) {

@@ -48,6 +48,7 @@ import com.movtery.zalithlauncher.game.versioninfo.models.GameManifest
 import com.movtery.zalithlauncher.path.LibPath
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.utils.GSON
 import com.movtery.zalithlauncher.utils.device.Architecture
 import com.movtery.zalithlauncher.utils.file.child
 import com.movtery.zalithlauncher.utils.file.ensureDirectorySilently
@@ -81,7 +82,13 @@ class GameLauncher(
             Renderers.setCurrentRenderer(activity, version.getRenderer())
         }
 
-        gameManifest = getGameManifest(version)
+        val manifest = GSON.fromJson(File(version.getVersionPath(), "${version.getVersionName()}.json").readText(), GameManifest::class.java)
+        val clientJar = manifest.inheritsFrom?.let { inheritsFrom ->
+            //FIXME: 依赖的是一个原版ID的版本，但这个版本可能是用户自行安装的，只是版本名称与ID一致，不保证客户端真的是对应版本
+            VersionsManager.getVersion(inheritsFrom)?.getClientJar()
+        } ?: version.getClientJar()
+
+        gameManifest = getGameManifest(version, gameManifest = manifest)
         CallbackBridge.nativeSetUseInputStackQueue(gameManifest.arguments != null)
 
         val currentAccount = AccountsManager.currentAccountFlow.value!!
@@ -105,6 +112,7 @@ class GameLauncher(
         return launchGame(
             screenSize = screenSize,
             account = account,
+            clientJar = clientJar,
             javaRuntime = javaRuntime,
             customArgs = customArgs
         )
@@ -182,6 +190,7 @@ class GameLauncher(
     private suspend fun launchGame(
         screenSize: IntSize,
         account: Account,
+        clientJar: File,
         javaRuntime: String,
         customArgs: String
     ): Int {
@@ -201,6 +210,7 @@ class GameLauncher(
             offlineServer = offlineServer,
             gameDirPath = gameDirPath,
             version = version,
+            clientJar = clientJar,
             gameManifest = gameManifest,
             runtime = runtime,
             readAssetsFile = { path -> activity.readAssetFile(path) },
