@@ -202,7 +202,7 @@ object VersionsManager {
         _currentVersion.update { version }
     }
 
-    private fun getVersion(name: String?): Version? {
+    fun getVersion(name: String?): Version? {
         name?.let { versionName ->
             return versions.find { it.getVersionName() == versionName }?.takeIf { it.isValid() }
         }

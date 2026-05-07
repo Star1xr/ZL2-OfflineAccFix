@@ -59,7 +59,7 @@ open class JvmLauncher(
         return launchJvm(
             context = context,
             jvmArgs = argList,
-            userHome = jvmLaunchInfo.userHome,
+            userHome = jvmLaunchInfo.userHome ?: GamePathManager.getUserPath(),
             userArgs = AllSettings.jvmArgs.getValue(),
             screenSize = screenSize,
             useLocalLanguage = false
