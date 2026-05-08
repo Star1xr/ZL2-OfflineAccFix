@@ -374,6 +374,7 @@ class AccountManageViewModel @Inject constructor(
             is AccountManageIntent.FetchMicrosoftCapes -> fetchMicrosoftCapes(intent.account)
             is AccountManageIntent.ApplyMicrosoftCape -> applyMicrosoftCape(intent)
             is AccountManageIntent.ApplyCustomCape -> applyCustomCape(intent)
+            is AccountManageIntent.UploadCustomCape -> uploadCustomCape(intent)
             is AccountManageIntent.CreateLocalAccount -> createLocalAccount(
                 intent.userName,
                 intent.userUUID
@@ -739,6 +740,13 @@ class AccountManageViewModel @Inject constructor(
                 )
             })
         )
+    }
+
+    /** 上传自定义披风（内部使用） */
+    private fun uploadCustomCape(intent: AccountManageIntent.UploadCustomCape) {
+        // Reuse the existing applyCustomCape logic since uploading a custom cape
+        // simply involves validating and copying the file locally.
+        applyCustomCape(AccountManageIntent.ApplyCustomCape(intent.account, intent.capeFile))
     }
 
     /** 创建离线账号 */
