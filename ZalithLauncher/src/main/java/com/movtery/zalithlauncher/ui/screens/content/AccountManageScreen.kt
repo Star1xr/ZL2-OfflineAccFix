@@ -796,9 +796,15 @@ private fun AccountSkinOperation(
                     )
                 },
                 isImportingSkin = skinDialogState.importingSkin,
+                isImportingCape = skinDialogState.importingCape,
                 onSkinPicked = { uri ->
                     actions.onIntent(
                         AccountManageIntent.OnSkinPicked(uri)
+                    )
+                },
+                onCapePicked = { account, uri ->
+                    actions.onIntent(
+                        AccountManageIntent.OnCapePicked(account, uri)
                     )
                 },
                 onDismissRequest = {
@@ -816,6 +822,9 @@ private fun AccountSkinOperation(
                 },
                 onApplyCape = { cape ->
                     actions.onIntent(AccountManageIntent.ApplyMicrosoftCape(account, cape))
+                },
+                onApplyCustomCape = { file ->
+                    actions.onIntent(AccountManageIntent.ApplyCustomCape(account, file))
                 }
             )
         }

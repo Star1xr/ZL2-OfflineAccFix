@@ -1145,9 +1145,8 @@ sealed interface ChangeSkin {
  */
 sealed interface ChangeCape {
     data object None : ChangeCape
-    data class ChangeCapeData(
-        val cape: PlayerProfile.Cape
-    ) : ChangeCape
+    data class SelectedCape(val cape: PlayerProfile.Cape) : ChangeCape
+    data class SelectedCustomCape(val capeFile: File) : ChangeCape
 }
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -1160,11 +1159,14 @@ fun ChangeSkinDialog(
     capeState: ChangeCape,
     onCapeStateChange: (ChangeCape) -> Unit,
     isImportingSkin: Boolean,
+    isImportingCape: Boolean = false,
     onSkinPicked: (Uri) -> Unit,
+    onCapePicked: (Account, Uri) -> Unit = { _, _ -> },
     onDismissRequest: () -> Unit,
     onResetSkin: () -> Unit,
     onApplySkin: (File, SkinModelType) -> Unit,
     onApplyCape: (PlayerProfile.Cape) -> Unit,
+    onApplyCustomCape: (File) -> Unit = {},
     onFetchCapes: () -> Unit
 ) {
     val context = LocalContext.current
@@ -1200,6 +1202,11 @@ fun ChangeSkinDialog(
     val skinPicker =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
             uri?.let(onSkinPicked)
+        }
+
+    val capePicker =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            uri?.let { onCapePicked(account, it) }
         }
 
     /**
@@ -1297,8 +1304,24 @@ fun ChangeSkinDialog(
 
                                             is ChangeSkin.ResetSkin -> resetSkin()
                                         }
-                                        if (account.isMicrosoftAccount()) {
-                                            playerSkin.loadCape(currentCapeToLoad)
+                                        when (capeState) {
+                                            is ChangeCape.SelectedCape -> {
+                                                if (account.isMicrosoftAccount()) {
+                                                    playerSkin.loadCape(capeState.cape)
+                                                }
+                                            }
+                                            is ChangeCape.SelectedCustomCape -> {
+                                                runCatching {
+                                                    capeState.capeFile.inputStream().use { stream ->
+                                                        playerSkin.loadCape(stream)
+                                                    }
+                                                }
+                                            }
+                                            ChangeCape.None -> {
+                                                if (account.isMicrosoftAccount()) {
+                                                    playerSkin.loadCape(currentCapeToLoad)
+                                                }
+                                            }
                                         }
                                     }
                                 },
@@ -1413,6 +1436,30 @@ fun ChangeSkinDialog(
                                 )
                             }
 
+                            //自定义披风上传
+                            InfoLayoutTextItem(
+                                modifier = Modifier.fillMaxWidth(),
+                                title = stringResource(R.string.account_change_cape_upload),
+                                icon = {
+                                    if (isImportingCape) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(22.dp),
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        Icon(
+                                            modifier = Modifier.size(22.dp),
+                                            painter = painterResource(R.drawable.ic_upload),
+                                            contentDescription = null
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    capePicker.launch(arrayOf("image/png"))
+                                },
+                                enabled = !isImportingCape
+                            )
+
                             //离线账号重置皮肤
                             if (account.isLocalAccount() && account.hasSkinFile && skinState != ChangeSkin.ResetSkin) {
                                 InfoLayoutTextItem(
@@ -1460,8 +1507,10 @@ fun ChangeSkinDialog(
                                     ChangeSkin.None -> {}
                                 }
 
-                                if (capeState is ChangeCape.ChangeCapeData) {
+                                if (capeState is ChangeCape.SelectedCape) {
                                     onApplyCape(capeState.cape)
+                                } else if (capeState is ChangeCape.SelectedCustomCape) {
+                                    onApplyCustomCape(capeState.capeFile)
                                 }
 
                                 onDismissRequest()
@@ -1477,7 +1526,7 @@ fun ChangeSkinDialog(
 
     if (showCapeSelector) {
         //若当前未更改披风，则使用使用中的披风
-        val cape = if (capeState is ChangeCape.ChangeCapeData) {
+        val cape = if (capeState is ChangeCape.SelectedCape) {
             capeState.cape
         } else {
             currentUsingCape
@@ -1492,7 +1541,7 @@ fun ChangeSkinDialog(
             onSelected = { cape, _ ->
                 //检查是否已经为正在使用的披风
                 val state = if (cape != currentUsingCape) {
-                    ChangeCape.ChangeCapeData(cape)
+                    ChangeCape.SelectedCape(cape)
                 } else {
                     ChangeCape.None
                 }

@@ -1256,4 +1256,9 @@
     <string name="festivals_new_year">Happy New Year!</string>
     <string name="festivals_april_fools">Happy April Fools\' Day!</string>
     <string name="festivals_christmas">Merry Christmas!</string>
+    <!-- Custom Cape Upload -->
+    <string name="account_change_cape_upload">Upload Custom Cape</string>
+    <string name="account_change_cape_invalid">Invalid cape file! Cape must be 64x32 pixels PNG.</string>
+    <string name="account_change_cape_failed_to_import">Failed to import cape: %s</string>
+    <string name="account_change_cape_apply_custom_success">Custom cape applied!</string>
 </resources>
