@@ -57,9 +57,14 @@ object GamePathManager {
     val currentPath = _currentPath.asStateFlow()
 
     /**
+     * 当前游戏路径
+     */
+    fun getCurrentPath(): String = File(_currentPath.value).absolutePath
+
+    /**
      * 当前用户路径
      */
-    fun getUserHome(): String = File(_currentPath.value).parentFile!!.absolutePath
+    fun getUserPath(): String = File(_currentPath.value).parentFile!!.absolutePath
 
     private lateinit var database: AppDatabase
     private lateinit var gamePathDao: GamePathDao

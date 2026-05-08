@@ -58,6 +58,7 @@ class LaunchArgs(
     private val offlineServer: OfflineYggdrasilServer,
     private val gameDirPath: File,
     private val version: Version,
+    private val clientJar: File,
     private val gameManifest: GameManifest,
     private val runtime: Runtime,
     private val readAssetsFile: (path: String) -> String,
@@ -206,13 +207,15 @@ class LaunchArgs(
             }
         }
         argsList.add("-Dlog4j.configurationFile=${configFilePath.absolutePath}")
-        argsList.add("-Dminecraft.client.jar=${version.getClientJar().absolutePath}")
+        argsList.add("-Dminecraft.client.jar=${clientJar.absolutePath}")
+        argsList.add("-Dminecraft.launcher.brand=${InfoDistributor.LAUNCHER_NAME}")
+        argsList.add("-Dminecraft.launcher.version=${BuildConfig.VERSION_NAME}")
 
         return argsList
     }
 
     private fun getMinecraftJVMArgs(): Array<String> {
-        val gameManifest1 = getGameManifest(version, true)
+        val gameManifest1 = getGameManifest(version, skipInheriting = true)
 
 //        // Parse Forge 1.17+ additional JVM Arguments
 //        if (versionInfo.inheritsFrom == null || versionInfo.arguments == null || versionInfo.arguments.jvm == null) {
@@ -271,11 +274,7 @@ class LaunchArgs(
      */
     private fun generateLaunchClassPath(gameManifest: GameManifest): String {
         val classpathList = mutableListOf<String>()
-
         val classpath: Array<String> = generateLibClasspath(gameManifest)
-
-        val clientClass = version.getClientJar()
-        val clientClasspath: String = clientClass.absolutePath
 
         for (jarFile in classpath) {
             val jarFileObj = File(jarFile)
@@ -285,8 +284,8 @@ class LaunchArgs(
             }
             classpathList.add(jarFile)
         }
-        if (clientClass.exists()) {
-            classpathList.add(clientClasspath)
+        if (clientJar.exists()) {
+            classpathList.add(clientJar.absolutePath)
         }
 
         return classpathList.joinToString(":")
@@ -341,7 +340,7 @@ class LaunchArgs(
         varArgMap["game_directory"] = gameDirPath.absolutePath
         varArgMap["user_properties"] = "{}"
         varArgMap["user_type"] = "msa"
-        varArgMap["version_name"] = version.getVersionInfo()!!.minecraftVersion
+        varArgMap["version_name"] = gameManifest.id
 
         setLauncherInfo(varArgMap)
 

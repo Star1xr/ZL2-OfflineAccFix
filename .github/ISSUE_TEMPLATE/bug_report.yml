@@ -32,11 +32,22 @@ body:
       description: |
         The crash page of the launcher will have a "Share Logs" button. Please upload the log provided by the launcher here.  
         If your issue is related to a "Launcher Crash", you can find the "Share Launcher Logs" option in the launcher settings. Please upload the log archive provided by the launcher here.  
-        If your issue is related to a "Game Crash", you can use a file manager to navigate to ZL2's public directory and locate the "latest_game.log" file.  
+        If your issue is related to a "Game Crash":  
+        < 2.4.3  
+        You can use a file manager to navigate to ZL2's public directory and locate the "latest_game.log" file.  
+        \>= 2.4.3  
+        You can find the "Running Log" button in the version overview page, click it to open the log menu, and then share it.  
         **Please do not upload the game's own logs here, as the information they record is not comprehensive!**  
+        
+        ---
+        
         启动器的崩溃页面会有“分享日志”按钮，请将启动器给出的日志上传在这里；  
         如果您的问题属于“启动器崩溃”，您可以在启动器设置内找到“分享启动器日志”选项，请将启动器给出的日志压缩包上传在这里；  
-        如果您的问题属于“游戏运行崩溃”，您可以在文件管理器软件内进入 ZL2 的公有目录，找到 “latest_game.log” 文件。  
+        如果您的问题属于“游戏运行崩溃”：  
+        < 2.4.3  
+        您可以在文件管理器软件内进入 ZL2 的公有目录，找到 “latest_game.log” 文件。  
+        \>= 2.4.3  
+        您可以在版本概览中，找到“运行日志”按钮，点击打开日志菜单，即可分享。  
         **请不要在此处上传游戏自己的日志，它记录的信息并不全面！**
     validations:
       required: true

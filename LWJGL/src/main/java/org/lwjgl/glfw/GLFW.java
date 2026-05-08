@@ -1278,6 +1278,16 @@ public class GLFW
         CallbackBridge.nativeSetCursorShape(CursorRegistry.getShape(cursor));
     }
 
+    /** {@code void glfwGetPreeditCursorRectangle(GLFWwindow * window, int * x, int * y, int * w, int * h)} */
+    public static void glfwGetPreeditCursorRectangle(@NativeType("GLFWwindow *") long window, @NativeType("int *") @Nullable IntBuffer x, @NativeType("int *") @Nullable IntBuffer y, @NativeType("int *") @Nullable IntBuffer w, @NativeType("int *") @Nullable IntBuffer h) {
+
+    }
+
+    /** {@code void glfwSetPreeditCursorRectangle(GLFWwindow * window, int x, int y, int w, int h)} */
+    public static void glfwSetPreeditCursorRectangle(@NativeType("GLFWwindow *") long window, int x, int y, int w, int h) {
+
+    }
+
     public static boolean glfwRawMouseMotionSupported() {
         // Should be not supported?
         return false;

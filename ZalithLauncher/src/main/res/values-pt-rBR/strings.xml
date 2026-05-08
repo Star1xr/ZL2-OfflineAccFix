@@ -1186,4 +1186,19 @@
     <string name="screenshots_manage_export_selected_message">Exportar %1$d prints selecionadas para a galeria do celular?</string>
     <string name="unpack_screen_jna">Permite que o Minecraft chame diretamente funções de baixo nível do sistema operacional.</string>
     <string name="notification_jvm_running_name">Serviço Keep-Alive da JVM</string>
+    <string name="generic_edit">Editar</string>
+    <string name="generic_view">Visualizar</string>
+    <string name="page_title_home_page_editor">Editor da Página Inicial</string>
+    <string name="versions_overview_log">Executando a Log</string>
+    <string name="settings_launcher_home_page_title">Página Inicial</string>
+    <string name="settings_launcher_home_page_type_blank">Em branco</string>
+    <string name="settings_launcher_home_page_type_local">Carregar do Local</string>
+    <string name="settings_launcher_home_page_type_url">Carregar da URL</string>
+    <string name="settings_launcher_home_page_type_local_tip">Edite o arquivo da página inicial local do launcher. O launcher usa uma sintaxe Markdown estendida para descrever a página inicial. Após a edição, clique em atualizar para recarregar a página inicial.</string>
+    <string name="settings_launcher_home_page_type_local_gen_doc">Gerar Documento</string>
+    <string name="settings_launcher_home_page_type_local_gen_doc_exists">Já existe um arquivo de página inicial. Tem certeza de que deseja sobrescrever a página inicial existente e regenerar a página inicial da documentação oficial?</string>
+    <string name="settings_launcher_home_page_type_url_tip">Busca o arquivo da página inicial do launcher a partir do link especificado e o armazena em cache. Em seguida, atualiza e recarrega a página inicial periodicamente</string>
+    <string name="settings_launcher_home_page_type_warning">Páginas iniciais personalizadas são conteúdo de terceiros. O iniciador não oferece nenhuma garantia quanto ao conteúdo delas. Tenha cuidado ao aceitar páginas iniciais desconhecidas!</string>
+    <string name="settings_launcher_home_page_url">URL de download da página inicial:</string>
+    <string name="settings_launcher_home_page_loading">Carregando a página inicial</string>
 </resources>

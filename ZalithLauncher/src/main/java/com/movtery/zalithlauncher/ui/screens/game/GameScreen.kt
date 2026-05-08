@@ -353,6 +353,8 @@ private class GameViewModel(
         mouseScrollDownEvent.cancel()
         gameTextSender.cancel()
         onChangeTextInputMode(TextInputMode.DISABLE)
+        moveOnlyPointers.clear()
+        occupiedPointers.clear()
     }
 
     init {
