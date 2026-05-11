@@ -176,7 +176,7 @@ class PlayerSkin(
         // Re‑apply the previously loaded cape if we have its ID.
         if (preservedCapeId != null) {
             // Create a lightweight Cape implementation to trigger loading.
-            val dummyCape = object : PlayerProfile.Cape(preservedCapeId) {}
+            val dummyCape = PlayerProfile.Cape(preservedCapeId, "ACTIVE", "", "")
             loadCape(dummyCape)
         } else {
             // No cape to preserve – clear it.
