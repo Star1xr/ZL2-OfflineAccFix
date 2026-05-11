@@ -170,6 +170,15 @@ private fun BoxWithConstraintsScope.BaseControlBoxLayout(
                             val pointerId = change.id
                             val isPressed = change.pressed
 
+                            //抬起时，总是尝试释放该指针下活跃的按钮
+                            //避免子级占用了指针后，导致按钮状态无法被释放
+                            if (!isPressed) {
+                                allActiveWidgets.remove(pointerId)?.forEach { widget ->
+                                    widget.onReleaseEvent(eventHandler, reversedLayers)
+                                }
+                                return@forEach
+                            }
+
                             if (
                                 change.isConsumed ||
                                 //不处理被子级占用的指针
@@ -284,10 +293,6 @@ private fun BoxWithConstraintsScope.BaseControlBoxLayout(
                                             )
                                         }
                                     }
-                                }
-                            } else {
-                                allActiveWidgets.remove(pointerId)?.forEach { widget ->
-                                    widget.onReleaseEvent(eventHandler, reversedLayers)
                                 }
                             }
                         }

@@ -163,14 +163,14 @@ fun TouchpadLayout(
                                     //是否被父级标记为仅处理滑动
                                     val isMoveOnly = isMoveOnlyPointer(pointerId)
 
-                                    //仅在未被父级消费且未被占用的情况下，尝试占用指针
-                                    if (!isMoveOnly && !change.isConsumed && pointerId !in occupiedPointers) {
-                                        onOccupiedPointer(pointerId)
-                                        occupiedPointers.add(pointerId)
-                                    }
-
                                     //如果没有活跃指针，且当前指针未被消费，则开始处理这个指针
                                     if (activePointer == null && (!change.isConsumed || isMoveOnly)) {
+                                        //fix: 只有真正成为 activePointer 的指针，才标记为已占用
+                                        if (!isMoveOnly && pointerId !in occupiedPointers) {
+                                            onOccupiedPointer(pointerId)
+                                            occupiedPointers.add(pointerId)
+                                        }
+
                                         activePointer = pointerId
 
                                         dragStates[pointerId] =
