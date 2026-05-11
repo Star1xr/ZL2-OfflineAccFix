@@ -44,6 +44,7 @@ import com.movtery.zalithlauncher.context.COPY_LABEL_LINK
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.control.ControlManager
+import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.notification.NotificationManager
 import com.movtery.zalithlauncher.path.URL_SUPPORT
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -469,6 +470,7 @@ class MainActivity : BaseAppCompatActivity() {
         data: String?
     ) {
         when (key) {
+            //浏览器内打开指定链接
             "url" -> {
                 if (data != null) {
                     withContext(Dispatchers.Main) {
@@ -476,8 +478,11 @@ class MainActivity : BaseAppCompatActivity() {
                     }
                 }
             }
+            //检查启动器更新
             "check_update" -> checkUpdate()
+            //启动当前选中的游戏版本
             "launch_game" -> launchGameViewModel.tryLaunch()
+            //复制指定文本
             "copy" -> {
                 if (data != null) {
                     withContext(Dispatchers.Main) {
@@ -490,7 +495,17 @@ class MainActivity : BaseAppCompatActivity() {
                     }
                 }
             }
+            //刷新主页
             "refresh_page" -> homePageViewModel.reloadPage(true)
+            //分享游戏日志
+            "share_game_log" -> {
+                VersionsManager.currentVersion.value?.let { version ->
+                    VersionsManager.getLatestLog(version).takeIf { it.exists() }
+                }?.let { logFile ->
+                    logsUploadViewModel.check(logFile)
+                    logShareViewModel.openMenu(logFile)
+                }
+            }
         }
     }
 
