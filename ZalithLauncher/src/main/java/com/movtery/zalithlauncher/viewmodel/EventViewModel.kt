@@ -28,6 +28,7 @@ import com.movtery.zalithlauncher.ui.screens.main.custom_home.MarkdownBlock
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.io.File
 
 class EventViewModel : ViewModel() {
     private val _events = MutableSharedFlow<Event>(extraBufferCapacity = 1)
@@ -103,6 +104,10 @@ class EventViewModel : ViewModel() {
                 val language: String,
                 val link: String
             )
+        }
+        /** 分享游戏日志 */
+        sealed interface LogShare : Event {
+            data class ShareGameLog(val logFile: File) : LogShare
         }
         /** 启动器主页相关 */
         sealed interface HomePage: Event {
