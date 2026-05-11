@@ -169,10 +169,9 @@ class OfflineYggdrasilServer(
         val skinFile = account.getSkinFile()
         val capeFile = account.getCapeFile()
 
-        // Preserve existing cape: do not overwrite if already present
         val skinBytes = skinFile.takeIf { it.exists() }?.readBytes()
         val skinHash = skinBytes?.let { DigestUtils.digestToString("SHA-256", it) }
-        val capeBytes = if (capeFile.exists()) null else capeFile.takeIf { it.exists() }?.readBytes()
+        val capeBytes = capeFile.takeIf { it.exists() }?.readBytes()
         val capeHash = capeBytes?.let { DigestUtils.digestToString("SHA-256", it) }
 
         val character = Character(

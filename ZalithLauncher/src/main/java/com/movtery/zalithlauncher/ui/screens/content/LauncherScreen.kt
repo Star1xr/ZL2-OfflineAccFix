@@ -399,11 +399,6 @@ private fun RightMenuContent(
                 onClick = onLogViewerClick,
                 contentDescription = stringResource(R.string.versions_overview_log)
             )
-            ShortcutButton(
-                icon = R.drawable.ic_folder_outlined,
-                onClick = onModsFolderClick,
-                contentDescription = stringResource(R.string.mods_manage)
-            )
         }
 
         Row(

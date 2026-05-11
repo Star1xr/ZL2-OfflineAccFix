@@ -181,6 +181,24 @@ class LaunchArgs(
                     offlineServer.stop()
                 }
             }
+        } else if (account.isMicrosoftAccount()) {
+            if (account.hasSkinFile || account.getCapeFile().exists()) {
+                // Microsoft account with local skin/cape, using authlib-injector as proxy to local server
+                offlineServer.start()
+                offlineServer.addCharacter(account)
+                offlineServer.getPort()?.let { port ->
+                    val msg = "Using offline Yggdrasil server as proxy for Microsoft account on port $port"
+                    LoggerBridge.append(msg)
+                    lInfo(msg)
+                    argsList.add("-javaagent:${LibPath.AUTHLIB_INJECTOR.absolutePath}=http://localhost:$port")
+                    argsList.add("-Dauthlibinjector.side=client")
+                } ?: run {
+                    val msg = "Failed to start offline Yggdrasil server for Microsoft account!"
+                    LoggerBridge.append(msg)
+                    lWarning(msg)
+                    offlineServer.stop()
+                }
+            }
         } else if (account.isAuthServerAccount()) {
             if (account.otherBaseUrl!!.contains("auth.mc-user.com")) {
                 argsList.add("-javaagent:${LibPath.NIDE_8_AUTH.absolutePath}=${account.otherBaseUrl!!.replace("https://auth.mc-user.com:233/", "")}")
