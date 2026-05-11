@@ -84,6 +84,7 @@ import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
 import com.movtery.zalithlauncher.ui.screens.content.elements.MemoryPreview
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
 import com.movtery.zalithlauncher.ui.screens.content.navigateToLogView
+import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPosition
 import com.movtery.zalithlauncher.ui.screens.content.versions.layouts.ToggleableIntSliderSettingsCard
 import com.movtery.zalithlauncher.ui.screens.main.custom_home.MarkdownBlock
 import com.movtery.zalithlauncher.ui.screens.main.custom_home.customHomePage
@@ -165,7 +166,7 @@ fun LauncherScreen(
                     VersionsManager.currentVersion.value?.let { version ->
                         val logFile = File(version.getGameDir(), "logs/latest.log")
                         if (logFile.exists()) {
-                            backStackViewModel.mainScreen.navigateToLogView(logFile.absolutePath)
+                            backStackViewModel.mainScreen.backStack.navigateToLogView(logFile.absolutePath)
                         }
                     }
                 },
@@ -182,7 +183,7 @@ private fun QuickRamDialog(
     onDismissRequest: () -> Unit
 ) {
     val context = LocalContext.current
-    val globalRamAllocation by AllSettings.ramAllocation.collectAsStateWithLifecycle()
+    val globalRamAllocation = AllSettings.ramAllocation.state
     var tempRamAllocation by remember { mutableStateOf(globalRamAllocation) }
 
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismissRequest) {
@@ -208,6 +209,7 @@ private fun QuickRamDialog(
 
                 ToggleableIntSliderSettingsCard(
                     modifier = Modifier.fillMaxWidth(),
+                    position = CardPosition.Single,
                     currentValue = tempRamAllocation ?: 0,
                     valueRange = AllSettings.ramAllocation.floatRange.start..getMaxMemoryForSettings(context).toFloat(),
                     defaultValue = AllSettings.ramAllocation.getOrMin(),
@@ -218,7 +220,7 @@ private fun QuickRamDialog(
                         tempRamAllocation = it
                     },
                     onValueChangeFinished = {
-                        AllSettings.ramAllocation.state = tempRamAllocation
+                        AllSettings.ramAllocation.save(tempRamAllocation)
                     },
                     previewContent = {
                         MemoryPreview(
