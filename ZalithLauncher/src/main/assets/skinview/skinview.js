@@ -284,3 +284,8 @@ function loadSkin(skinUrl, model = "auto-detect") {
 function loadCape(capeUrl) {
     skinViewer.loadCape(capeUrl);
 }
+
+function loadSkinAndCape(skinUrl, model = "auto-detect", capeUrl = null) {
+    skinViewer.loadSkin(skinUrl, { model: model });
+    skinViewer.loadCape(capeUrl);
+}

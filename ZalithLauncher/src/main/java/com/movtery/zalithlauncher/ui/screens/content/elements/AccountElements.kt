@@ -1185,6 +1185,8 @@ fun ChangeSkinDialog(
     var currentCapeToLoad by remember { mutableStateOf(EmptyCape) }
     var currentUsingCape by remember { mutableStateOf(EmptyCape) }
 
+    var pageFinished by remember { mutableStateOf(false) }
+
     LaunchedEffect(availableCapes) {
         if (account.isMicrosoftAccount()) {
             if (availableCapes.isNotEmpty()) {
@@ -1213,10 +1215,28 @@ fun ChangeSkinDialog(
      * 初始化账号设置的皮肤
      */
     fun loadSkin() {
-        playerSkin.loadSkin(
-            skinId = account.uniqueUUID.takeIf { account.hasSkinFile },
-            model = account.skinModelType
-        )
+        val capeFile = account.getCapeFile()
+        val skinFile = account.getSkinFile()
+        
+        if (skinFile.exists() && capeFile.exists()) {
+            runCatching {
+                skinFile.inputStream().use { skinStream ->
+                    capeFile.inputStream().use { capeStream ->
+                        playerSkin.loadSkinAndCape(skinStream, account.skinModelType, capeStream)
+                    }
+                }
+            }.onFailure {
+                playerSkin.loadSkin(
+                    skinId = account.uniqueUUID.takeIf { account.hasSkinFile },
+                    model = account.skinModelType
+                )
+            }
+        } else {
+            playerSkin.loadSkin(
+                skinId = account.uniqueUUID.takeIf { account.hasSkinFile },
+                model = account.skinModelType
+            )
+        }
     }
 
     /**
@@ -1224,6 +1244,82 @@ fun ChangeSkinDialog(
      */
     fun resetSkin() {
         playerSkin.resetSkin()
+    }
+
+    LaunchedEffect(pageFinished, skinState, capeState, currentCapeToLoad) {
+        if (!pageFinished) return@LaunchedEffect
+
+        // Determine skin stream and model
+        var skinStream: java.io.InputStream? = null
+        var skinModel: SkinModelType = account.skinModelType
+        var skinId: String? = null
+        var isReset = false
+
+        when (skinState) {
+            ChangeSkin.None -> {
+                skinId = account.uniqueUUID.takeIf { account.hasSkinFile }
+                if (skinId == null) skinStream = null // Steve
+                else {
+                    val file = account.getSkinFile()
+                    if (file.exists()) skinStream = file.inputStream()
+                }
+            }
+            is ChangeSkin.ChangeSkinData -> {
+                skinStream = skinState.cacheFile.inputStream()
+                skinModel = skinState.skinModel
+            }
+            ChangeSkin.ResetSkin -> {
+                isReset = true
+            }
+        }
+
+        // Determine cape stream or ID
+        var capeStream: java.io.InputStream? = null
+        var capeObj: PlayerProfile.Cape? = null
+
+        when (capeState) {
+            is ChangeCape.SelectedCape -> {
+                if (account.isMicrosoftAccount()) {
+                    capeObj = capeState.cape
+                }
+            }
+            is ChangeCape.SelectedCustomCape -> {
+                capeStream = capeState.capeFile.inputStream()
+            }
+            ChangeCape.None -> {
+                if (account.isMicrosoftAccount()) {
+                    capeObj = currentCapeToLoad
+                } else {
+                    val file = account.getCapeFile()
+                    if (file.exists()) capeStream = file.inputStream()
+                }
+            }
+        }
+
+        if (isReset) {
+            playerSkin.resetSkin()
+        } else if (skinStream != null && capeStream != null) {
+            skinStream.use { ss ->
+                capeStream.use { cs ->
+                    playerSkin.loadSkinAndCape(ss, skinModel, cs)
+                }
+            }
+        } else if (skinStream != null) {
+            skinStream.use { ss ->
+                playerSkin.loadSkin(ss, skinModel)
+            }
+            if (capeObj != null) playerSkin.loadCape(capeObj)
+            else if (capeStream == null && capeState == ChangeCape.None && !account.isMicrosoftAccount()) {
+                // Already handled above if file exists, if not we might want to clear it if it was there
+                playerSkin.loadCape(cape = null)
+            }
+        } else {
+            playerSkin.loadSkin(skinId, skinModel)
+            if (capeObj != null) playerSkin.loadCape(capeObj)
+            else if (capeStream != null) {
+                capeStream.use { cs -> playerSkin.loadCape(cs) }
+            }
+        }
     }
 
     Dialog(
@@ -1267,8 +1363,6 @@ fun ChangeSkinDialog(
                                 .background(itemColor(false)),
                             contentAlignment = Alignment.Center
                         ) {
-                            var pageFinished by remember { mutableStateOf(false) }
-
                             if (!pageFinished) {
                                 //加载皮肤预览中
                                 LoadingIndicator()
@@ -1285,46 +1379,7 @@ fun ChangeSkinDialog(
                                         }
                                     )
                                 },
-                                update = {
-                                    if (pageFinished) {
-                                        when (skinState) {
-                                            ChangeSkin.None -> loadSkin()
-                                            is ChangeSkin.ChangeSkinData -> {
-                                                runCatching {
-                                                    skinState.cacheFile.inputStream().use { stream ->
-                                                        playerSkin.loadSkin(stream, skinState.skinModel)
-                                                    }
-                                                }.onFailure {
-                                                    playerSkin.loadSkin(
-                                                        skinId = null,
-                                                        skinState.skinModel
-                                                    )
-                                                }
-                                            }
-
-                                            is ChangeSkin.ResetSkin -> resetSkin()
-                                        }
-                                        when (capeState) {
-                                            is ChangeCape.SelectedCape -> {
-                                                if (account.isMicrosoftAccount()) {
-                                                    playerSkin.loadCape(capeState.cape)
-                                                }
-                                            }
-                                            is ChangeCape.SelectedCustomCape -> {
-                                                runCatching {
-                                                    capeState.capeFile.inputStream().use { stream ->
-                                                        playerSkin.loadCape(stream)
-                                                    }
-                                                }
-                                            }
-                                            ChangeCape.None -> {
-                                                if (account.isMicrosoftAccount()) {
-                                                    playerSkin.loadCape(currentCapeToLoad)
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
+                                update = {},
                                 modifier = Modifier.fillMaxSize()
                             )
                         }

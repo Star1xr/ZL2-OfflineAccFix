@@ -30,24 +30,32 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.painterResource
@@ -62,6 +70,9 @@ import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.info.InfoDistributor
+import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.setting.unit.floatRange
+import com.movtery.zalithlauncher.setting.unit.getOrMin
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.MarqueeText
@@ -70,13 +81,20 @@ import com.movtery.zalithlauncher.ui.components.defaultRichTextStyle
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
+import com.movtery.zalithlauncher.ui.screens.content.elements.MemoryPreview
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
+import com.movtery.zalithlauncher.ui.screens.content.navigateToLogView
+import com.movtery.zalithlauncher.ui.screens.content.versions.layouts.ToggleableIntSliderSettingsCard
 import com.movtery.zalithlauncher.ui.screens.main.custom_home.MarkdownBlock
 import com.movtery.zalithlauncher.ui.screens.main.custom_home.customHomePage
+import com.movtery.zalithlauncher.ui.theme.cardColor
+import com.movtery.zalithlauncher.ui.theme.onCardColor
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
+import com.movtery.zalithlauncher.utils.platform.getMaxMemoryForSettings
 import com.movtery.zalithlauncher.viewmodel.HomePageState
 import com.movtery.zalithlauncher.viewmodel.LocalHomePageViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
+import java.io.File
 
 @Composable
 fun LauncherScreen(
@@ -86,6 +104,14 @@ fun LauncherScreen(
     onOpenLink: (String) -> Unit,
     onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
 ) {
+    var showQuickRamDialog by remember { mutableStateOf(false) }
+
+    if (showQuickRamDialog) {
+        QuickRamDialog(
+            onDismissRequest = { showQuickRamDialog = false }
+        )
+    }
+
     BaseScreen(
         screenKey = NormalNavKey.LauncherMain,
         currentKey = backStackViewModel.mainScreen.currentKey
@@ -133,8 +159,90 @@ fun LauncherScreen(
                 onLaunchGame = onLaunchGame,
                 toAccountManageScreen = toAccountManageScreen,
                 toVersionManageScreen = toVersionManageScreen,
-                toVersionSettingsScreen = toVersionSettingsScreen
+                toVersionSettingsScreen = toVersionSettingsScreen,
+                onQuickRamClick = { showQuickRamDialog = true },
+                onLogViewerClick = {
+                    VersionsManager.currentVersion.value?.let { version ->
+                        val logFile = File(version.getGameDir(), "logs/latest.log")
+                        if (logFile.exists()) {
+                            backStackViewModel.mainScreen.navigateToLogView(logFile.absolutePath)
+                        }
+                    }
+                },
+                onModsFolderClick = {
+                    backStackViewModel.mainScreen.navigateTo(NormalNavKey.Versions.ModsManager)
+                }
             )
+        }
+    }
+}
+
+@Composable
+private fun QuickRamDialog(
+    onDismissRequest: () -> Unit
+) {
+    val context = LocalContext.current
+    val globalRamAllocation by AllSettings.ramAllocation.collectAsStateWithLifecycle()
+    var tempRamAllocation by remember { mutableStateOf(globalRamAllocation) }
+
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismissRequest) {
+        Surface(
+            modifier = Modifier
+                .padding(all = 16.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = MaterialTheme.shapes.extraLarge,
+            color = cardColor(false),
+            contentColor = onCardColor(),
+            shadowElevation = 6.dp
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_game_java_memory_title),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                ToggleableIntSliderSettingsCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    currentValue = tempRamAllocation ?: 0,
+                    valueRange = AllSettings.ramAllocation.floatRange.start..getMaxMemoryForSettings(context).toFloat(),
+                    defaultValue = AllSettings.ramAllocation.getOrMin(),
+                    title = stringResource(R.string.settings_game_java_memory_title),
+                    summary = stringResource(R.string.settings_game_java_memory_summary),
+                    suffix = "MB",
+                    onValueChange = {
+                        tempRamAllocation = it
+                    },
+                    onValueChangeFinished = {
+                        AllSettings.ramAllocation.state = tempRamAllocation
+                    },
+                    previewContent = {
+                        MemoryPreview(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 2.dp, end = 8.dp),
+                            preview = tempRamAllocation?.toDouble(),
+                            usedText = { usedMemory, totalMemory ->
+                                stringResource(R.string.settings_game_java_memory_used_text, usedMemory.toInt(), totalMemory.toInt())
+                            },
+                            previewText = { preview ->
+                                stringResource(R.string.settings_game_java_memory_allocation_text, preview.toInt())
+                            }
+                        )
+                    }
+                )
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onDismissRequest
+                ) {
+                    Text(text = stringResource(R.string.generic_confirm))
+                }
+            }
         }
     }
 }
@@ -232,6 +340,9 @@ private fun RightMenuContent(
     toAccountManageScreen: () -> Unit,
     toVersionManageScreen: () -> Unit,
     toVersionSettingsScreen: () -> Unit,
+    onQuickRamClick: () -> Unit,
+    onLogViewerClick: () -> Unit,
+    onModsFolderClick: () -> Unit,
     launchButton: @Composable (
         innerModifier: Modifier,
         onClick: () -> Unit,
@@ -245,19 +356,53 @@ private fun RightMenuContent(
     ConstraintLayout(
         modifier = modifier
     ) {
-        val (accountAvatar, versionManagerLayout, launchButton) = createRefs()
+        val (accountAvatar, shortcutsGrid, versionManagerLayout, launchButton) = createRefs()
 
         AccountAvatar(
             modifier = Modifier
                 .constrainAs(accountAvatar) {
                     top.linkTo(parent.top)
-                    bottom.linkTo(launchButton.top, margin = 32.dp)
+                    bottom.linkTo(shortcutsGrid.top, margin = 8.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
             account = account,
             onClick = toAccountManageScreen
         )
+
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .constrainAs(shortcutsGrid) {
+                    top.linkTo(accountAvatar.bottom)
+                    bottom.linkTo(versionManagerLayout.top, margin = 8.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ShortcutButton(
+                icon = R.drawable.ic_sort,
+                onClick = toVersionManageScreen,
+                contentDescription = stringResource(R.string.page_title_version_list)
+            )
+            ShortcutButton(
+                icon = R.drawable.ic_build_filled,
+                onClick = onQuickRamClick,
+                contentDescription = stringResource(R.string.settings_game_java_memory_title)
+            )
+            ShortcutButton(
+                icon = R.drawable.ic_terminal_outlined,
+                onClick = onLogViewerClick,
+                contentDescription = stringResource(R.string.versions_overview_log)
+            )
+            ShortcutButton(
+                icon = R.drawable.ic_folder_outlined,
+                onClick = onModsFolderClick,
+                contentDescription = stringResource(R.string.mods_manage)
+            )
+        }
 
         Row(
             modifier = Modifier.constrainAs(versionManagerLayout) {
@@ -306,13 +451,39 @@ private fun RightMenuContent(
 }
 
 @Composable
+private fun ShortcutButton(
+    icon: Int,
+    onClick: () -> Unit,
+    contentDescription: String
+) {
+    Surface(
+        modifier = Modifier.size(42.dp),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        onClick = onClick
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(icon),
+                contentDescription = contentDescription
+            )
+        }
+    }
+}
+
+@Composable
 private fun RightMenu(
     isVisible: Boolean,
     onLaunchGame: () -> Unit,
     modifier: Modifier = Modifier,
     toAccountManageScreen: () -> Unit = {},
     toVersionManageScreen: () -> Unit = {},
-    toVersionSettingsScreen: () -> Unit = {}
+    toVersionSettingsScreen: () -> Unit = {},
+    onQuickRamClick: () -> Unit = {},
+    onLogViewerClick: () -> Unit = {},
+    onModsFolderClick: () -> Unit = {}
 ) {
     val xOffset by swapAnimateDpAsState(
         targetValue = 40.dp,
@@ -329,7 +500,10 @@ private fun RightMenu(
             onLaunchGame = onLaunchGame,
             toAccountManageScreen = toAccountManageScreen,
             toVersionManageScreen = toVersionManageScreen,
-            toVersionSettingsScreen = toVersionSettingsScreen
+            toVersionSettingsScreen = toVersionSettingsScreen,
+            onQuickRamClick = onQuickRamClick,
+            onLogViewerClick = onLogViewerClick,
+            onModsFolderClick = onModsFolderClick
         ) { innerModifier, onClick, text ->
             ScalingActionButton(
                 modifier = innerModifier,
