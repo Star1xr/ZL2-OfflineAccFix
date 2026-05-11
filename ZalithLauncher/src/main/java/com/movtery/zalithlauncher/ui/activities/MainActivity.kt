@@ -489,7 +489,7 @@ class MainActivity : BaseAppCompatActivity() {
                         if (parms.size == 2 && parms[0] == "server") {
                             //指定快速启动的服务器ip
                             val serverIp = parms[1].trim()
-                            launchGameViewModel.tryLaunchServer(serverIp)
+                            launchGameViewModel.tryPlayServer(serverIp)
                             return
                         }
                     }.onFailure { e ->
