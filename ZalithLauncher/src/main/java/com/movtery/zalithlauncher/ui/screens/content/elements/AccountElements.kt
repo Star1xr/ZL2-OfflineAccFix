@@ -296,7 +296,7 @@ fun PlayerFace(
 ) {
     val context = LocalContext.current
     val refreshWardrobe by AccountsManager.refreshWardrobe.collectAsStateWithLifecycle()
-    val avatarBitmap = remember(account, refreshKey, refreshWardrobe) {
+    val avatarBitmap = remember(account, account.getCapeFile(), refreshKey, refreshWardrobe) {
         getSkinAvatarFromAccount(context, account, avatarSize).asImageBitmap()
     }
 

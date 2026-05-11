@@ -70,6 +70,9 @@ class PlayerSkin(
         .append("steve.png")
         .toString()
 
+    // Holds the identifier of the currently loaded cape (if any). This helps preserve the cape when the skin is reset.
+    private var currentCapeId: String? = null
+
     fun loadWebView(
         context: Context,
         onPageFinished: () -> Unit = {}
@@ -132,7 +135,7 @@ class PlayerSkin(
 
     fun loadSkin(inputStream: InputStream?, model: SkinModelType?) {
         inputStream?.asBase64Image()?.let { dataUrl ->
-            val modelString = model.takeIf { it != SkinModelType.NONE }?.modelType ?: "auto-detect"
+            val modelString = model?.takeIf { it != SkinModelType.NONE }?.modelType ?: "auto-detect"
             webview?.evaluateJavascript("loadSkin('$dataUrl', '$modelString')", null)
         } ?: run {
             loadSkin(skinId = null, model)
@@ -140,6 +143,8 @@ class PlayerSkin(
     }
 
     fun loadCape(cape: PlayerProfile.Cape?) {
+        // Store the cape id so that a later skin reset can restore it.
+        currentCapeId = cape?.takeIf { it != EmptyCape }?.id?.toString()
         val path = cape?.takeIf { it != EmptyCape }?.id?.let { id ->
             AssetsUrlBuilder()
                 .append("capes")
@@ -152,15 +157,31 @@ class PlayerSkin(
 
     fun loadCape(inputStream: InputStream?) {
         inputStream?.asBase64Image()?.let { dataUrl ->
+            // When loading from a raw InputStream we cannot determine an ID, so we clear the stored ID.
+            currentCapeId = null
             webview?.evaluateJavascript("loadCape('$dataUrl')", null)
         } ?: run {
             loadCape(cape = null)
         }
     }
 
+    /**
+     * Reset the skin while preserving the currently loaded cape (if any).
+     */
     fun resetSkin() {
+        // Preserve the currently loaded cape (if any) by re‑applying it after resetting the skin.
+        val preservedCapeId = currentCapeId
+        // Reset skin to default (no skin, model NONE)
         loadSkin(skinId = null, SkinModelType.NONE)
-        loadCape(cape = null)
+        // Re‑apply the previously loaded cape if we have its ID.
+        if (preservedCapeId != null) {
+            // Create a lightweight Cape implementation to trigger loading.
+            val dummyCape = object : PlayerProfile.Cape(preservedCapeId) {}
+            loadCape(dummyCape)
+        } else {
+            // No cape to preserve – clear it.
+            loadCape(cape = null)
+        }
     }
 
     fun startAnim(
