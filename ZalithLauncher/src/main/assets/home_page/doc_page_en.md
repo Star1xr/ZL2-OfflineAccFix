@@ -15,6 +15,27 @@ In addition to standard Markdown, you can also use the following extension compo
 
 ---
 
+### Random Text Block
+Place multiple text segments within a block. When the homepage loads, one of the segments will be randomly displayed.
+
+**Syntax**  
+...random-start
+This is a piece of text, weight defaults to 1.0
+weight(2.0): This is the second piece of text, weight is set to 2.0
+This is the third piece of text
+...random-end
+
+**Parameter description:**
+- Unlike other components, this component uses inline parameters, embedded directly at the beginning of the actual value line.
+- `weight`:
+    - Specifies the weight value for this piece of text. Supports integers and decimals. Optional.
+    - The homepage will randomly select a piece of text according to the weights.
+
+> This component is only supported within standard Markdown.
+> This component will NOT take effect inside standard Markdown containers or other extension components.
+
+---
+
 ### Card Component
 Used to wrap content inside a container with a background and rounded corners.
 
