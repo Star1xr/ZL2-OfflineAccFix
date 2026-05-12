@@ -185,6 +185,9 @@ sealed interface AccountManageIntent {
 
     /** 将账号皮肤重置为默认状态 */
     data class ResetSkin(val account: Account) : AccountManageIntent
+
+    /** Reset the account cape */
+    data class ResetCape(val account: Account) : AccountManageIntent
 }
 
 /**
@@ -386,6 +389,7 @@ class AccountManageViewModel @Inject constructor(
             is AccountManageIntent.DeleteAccount -> deleteAccount(intent.account)
             is AccountManageIntent.RefreshAccount -> refreshAccount(intent.account)
             is AccountManageIntent.ResetSkin -> resetSkin(intent.account)
+            is AccountManageIntent.ResetCape -> resetCape(intent.account)
         }
     }
 
@@ -844,6 +848,22 @@ class AccountManageViewModel @Inject constructor(
                 FileUtils.deleteQuietly(getSkinFile())
                 skinModelType = SkinModelType.NONE
                 profileId = getLocalUUIDWithSkinModel(username, skinModelType)
+                AccountsManager.suspendSaveAccount(this)
+                AccountsManager.refreshWardrobe()
+            }
+        }))
+        onIntent(
+            AccountManageIntent.UpdateAccountSkinOp(
+                AccountSkinOperation.None
+            )
+        )
+    }
+
+    /** Reset cape data */
+    private fun resetCape(account: Account) {
+        TaskSystem.submitTask(Task.runTask(dispatcher = Dispatchers.IO, task = {
+            account.apply {
+                FileUtils.deleteQuietly(getCapeFile())
                 AccountsManager.suspendSaveAccount(this)
                 AccountsManager.refreshWardrobe()
             }

@@ -814,6 +814,9 @@ private fun AccountSkinOperation(
                 onResetSkin = {
                     actions.onIntent(AccountManageIntent.ResetSkin(account))
                 },
+                onResetCape = {
+                    actions.onIntent(AccountManageIntent.ResetCape(account))
+                },
                 onFetchCapes = {
                     actions.onIntent(AccountManageIntent.FetchMicrosoftCapes(account))
                 },

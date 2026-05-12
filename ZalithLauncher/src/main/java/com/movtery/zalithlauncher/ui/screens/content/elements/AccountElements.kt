@@ -1147,6 +1147,7 @@ sealed interface ChangeCape {
     data object None : ChangeCape
     data class SelectedCape(val cape: PlayerProfile.Cape) : ChangeCape
     data class SelectedCustomCape(val capeFile: File) : ChangeCape
+    data object ResetCape : ChangeCape
 }
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -1164,6 +1165,7 @@ fun ChangeSkinDialog(
     onCapePicked: (Account, Uri) -> Unit = { _, _ -> },
     onDismissRequest: () -> Unit,
     onResetSkin: () -> Unit,
+    onResetCape: () -> Unit = {},
     onApplySkin: (File, SkinModelType) -> Unit,
     onApplyCape: (PlayerProfile.Cape) -> Unit,
     onApplyCustomCape: (File) -> Unit = {},
@@ -1286,6 +1288,10 @@ fun ChangeSkinDialog(
             is ChangeCape.SelectedCustomCape -> {
                 capeStream = capeState.capeFile.inputStream()
             }
+            ChangeCape.ResetCape -> {
+                capeStream = null
+                capeObj = null
+            }
             ChangeCape.None -> {
                 if (account.isMicrosoftAccount()) {
                     capeObj = currentCapeToLoad
@@ -1298,10 +1304,15 @@ fun ChangeSkinDialog(
 
         if (isReset) {
             playerSkin.resetSkin()
-        } else if (skinStream != null && capeStream != null) {
+        } else if (skinStream != null && (capeStream != null || capeState == ChangeCape.ResetCape)) {
             skinStream.use { ss ->
-                capeStream.use { cs ->
-                    playerSkin.loadSkinAndCape(ss, skinModel, cs)
+                if (capeStream != null) {
+                    capeStream.use { cs ->
+                        playerSkin.loadSkinAndCape(ss, skinModel, cs)
+                    }
+                } else {
+                    playerSkin.loadSkin(ss, skinModel)
+                    playerSkin.loadCape(cape = null)
                 }
             }
         } else if (skinStream != null) {
@@ -1309,7 +1320,7 @@ fun ChangeSkinDialog(
                 playerSkin.loadSkin(ss, skinModel)
             }
             if (capeObj != null) playerSkin.loadCape(capeObj)
-            else if (capeStream == null && capeState == ChangeCape.None && !account.isMicrosoftAccount()) {
+            else if (capeStream == null && (capeState == ChangeCape.None || capeState == ChangeCape.ResetCape) && !account.isMicrosoftAccount()) {
                 // Already handled above if file exists, if not we might want to clear it if it was there
                 playerSkin.loadCape(cape = null)
             }
@@ -1318,6 +1329,8 @@ fun ChangeSkinDialog(
             if (capeObj != null) playerSkin.loadCape(capeObj)
             else if (capeStream != null) {
                 capeStream.use { cs -> playerSkin.loadCape(cs) }
+            } else if (capeState == ChangeCape.ResetCape) {
+                playerSkin.loadCape(cape = null)
             }
         }
     }
@@ -1515,6 +1528,24 @@ fun ChangeSkinDialog(
                                 enabled = !isImportingCape
                             )
 
+                            //离线账号重置披风
+                            if (account.getCapeFile().exists() && capeState != ChangeCape.ResetCape) {
+                                InfoLayoutTextItem(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    title = stringResource(R.string.account_change_cape_reset),
+                                    icon = {
+                                        Icon(
+                                            modifier = Modifier.size(22.dp),
+                                            painter = painterResource(R.drawable.ic_restart_alt),
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = {
+                                        onCapeStateChange(ChangeCape.ResetCape)
+                                    }
+                                )
+                            }
+
                             //离线账号重置皮肤
                             if (account.isLocalAccount() && account.hasSkinFile && skinState != ChangeSkin.ResetSkin) {
                                 InfoLayoutTextItem(
@@ -1562,10 +1593,17 @@ fun ChangeSkinDialog(
                                     ChangeSkin.None -> {}
                                 }
 
-                                if (capeState is ChangeCape.SelectedCape) {
-                                    onApplyCape(capeState.cape)
-                                } else if (capeState is ChangeCape.SelectedCustomCape) {
-                                    onApplyCustomCape(capeState.capeFile)
+                                when (val state = capeState) {
+                                    is ChangeCape.SelectedCape -> {
+                                        onApplyCape(state.cape)
+                                    }
+                                    is ChangeCape.SelectedCustomCape -> {
+                                        onApplyCustomCape(state.capeFile)
+                                    }
+                                    ChangeCape.ResetCape -> {
+                                        onResetCape()
+                                    }
+                                    ChangeCape.None -> {}
                                 }
 
                                 onDismissRequest()
