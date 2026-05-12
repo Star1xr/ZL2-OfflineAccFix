@@ -1550,7 +1550,7 @@ fun ChangeSkinDialog(
                             if (account.isLocalAccount() && account.hasSkinFile && skinState != ChangeSkin.ResetSkin) {
                                 InfoLayoutTextItem(
                                     modifier = Modifier.fillMaxWidth(),
-                                    title = stringResource(R.string.generic_reset),
+                                    title = stringResource(R.string.skin_reset),
                                     icon = {
                                         Icon(
                                             modifier = Modifier.size(22.dp),

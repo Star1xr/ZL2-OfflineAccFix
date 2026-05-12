@@ -8,6 +8,7 @@
     <string name="generic_back">뒤로가기</string>
     <string name="generic_refresh">새로고침</string>
     <string name="generic_reset">초기화</string>
+    <string name="skin_reset">스킨 초기화</string>
     <string name="generic_delete">삭제</string>
     <string name="generic_rename">이름 변경</string>
     <string name="generic_copy">복사</string>

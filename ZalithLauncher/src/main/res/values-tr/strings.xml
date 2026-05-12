@@ -8,6 +8,7 @@
     <string name="generic_back">Geri Dön</string>
     <string name="generic_refresh">Yenile</string>
     <string name="generic_reset">Sıfırla</string>
+    <string name="skin_reset">Skin Sıfırla</string>
     <string name="generic_delete">Sil</string>
     <string name="generic_rename">Yeniden Adlandır</string>
     <string name="generic_copy">Kopyala</string>
@@ -1201,4 +1202,5 @@
     <string name="settings_launcher_home_page_type_warning">Özel ana sayfalar üçüncü taraf içeriktir. Başlatıcı, bu içerikler için herhangi bir garanti vermez. Tanıdık olmayan ana sayfaları kabul ederken lütfen dikkatli olun!</string>
     <string name="settings_launcher_home_page_url">Ana Sayfa İndirme Bağlantısı:</string>
     <string name="settings_launcher_home_page_loading">Ana Sayfa Yükleniyor</string>
+    <string name="account_change_cape_reset">Pelerini Sıfırla</string>
 </resources>

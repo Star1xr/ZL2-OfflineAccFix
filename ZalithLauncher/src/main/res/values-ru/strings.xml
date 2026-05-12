@@ -7,6 +7,7 @@
     <string name="generic_back">Назад</string>
     <string name="generic_refresh">Обновить</string>
     <string name="generic_reset">Сбросить</string>
+    <string name="skin_reset">Сбросить скин</string>
     <string name="generic_delete">Удалить</string>
     <string name="generic_rename">Переименовать</string>
     <string name="generic_copy">Копировать</string>

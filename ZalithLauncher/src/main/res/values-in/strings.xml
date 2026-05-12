@@ -504,6 +504,7 @@
     <string name="minecraft_download_progress_retry_downloading_files">Mencoba mengunduh ulang\n(%1$d/%2$d, %3$s/%4$s)</string>
     <string name="minecraft_download_failed">Terjadi kesalahan saat mengunduh Minecraft</string>
     <string name="generic_reset">Reset</string>
+    <string name="skin_reset">Reset skin</string>
     <string name="generic_cancel">Batal</string>
     <string name="generic_confirm">Konfirmasi</string>
     <string name="generic_error">Kesalahan</string>

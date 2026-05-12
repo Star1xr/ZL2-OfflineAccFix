@@ -8,6 +8,7 @@
     <string name="generic_back">กลับ</string>
     <string name="generic_refresh">รีเฟรช</string>
     <string name="generic_reset">รีเซ็ต</string>
+    <string name="skin_reset">รีเซ็ตสกิน</string>
     <string name="generic_delete">ลบ</string>
     <string name="generic_rename">เปลี่ยนชื่อ</string>
     <string name="generic_copy">คัดลอก</string>

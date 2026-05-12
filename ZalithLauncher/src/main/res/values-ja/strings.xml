@@ -6,6 +6,7 @@
     <string name="generic_back">戻る</string>
     <string name="generic_refresh">更新</string>
     <string name="generic_reset">リセット</string>
+    <string name="skin_reset">スキンをリセット</string>
     <string name="generic_delete">削除</string>
     <string name="generic_copy">コピー</string>
     <string name="generic_paste">ペースト</string>

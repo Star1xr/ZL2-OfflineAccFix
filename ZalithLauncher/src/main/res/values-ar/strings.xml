@@ -7,6 +7,7 @@
     <string name="generic_back">رجوع</string>
     <string name="generic_refresh">إعادة تحميل</string>
     <string name="generic_reset">إعادة تعيين</string>
+    <string name="skin_reset">إعادة تعيين المظهر</string>
     <string name="generic_delete">حذف</string>
     <string name="generic_rename">إعادة تسمية</string>
     <string name="generic_copy">نسخ</string>
