@@ -1263,4 +1263,13 @@
     <string name="account_change_cape_invalid">Invalid cape file! Cape must be 64x32 pixels PNG.</string>
     <string name="account_change_cape_failed_to_import">Failed to import cape: %s</string>
     <string name="account_change_cape_apply_custom_success">Custom cape applied!</string>
+
+    <!-- Rank and Play Time -->
+    <string name="rank_novice">Novice</string>
+    <string name="rank_player">Player</string>
+    <string name="rank_experienced">Experienced</string>
+    <string name="rank_veteran">Veteran</string>
+    <string name="rank_master">Master</string>
+    <string name="rank_legend">Legend</string>
+    <string name="play_time_format">Play Time: %d Hours</string>
 </resources>

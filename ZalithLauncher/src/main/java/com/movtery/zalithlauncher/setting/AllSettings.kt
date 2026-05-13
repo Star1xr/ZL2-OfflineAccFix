@@ -586,6 +586,11 @@ object AllSettings : SettingsRegistry() {
     val finishedGame = intSetting("finishedGame", 0)
 
     /**
+     * 玩家在模拟器中运行游戏的总时长（毫秒）
+     */
+    val playTime = longSetting("playTime", 0L)
+
+    /**
      * 是否在打开启动器时，根据特定的运行游戏次数，显示赞助支持弹窗
      */
     val showSponsorship = boolSetting("showSponsorship", true)

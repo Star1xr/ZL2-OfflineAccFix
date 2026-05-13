@@ -1203,4 +1203,13 @@
     <string name="settings_launcher_home_page_url">Ana Sayfa İndirme Bağlantısı:</string>
     <string name="settings_launcher_home_page_loading">Ana Sayfa Yükleniyor</string>
     <string name="account_change_cape_reset">Pelerini Sıfırla</string>
+
+    <!-- Rank and Play Time -->
+    <string name="rank_novice">Çaylak</string>
+    <string name="rank_player">Oyuncu</string>
+    <string name="rank_experienced">Deneyimli</string>
+    <string name="rank_veteran">Gazi</string>
+    <string name="rank_master">Usta</string>
+    <string name="rank_legend">Efsane</string>
+    <string name="play_time_format">Oynama Süresi: %d Saat</string>
 </resources>
