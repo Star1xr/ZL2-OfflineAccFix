@@ -84,7 +84,6 @@ import com.movtery.zalithlauncher.ui.components.defaultRichTextStyle
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
-import com.movtery.zalithlauncher.ui.screens.content.elements.MemoryPreview
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
 import com.movtery.zalithlauncher.ui.screens.content.navigateToLogView
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPosition
@@ -440,7 +439,6 @@ private fun RightMenuContent(
             modifier = Modifier
                 .constrainAs(accountAvatar) {
                     top.linkTo(parent.top)
-                    bottom.linkTo(shortcutsGrid.top, margin = 8.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
@@ -453,7 +451,7 @@ private fun RightMenuContent(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp)
                 .constrainAs(shortcutsGrid) {
-                    top.linkTo(accountAvatar.bottom)
+                    bottom.linkTo(versionManagerLayout.top, margin = 8.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
@@ -485,25 +483,6 @@ private fun RightMenuContent(
                 contentDescription = stringResource(R.string.versions_overview_log)
             )
         }
-
-        val ramAllocation = AllSettings.ramAllocation.state
-        MemoryPreview(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .constrainAs(createRef()) {
-                    top.linkTo(shortcutsGrid.bottom)
-                    bottom.linkTo(versionManagerLayout.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
-            preview = ramAllocation?.toDouble(),
-            usedText = { usedMemory, totalMemory ->
-                stringResource(R.string.settings_game_java_memory_used_text, usedMemory.toInt(), totalMemory.toInt())
-            },
-            previewText = { preview ->
-                stringResource(R.string.settings_game_java_memory_allocation_text, preview.toInt())
-            }
-        )
 
         Row(
             modifier = Modifier.constrainAs(versionManagerLayout) {
