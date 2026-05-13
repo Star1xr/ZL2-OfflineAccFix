@@ -1212,4 +1212,10 @@
     <string name="rank_master">Usta</string>
     <string name="rank_legend">Efsane</string>
     <string name="play_time_format">Oynama Süresi: %d Saat</string>
+    <string name="settings_chroma_name_title">Chroma Kullanıcı Adı</string>
+    <string name="chroma_mode_red_blue">Kırmızı ve Mavi</string>
+    <string name="chroma_mode_sunset">Gün Batımı</string>
+    <string name="chroma_mode_ocean">Okyanus</string>
+    <string name="chroma_mode_forest">Orman</string>
+    <string name="chroma_mode_neon">Neon</string>
 </resources>

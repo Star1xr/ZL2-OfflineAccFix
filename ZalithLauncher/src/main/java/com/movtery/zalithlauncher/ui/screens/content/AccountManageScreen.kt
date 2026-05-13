@@ -36,7 +36,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -51,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +70,8 @@ import com.movtery.zalithlauncher.game.account.auth_server.data.AuthServer
 import com.movtery.zalithlauncher.game.account.isAuthServerAccount
 import com.movtery.zalithlauncher.game.account.isMicrosoftLogging
 import com.movtery.zalithlauncher.game.account.yggdrasil.PlayerProfile
+import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.setting.enums.ChromaMode
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.MarqueeText
@@ -359,6 +364,53 @@ private fun ActionsLayout(
             }
         ) {
             MarqueeText(text = stringResource(R.string.account_add_new_account))
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Chroma toggle
+        var showChromaSelector by remember { mutableStateOf(false) }
+        
+        InfoLayoutTextItem(
+            modifier = Modifier.fillMaxWidth(),
+            title = stringResource(R.string.settings_chroma_name_title),
+            icon = {
+                Icon(
+                    modifier = Modifier.size(22.dp),
+                    painter = painterResource(R.drawable.ic_styler),
+                    contentDescription = null
+                )
+            },
+            onClick = {
+                showChromaSelector = true
+            }
+        )
+
+        if (showChromaSelector) {
+            val modes = ChromaMode.entries
+            SimpleListDialog(
+                title = stringResource(R.string.settings_chroma_name_title),
+                items = modes,
+                itemTextProvider = { mode ->
+                    when (mode) {
+                        ChromaMode.NONE -> context.getString(R.string.generic_none)
+                        ChromaMode.RGB -> "RGB (Classic)"
+                        ChromaMode.RED_BLUE -> context.getString(R.string.chroma_mode_red_blue)
+                        ChromaMode.SUNSET -> context.getString(R.string.chroma_mode_sunset)
+                        ChromaMode.OCEAN -> context.getString(R.string.chroma_mode_ocean)
+                        ChromaMode.FOREST -> context.getString(R.string.chroma_mode_forest)
+                        ChromaMode.NEON -> context.getString(R.string.chroma_mode_neon)
+                    }
+                },
+                onItemSelected = { mode ->
+                    AllSettings.chromaMode.save(mode)
+                    showChromaSelector = false
+                },
+                current = AllSettings.chromaMode.state,
+                onDismissRequest = {
+                    showChromaSelector = false
+                }
+            )
         }
     }
 }

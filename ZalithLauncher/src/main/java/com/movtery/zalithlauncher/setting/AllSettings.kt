@@ -29,6 +29,7 @@ import com.movtery.zalithlauncher.game.path.GamePathManager
 import com.movtery.zalithlauncher.game.version.installed.GraphicsApi
 import com.movtery.zalithlauncher.info.InfoDistributor
 import com.movtery.zalithlauncher.setting.enums.AppLanguage
+import com.movtery.zalithlauncher.setting.enums.ChromaMode
 import com.movtery.zalithlauncher.setting.enums.DarkMode
 import com.movtery.zalithlauncher.setting.enums.GestureActionType
 import com.movtery.zalithlauncher.setting.enums.HomePageType
@@ -591,9 +592,9 @@ object AllSettings : SettingsRegistry() {
     val playTime = longSetting("playTime", 0L)
 
     /**
-     * 是否启用彩虹（Chroma）用户名特效
+     * 彩虹（Chroma）用户名特效模式
      */
-    val chromaName = boolSetting("chromaName", true)
+    val chromaMode = enumSetting("chromaMode", ChromaMode.RGB)
 
     /**
      * 是否在打开启动器时，根据特定的运行游戏次数，显示赞助支持弹窗

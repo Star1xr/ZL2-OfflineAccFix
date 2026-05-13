@@ -137,6 +137,7 @@ import com.movtery.zalithlauncher.info.InfoDistributor
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.path.URL_MINECRAFT_PURCHASE
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.setting.enums.ChromaMode
 import com.movtery.zalithlauncher.ui.components.BaseIconTextButton
 import com.movtery.zalithlauncher.ui.components.IconTextButton
 import com.movtery.zalithlauncher.ui.components.MarqueeText
@@ -249,24 +250,47 @@ sealed interface OtherLoginOperation {
 
 @Composable
 fun rememberChromaBrush(): Brush {
+    val mode = AllSettings.chromaMode.state
     val infiniteTransition = rememberInfiniteTransition(label = "Chroma")
     val offset by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 1000f,
+        targetValue = 2000f, // Larger target for smoother wrapping with repeating
         animationSpec = infiniteRepeatable(
-            animation = tween(3000, easing = LinearEasing),
+            animation = tween(10000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "ChromaOffset"
     )
-    val chromaColors = listOf(
-        Color.Red, Color.Magenta, Color.Blue, Color.Cyan, Color.Green, Color.Yellow, Color.Red
-    )
-    return remember(offset) {
+
+    val chromaColors = remember(mode) {
+        when (mode) {
+            ChromaMode.RGB -> listOf(
+                Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red
+            )
+            ChromaMode.RED_BLUE -> listOf(
+                Color.Red, Color.Blue, Color.Red
+            )
+            ChromaMode.SUNSET -> listOf(
+                Color(0xFFFF4E50), Color(0xFFF9D423), Color(0xFFFF4E50)
+            )
+            ChromaMode.OCEAN -> listOf(
+                Color(0xFF2193B0), Color(0xFF6DD5ED), Color(0xFF2193B0)
+            )
+            ChromaMode.FOREST -> listOf(
+                Color(0xFF11998E), Color(0xFF38EF7D), Color(0xFF11998E)
+            )
+            ChromaMode.NEON -> listOf(
+                Color(0xFF8E2DE2), Color(0xFF4A00E0), Color(0xFF8E2DE2)
+            )
+            else -> listOf(Color.White, Color.White)
+        }
+    }
+
+    return remember(offset, chromaColors) {
         Brush.linearGradient(
             colors = chromaColors,
             start = Offset(offset, 0f),
-            end = Offset(offset + 500f, 0f),
+            end = Offset(offset + 600f, 0f),
             tileMode = TileMode.Repeated
         )
     }
@@ -281,7 +305,7 @@ fun AccountAvatar(
     onClick: () -> Unit = {}
 ) {
     val chromaBrush = rememberChromaBrush()
-    val useChroma = AllSettings.chromaName.state && account != null
+    val useChroma = AllSettings.chromaMode.state != ChromaMode.NONE && account != null
 
     Box(
         modifier = modifier
@@ -386,7 +410,7 @@ fun AccountItem(
         scale.animateTo(targetValue = 1f, animationSpec = getAnimateTween())
     }
     val chromaBrush = rememberChromaBrush()
-    val useChroma = AllSettings.chromaName.state
+    val useChroma = AllSettings.chromaMode.state != ChromaMode.NONE
 
     Surface(
         modifier = modifier.graphicsLayer(scaleY = scale.value, scaleX = scale.value),
