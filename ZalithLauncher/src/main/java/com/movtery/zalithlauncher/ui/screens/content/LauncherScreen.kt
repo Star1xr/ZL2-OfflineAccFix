@@ -454,6 +454,7 @@ private fun RightMenuContent(
             modifier = Modifier
                 .constrainAs(accountAvatar) {
                     top.linkTo(parent.top)
+                    bottom.linkTo(shortcutsGrid.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
