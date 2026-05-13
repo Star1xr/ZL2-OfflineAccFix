@@ -302,10 +302,10 @@ private fun QuickRamDialog(
                                 .fillMaxWidth()
                                 .padding(start = 2.dp, end = 8.dp),
                             preview = tempRamAllocation?.toDouble(),
-                            usedText = { usedMemory, totalMemory ->
+                            usedText = { usedMemory: Double, totalMemory: Double ->
                                 stringResource(R.string.settings_game_java_memory_used_text, usedMemory.toInt(), totalMemory.toInt())
                             },
-                            previewText = { preview ->
+                            previewText = { preview: Double ->
                                 stringResource(R.string.settings_game_java_memory_allocation_text, preview.toInt())
                             }
                         )
