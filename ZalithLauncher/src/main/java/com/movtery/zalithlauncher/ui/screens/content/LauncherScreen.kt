@@ -51,6 +51,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableIntStateOf
+import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCardColumn
+import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SwitchSettingsCard
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -106,10 +109,17 @@ fun LauncherScreen(
     onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
 ) {
     var showQuickRamDialog by remember { mutableStateOf(false) }
+    var showQuickFpsDialog by remember { mutableStateOf(false) }
 
     if (showQuickRamDialog) {
         QuickRamDialog(
             onDismissRequest = { showQuickRamDialog = false }
+        )
+    }
+
+    if (showQuickFpsDialog) {
+        QuickFpsDialog(
+            onDismissRequest = { showQuickFpsDialog = false }
         )
     }
 
@@ -162,6 +172,7 @@ fun LauncherScreen(
                 toVersionManageScreen = toVersionManageScreen,
                 toVersionSettingsScreen = toVersionSettingsScreen,
                 onQuickRamClick = { showQuickRamDialog = true },
+                onQuickFpsClick = { showQuickFpsDialog = true },
                 onLogViewerClick = {
                     VersionsManager.currentVersion.value?.let { version ->
                         val logFile = File(version.getGameDir(), "logs/latest.log")
@@ -174,6 +185,70 @@ fun LauncherScreen(
                     backStackViewModel.mainScreen.navigateTo(NormalNavKey.Versions.ModsManager)
                 }
             )
+        }
+    }
+}
+
+@Composable
+private fun QuickFpsDialog(
+    onDismissRequest: () -> Unit
+) {
+    val showFps = AllSettings.showFPS.state
+    val resolutionRatio = AllSettings.resolutionRatio.state
+    var tempResolutionRatio by remember { mutableIntStateOf(resolutionRatio) }
+
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismissRequest) {
+        Surface(
+            modifier = Modifier
+                .padding(all = 16.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = MaterialTheme.shapes.extraLarge,
+            color = cardColor(false),
+            contentColor = onCardColor(),
+            shadowElevation = 6.dp
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.game_menu_option_switch_fps),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                SettingsCardColumn {
+                    SwitchSettingsCard(
+                        position = CardPosition.Top,
+                        title = stringResource(R.string.game_menu_option_switch_fps),
+                        checked = showFps,
+                        onCheckedChange = { AllSettings.showFPS.save(it) }
+                    )
+                    ToggleableIntSliderSettingsCard(
+                        position = CardPosition.Bottom,
+                        currentValue = tempResolutionRatio,
+                        valueRange = AllSettings.resolutionRatio.floatRange,
+                        defaultValue = AllSettings.resolutionRatio.defaultValue,
+                        title = stringResource(R.string.settings_renderer_resolution_scale_title),
+                        summary = stringResource(R.string.settings_renderer_resolution_scale_summary),
+                        suffix = "%",
+                        onValueChange = {
+                            tempResolutionRatio = it
+                        },
+                        onValueChangeFinished = {
+                            AllSettings.resolutionRatio.save(tempResolutionRatio)
+                        }
+                    )
+                }
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onDismissRequest
+                ) {
+                    Text(text = stringResource(R.string.generic_confirm))
+                }
+            }
         }
     }
 }
@@ -343,6 +418,7 @@ private fun RightMenuContent(
     toVersionManageScreen: () -> Unit,
     toVersionSettingsScreen: () -> Unit,
     onQuickRamClick: () -> Unit,
+    onQuickFpsClick: () -> Unit,
     onLogViewerClick: () -> Unit,
     onModsFolderClick: () -> Unit,
     launchButton: @Composable (
@@ -374,6 +450,7 @@ private fun RightMenuContent(
 
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 12.dp)
                 .constrainAs(shortcutsGrid) {
                     top.linkTo(accountAvatar.bottom)
@@ -385,16 +462,25 @@ private fun RightMenuContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ShortcutButton(
+                modifier = Modifier.weight(1f),
                 icon = R.drawable.ic_sort,
                 onClick = toVersionManageScreen,
                 contentDescription = stringResource(R.string.page_title_version_list)
             )
             ShortcutButton(
+                modifier = Modifier.weight(1f),
                 icon = R.drawable.ic_build_filled,
                 onClick = onQuickRamClick,
                 contentDescription = stringResource(R.string.settings_game_java_memory_title)
             )
             ShortcutButton(
+                modifier = Modifier.weight(1f),
+                icon = R.drawable.ic_video_settings,
+                onClick = onQuickFpsClick,
+                contentDescription = stringResource(R.string.game_menu_option_switch_fps)
+            )
+            ShortcutButton(
+                modifier = Modifier.weight(1f),
                 icon = R.drawable.ic_terminal_outlined,
                 onClick = onLogViewerClick,
                 contentDescription = stringResource(R.string.versions_overview_log)
@@ -451,10 +537,11 @@ private fun RightMenuContent(
 private fun ShortcutButton(
     icon: Int,
     onClick: () -> Unit,
-    contentDescription: String
+    contentDescription: String,
+    modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = Modifier.size(42.dp),
+        modifier = modifier.height(42.dp),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.secondaryContainer,
         contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -479,6 +566,7 @@ private fun RightMenu(
     toVersionManageScreen: () -> Unit = {},
     toVersionSettingsScreen: () -> Unit = {},
     onQuickRamClick: () -> Unit = {},
+    onQuickFpsClick: () -> Unit = {},
     onLogViewerClick: () -> Unit = {},
     onModsFolderClick: () -> Unit = {}
 ) {
@@ -499,6 +587,7 @@ private fun RightMenu(
             toVersionManageScreen = toVersionManageScreen,
             toVersionSettingsScreen = toVersionSettingsScreen,
             onQuickRamClick = onQuickRamClick,
+            onQuickFpsClick = onQuickFpsClick,
             onLogViewerClick = onLogViewerClick,
             onModsFolderClick = onModsFolderClick
         ) { innerModifier, onClick, text ->
