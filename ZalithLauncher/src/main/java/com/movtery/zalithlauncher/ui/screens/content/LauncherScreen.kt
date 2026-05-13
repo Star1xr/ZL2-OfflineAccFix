@@ -454,7 +454,6 @@ private fun RightMenuContent(
                 .padding(horizontal = 12.dp)
                 .constrainAs(shortcutsGrid) {
                     top.linkTo(accountAvatar.bottom)
-                    bottom.linkTo(versionManagerLayout.top, margin = 8.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
@@ -486,6 +485,25 @@ private fun RightMenuContent(
                 contentDescription = stringResource(R.string.versions_overview_log)
             )
         }
+
+        val ramAllocation = AllSettings.ramAllocation.state
+        MemoryPreview(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .constrainAs(createRef()) {
+                    top.linkTo(shortcutsGrid.bottom)
+                    bottom.linkTo(versionManagerLayout.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+            preview = ramAllocation?.toDouble(),
+            usedText = { usedMemory, totalMemory ->
+                stringResource(R.string.settings_game_java_memory_used_text, usedMemory.toInt(), totalMemory.toInt())
+            },
+            previewText = { preview ->
+                stringResource(R.string.settings_game_java_memory_allocation_text, preview.toInt())
+            }
+        )
 
         Row(
             modifier = Modifier.constrainAs(versionManagerLayout) {
