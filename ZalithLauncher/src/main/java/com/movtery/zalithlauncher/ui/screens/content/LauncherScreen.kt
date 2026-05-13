@@ -84,6 +84,7 @@ import com.movtery.zalithlauncher.ui.components.defaultRichTextStyle
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountAvatar
+import com.movtery.zalithlauncher.ui.screens.content.elements.MemoryPreview
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
 import com.movtery.zalithlauncher.ui.screens.content.navigateToLogView
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPosition
@@ -223,6 +224,20 @@ private fun QuickFpsDialog(
                         title = stringResource(R.string.game_menu_option_switch_fps),
                         checked = showFps,
                         onCheckedChange = { AllSettings.showFPS.save(it) }
+                    )
+                    SwitchSettingsCard(
+                        position = CardPosition.Middle,
+                        title = stringResource(R.string.settings_renderer_force_big_core_title),
+                        summary = stringResource(R.string.settings_renderer_force_big_core_summary),
+                        checked = AllSettings.bigCoreAffinity.state,
+                        onCheckedChange = { AllSettings.bigCoreAffinity.save(it) }
+                    )
+                    SwitchSettingsCard(
+                        position = CardPosition.Middle,
+                        title = stringResource(R.string.settings_renderer_sustained_performance_title),
+                        summary = stringResource(R.string.settings_renderer_sustained_performance_summary),
+                        checked = AllSettings.sustainedPerformance.state,
+                        onCheckedChange = { AllSettings.sustainedPerformance.save(it) }
                     )
                     ToggleableIntSliderSettingsCard(
                         position = CardPosition.Bottom,
