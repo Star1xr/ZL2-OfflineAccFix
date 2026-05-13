@@ -1,9 +1,6 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - '**'
   workflow_dispatch:
 
 # Otomatik GITHUB_TOKEN'a release oluşturma yetkisi veriyoruz
