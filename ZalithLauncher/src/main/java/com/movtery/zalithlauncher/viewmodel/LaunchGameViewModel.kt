@@ -62,6 +62,15 @@ class LaunchGameViewModel : ViewModel() {
     }
 
     /**
+     * 尝试启动游戏快速游玩服务器
+     * @param address 服务器地址
+     */
+    fun tryPlayServer(address: String) {
+        val version = VersionsManager.currentVersion.value ?: return
+        quickPlayServer(version, address)
+    }
+
+    /**
      * 通过服务器列表快速游玩服务器
      * @param address 服务器地址
      */
