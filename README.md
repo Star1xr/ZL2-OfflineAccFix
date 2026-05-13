@@ -16,7 +16,6 @@ This fork aims to enhance and customize the original Zalith Launcher 2 experienc
 - Community-driven enhancements
 - New systems
 
-> **Note:** Check the [CHANGELOG.md](./CHANGELOG.md) or commit history for detailed information about modifications.
 
 ## 🔗 Upstream Project
 
@@ -28,7 +27,7 @@ Please visit the upstream project if you want the official, unmodified version.
 
 ## 🌐 Language and Translation Support
 
-This fork supports the same translations as Zalith Launcher 2. To contribute translations or improvements, please consider contributing upstream to the [Zalith Launcher 2 Weblate project](https://hosted.weblate.org/projects/zalithlauncher2).
+This fork uses translations of Zalith Launcher 2. To contribute translations or improvements, please consider contributing upstream to the [Zalith Launcher 2 Weblate project](https://hosted.weblate.org/projects/zalithlauncher2).
 
 ## 📦 Build Instructions (For Developers)
 
