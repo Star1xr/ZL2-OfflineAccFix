@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.WarningCard
 import com.movtery.zalithlauncher.ui.components.fadeEdge
@@ -208,7 +209,7 @@ private fun NavigationUI(
                     .fillMaxWidth()
                     .padding(12.dp),
                 title = stringResource(R.string.generic_info),
-                text = stringResource(R.string.settings_tip_import_export),
+                text = { Text(stringResource(R.string.settings_tip_import_export)) },
                 onDismiss = { AllSettings.showSettingsTip.save(false) }
             )
         }

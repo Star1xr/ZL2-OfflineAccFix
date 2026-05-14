@@ -19,6 +19,7 @@
 package com.movtery.zalithlauncher.ui.screens.content.settings
 
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -43,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -119,6 +121,7 @@ fun LauncherSettingsScreen(
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit,
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     BaseScreen(
         Triple(key, mainScreenKey, false),
@@ -136,13 +139,13 @@ fun LauncherSettingsScreen(
                     contract = androidx.activity.result.contract.ActivityResultContracts.GetContent()
                 ) { uri ->
                     uri?.let {
-                        scope.launch {
+                        coroutineScope.launch {
                             val success = SettingsTransferUtils.importData(context, it)
                             withContext(Dispatchers.Main) {
-                                android.widget.Toast.makeText(
+                                Toast.makeText(
                                     context,
                                     if (success) R.string.settings_import_success else R.string.settings_import_failed,
-                                    android.widget.Toast.LENGTH_SHORT
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             }
                         }
@@ -158,13 +161,13 @@ fun LauncherSettingsScreen(
                         position = CardPosition.Top,
                         title = stringResource(R.string.settings_export),
                         onClick = {
-                            scope.launch {
+                            coroutineScope.launch {
                                 val file = SettingsTransferUtils.exportSettings(context)
                                 withContext(Dispatchers.Main) {
                                     if (file != null) {
                                         shareFile(context, file)
                                     } else {
-                                        android.widget.Toast.makeText(context, R.string.settings_export_failed, android.widget.Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, R.string.settings_export_failed, Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             }

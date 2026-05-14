@@ -49,6 +49,6 @@ object PlayTimeUtils {
      */
     fun formatPlayTime(context: Context, playTimeMs: Long): String {
         val hours = getPlayHours(playTimeMs)
-        return context.getString(R.string.account_play_time_format, "%.1f".format(hours))
+        return context.getString(R.string.play_time_format, "%.1f".format(hours))
     }
 }

@@ -1279,6 +1279,12 @@
     <string name="rank_master">Master</string>
     <string name="rank_legend">Legend</string>
     <string name="play_time_format">Play Time: %s Hours</string>
+    <string name="settings_chroma_name_title">Chroma Username</string>
+    <string name="chroma_mode_red_blue">Red &amp; Blue</string>
+    <string name="chroma_mode_sunset">Sunset</string>
+    <string name="chroma_mode_ocean">Ocean</string>
+    <string name="chroma_mode_forest">Forest</string>
+    <string name="chroma_mode_neon">Neon</string>
     <string name="settings_tip_import_export">You can export or import settings from launcher settings.</string>
     <string name="settings_import">Import Settings</string>
     <string name="settings_export">Export Settings</string>

@@ -18,9 +18,12 @@
 
 package com.movtery.zalithlauncher.ui.screens.content
 
+import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -785,7 +788,7 @@ private fun AccountsLayout(
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
                 title = stringResource(R.string.generic_info),
-                text = stringResource(R.string.settings_tip_import_export),
+                text = { Text(stringResource(R.string.settings_tip_import_export)) },
                 onDismiss = { AllSettings.showSettingsTip.save(false) }
             )
         }
@@ -897,7 +900,7 @@ private fun AccountsLayout(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_file_upload_filled),
+                        painter = painterResource(R.drawable.ic_upload),
                         contentDescription = null,
                         modifier = Modifier.size(18.dp)
                     )
