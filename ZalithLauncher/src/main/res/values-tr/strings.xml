@@ -1205,6 +1205,13 @@
     <string name="settings_launcher_home_page_loading">Ana Sayfa Yükleniyor</string>
     <string name="account_change_cape_reset">Pelerini Sıfırla</string>
 
+    <!-- Custom Cape Upload -->
+    <string name="account_change_cape_upload">Özel Pelerin Yükle</string>
+    <string name="account_change_cape_reset">Pelerini Sıfırla</string>
+    <string name="account_change_cape_invalid">Geçersiz pelerin dosyası! Pelerinler 64'e 32 PNG dosyaları olmalıdır..</string>
+    <string name="account_change_cape_failed_to_import">Pelerin yüklenemedi: %s</string>
+    <string name="account_change_cape_apply_custom_success">Özel pelerin uygulandı!</string>
+
     <!-- Rank and Play Time -->
     <string name="rank_novice">Çaylak</string>
     <string name="rank_player">Oyuncu</string>
