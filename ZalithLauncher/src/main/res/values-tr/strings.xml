@@ -1207,7 +1207,7 @@
 
     <!-- Custom Cape Upload -->
     <string name="account_change_cape_upload">Özel Pelerin Yükle</string>
-    <string name="account_change_cape_invalid">Geçersiz pelerin dosyası! Pelerinler 64'e 32 PNG dosyaları olmalıdır..</string>
+    <string name="account_change_cape_invalid">Geçersiz pelerin dosyası! Pelerinler 64\'e 32 PNG dosyaları olmalıdır..</string>
     <string name="account_change_cape_failed_to_import">Pelerin yüklenemedi: %s</string>
     <string name="account_change_cape_apply_custom_success">Özel pelerin uygulandı!</string>
 
