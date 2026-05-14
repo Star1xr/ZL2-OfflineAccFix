@@ -18,7 +18,8 @@ This fork aims to enhance and customize the original Zalith Launcher 2 experienc
 - [x] Shortcuts in main screen
 - [x] Importing/exporting settings
 - [x] Importing/exporting accounts along with capes and skins
-Soon:
+
+**Soon:**
 - [ ] Friend system
 
 
