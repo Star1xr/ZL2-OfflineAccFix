@@ -7,9 +7,9 @@
 
 **Zalith Launcher 2+** is a community-modified launcher for **Android devices** tailored for [Minecraft: Java Edition](https://www.minecraft.net/). It builds upon the foundation of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2), utilizing [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher/tree/v3_openjdk/app_pojavlauncher/src/main/jni) as its core launching engine with a modern UI built using **Jetpack Compose** and **Material Design 3**.
 
-## 📋 What's Different in This Fork?
+## 📋 What's New in This Fork?
 
-This fork aims to enhance and customize the original Zalith Launcher 2 experience. Some key improvements may include:
+This fork aims to enhance and customize the original Zalith Launcher 2 experience. Some key improvements include:
 
 - [x] Cape system
 - [x] Fixes
