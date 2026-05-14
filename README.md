@@ -86,7 +86,7 @@ This is a community fork. Before contributing:
 ## 📞 Contact & Links
 
 - **Original Project:** https://github.com/ZalithLauncher/ZalithLauncher2
-- **This Fork:** [[Your repository URL]](https://github.com/Star1xr/ZalithLauncher2Plus
+- **This Fork:** https://github.com/Star1xr/ZalithLauncher2Plus
 
 ---
 
