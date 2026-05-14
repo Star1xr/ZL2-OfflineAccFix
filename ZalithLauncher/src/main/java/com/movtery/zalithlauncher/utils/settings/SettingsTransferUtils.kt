@@ -43,6 +43,12 @@ object SettingsTransferUtils {
         encodeDefaults = true
     }
 
+    private fun getExportDir(): File {
+        val dir = File("/storage/emulated/0/zalithplus")
+        if (!dir.exists()) dir.mkdirs()
+        return dir
+    }
+
     suspend fun exportSettings(context: Context): File? = withContext(Dispatchers.IO) {
         try {
             val settingsMap = mutableMapOf<String, String>()
@@ -56,7 +62,7 @@ object SettingsTransferUtils {
             val export = SettingsExport(settings = settingsMap)
             val jsonString = json.encodeToString(export)
             
-            val exportFile = File(context.cacheDir, "zalith_settings_export.json")
+            val exportFile = File(getExportDir(), "settings.json")
             exportFile.writeText(jsonString)
             lInfo("Settings exported to ${exportFile.absolutePath}")
             exportFile
@@ -98,7 +104,8 @@ object SettingsTransferUtils {
             )
             val jsonString = json.encodeToString(export)
             
-            val exportFile = File(context.cacheDir, "zalith_accounts_export.json")
+            val accountName = accounts.firstOrNull()?.username ?: "backup"
+            val exportFile = File(getExportDir(), "account($accountName).json")
             exportFile.writeText(jsonString)
             lInfo("Accounts exported to ${exportFile.absolutePath}")
             exportFile
