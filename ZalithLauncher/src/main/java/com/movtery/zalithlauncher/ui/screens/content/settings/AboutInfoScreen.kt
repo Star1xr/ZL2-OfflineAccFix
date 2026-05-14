@@ -135,7 +135,7 @@ fun AboutInfoScreen(
                         )
 
                         ButtonIconItem(
-                            icon = painterResource(R.drawable.ic_github),
+                            icon = painterResource(R.drawable.img_star1xr),
                             title = stringResource(R.string.about_launcher_author_star1xr_title),
                             text = stringResource(R.string.about_launcher_author_star1xr_text, InfoDistributor.LAUNCHER_NAME),
                             button = {
