@@ -18,9 +18,12 @@
 
 package com.movtery.zalithlauncher.game.account.wardrobe
 
+import kotlinx.serialization.Serializable
+
 /**
  * 皮肤模型枚举
  */
+@Serializable
 enum class SkinModelType(val string: String, val targetParity: Int, val modelType: String) {
     /** 未设定 */
     NONE("none", -1, ""),
