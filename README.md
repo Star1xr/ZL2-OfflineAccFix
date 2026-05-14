@@ -50,20 +50,9 @@ git clone https://github.com/Star1xr/ZalithLauncher2Plus.git
 
 This project is licensed under the **[GPL-3.0 license](LICENSE)**, inherited from the upstream Zalith Launcher 2 project.
 
-### Important Terms (Pursuant to Section 7 of the GPLv3 License)
+### Important Terms
 
-As a modified version of Zalith Launcher 2, this project must comply with GPL-3.0 Section 7:
-
-1. **Program Identification**
-   - This application is clearly labeled as **"Zalith Launcher 2+ (Unofficial Modified Version)"** on the startup screen and main interface
-   - The name has been modified to distinguish it from the official Zalith Launcher
-   - This project **does not** use the original name "ZalithLauncher" or abbreviation "ZL" in a way that could cause confusion with the official version
-
-2. **Copyright Notices**
-   - All original copyright notices from Zalith Launcher 2 have been preserved
-   - The original project attribution is maintained in this README and within the application
-
-3. **Contributions and Attribution**
+**Contributions and Attribution**
    - All modifications are clearly documented and attributed to this fork
    - The upstream project is properly credited
 
@@ -97,8 +86,7 @@ This is a community fork. Before contributing:
 ## 📞 Contact & Links
 
 - **Original Project:** https://github.com/ZalithLauncher/ZalithLauncher2
-- **This Fork:** [Your repository URL]
-- **Issues/Bug Reports:** [Your repository issues page]
+- **This Fork:** [[Your repository URL]](https://github.com/Star1xr/ZalithLauncher2Plus
 
 ---
 
