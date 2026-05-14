@@ -1205,6 +1205,7 @@
     <string name="disclaimer_title">Unofficial Version</string>
     <string name="disclaimer_content">This is an unofficial modified version of Zalith Launcher 2.</string>
     <string name="disclaimer_original_repo">Original Repo</string>
+    <string name="launcher_fork_subtitle">a fork of Zalith Launcher 2</string>
     <string name="about_acknowledgements_title">Acknowledgements</string>
     <string name="about_acknowledgements_pojav_text">%s uses the launch backend from PojavLauncher</string>
     <string name="about_acknowledgements_pcl_text">%s references parts of the implementation from PCL2</string>
@@ -1277,11 +1278,14 @@
     <string name="rank_veteran">Veteran</string>
     <string name="rank_master">Master</string>
     <string name="rank_legend">Legend</string>
-    <string name="play_time_format">Play Time: %d Hours</string>
-    <string name="settings_chroma_name_title">Chroma Username</string>
-    <string name="chroma_mode_red_blue">Red &amp; Blue</string>
-    <string name="chroma_mode_sunset">Sunset</string>
-    <string name="chroma_mode_ocean">Ocean</string>
-    <string name="chroma_mode_forest">Forest</string>
-    <string name="chroma_mode_neon">Neon</string>
+    <string name="play_time_format">Play Time: %s Hours</string>
+    <string name="settings_tip_import_export">You can export or import settings from launcher settings.</string>
+    <string name="settings_import">Import Settings</string>
+    <string name="settings_export">Export Settings</string>
+    <string name="settings_import_accounts">Import Accounts</string>
+    <string name="settings_export_accounts">Export Accounts</string>
+    <string name="settings_import_success">Import successful!</string>
+    <string name="settings_import_failed">Import failed!</string>
+    <string name="settings_export_success">Exported to: %s</string>
+    <string name="settings_export_failed">Export failed!</string>
 </resources>

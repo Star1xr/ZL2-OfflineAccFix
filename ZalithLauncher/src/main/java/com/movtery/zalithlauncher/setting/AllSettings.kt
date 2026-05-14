@@ -599,7 +599,12 @@ object AllSettings : SettingsRegistry() {
     /**
      * 彩虹（Chroma）用户名特效模式
      */
-    val chromaMode = enumSetting("chromaMode", ChromaMode.RGB)
+    val chromaMode = enumSetting("chromaMode", ChromaMode.NONE)
+
+    /**
+     * 是否显示设置导出/导入提示
+     */
+    val showSettingsTip = boolSetting("showSettingsTip", true)
 
     /**
      * 是否在打开启动器时，根据特定的运行游戏次数，显示赞助支持弹窗

@@ -18,8 +18,9 @@
 
 package com.movtery.zalithlauncher.ui.screens.content
 
-import android.content.Context
-import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,6 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialExpressiveTheme
@@ -49,6 +51,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -84,6 +87,7 @@ import com.movtery.zalithlauncher.ui.components.ScalingLabel
 import com.movtery.zalithlauncher.ui.components.SimpleAlertDialog
 import com.movtery.zalithlauncher.ui.components.SimpleEditDialog
 import com.movtery.zalithlauncher.ui.components.SimpleListDialog
+import com.movtery.zalithlauncher.ui.components.WarningCard
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountItem
 import com.movtery.zalithlauncher.ui.screens.content.elements.AccountOperation
@@ -101,6 +105,8 @@ import com.movtery.zalithlauncher.ui.screens.content.elements.ServerOperation
 import com.movtery.zalithlauncher.ui.screens.main.control_editor.InfoLayoutTextItem
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.utils.copyText
+import com.movtery.zalithlauncher.utils.file.shareFile
+import com.movtery.zalithlauncher.utils.settings.SettingsTransferUtils
 import com.movtery.zalithlauncher.utils.string.getMessageOrToString
 import com.movtery.zalithlauncher.viewmodel.AccountManageEffect
 import com.movtery.zalithlauncher.viewmodel.AccountManageIntent
@@ -108,6 +114,9 @@ import com.movtery.zalithlauncher.viewmodel.AccountManageViewModel
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.LocalBackgroundViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * 封装账号界面 UI 交互的回调函数
@@ -739,6 +748,7 @@ private fun AccountsLayout(
 ) {
     val yOffset by swapAnimateDpAsState(targetValue = (-40).dp, swapIn = isVisible)
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     AccountOperation(accountOperation, actions)
 
@@ -749,69 +759,151 @@ private fun AccountsLayout(
         actions = actions
     )
 
-    BackgroundCard(
-        modifier = modifier.offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
-        shape = MaterialTheme.shapes.extraLarge
-    ) {
-        if (accounts.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(MaterialTheme.shapes.extraLarge),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-            ) {
-                items(accounts, key = { it.uniqueUUID }) { account ->
-                    AccountItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp),
-                        currentAccount = currentAccount,
-                        account = account,
-                        enabled = !isOffline, //非正版状态下不允许选择任何状态
-                        onSelected = { AccountsManager.setCurrentAccount(it) },
-                        openChangeSkinDialog = {
-                            if (!account.isAuthServerAccount()) {
-                                actions.onIntent(
-                                    AccountManageIntent.UpdateAccountSkinOp(
-                                        AccountSkinOperation.ChangeSkin(account)
-                                    )
-                                )
-                            }
-                        },
-                        onRefreshClick = {
-                            actions.onIntent(
-                                AccountManageIntent.RefreshAccount(
-                                    account
-                                )
-                            )
-                        },
-                        onCopyUUID = {
-                            copyText(COPY_LABEL_ACCOUNT_UUID, account.profileId, context, false)
-                            Toast.makeText(
-                                context,
-                                context.getString(
-                                    R.string.account_local_uuid_copied,
-                                    account.username
-                                ),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        onDeleteClick = {
-                            actions.onIntent(
-                                AccountManageIntent.UpdateAccountOp(
-                                    AccountOperation.Delete(account)
-                                )
-                            )
-                        }
-                    )
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            scope.launch {
+                val success = SettingsTransferUtils.importData(context, it)
+                withContext(Dispatchers.Main) {
+                    android.widget.Toast.makeText(
+                        context,
+                        if (success) R.string.settings_import_success else R.string.settings_import_failed,
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-        } else {
-            Box(modifier = Modifier.fillMaxSize()) {
-                ScalingLabel(
-                    modifier = Modifier.align(Alignment.Center),
-                    text = stringResource(R.string.account_no_account)
-                )
+        }
+    }
+
+    Column(
+        modifier = modifier.offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
+    ) {
+        if (AllSettings.showSettingsTip.state) {
+            WarningCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                title = stringResource(R.string.generic_info),
+                text = stringResource(R.string.settings_tip_import_export),
+                onDismiss = { AllSettings.showSettingsTip.save(false) }
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            BackgroundCard(
+                modifier = Modifier.fillMaxSize(),
+                shape = MaterialTheme.shapes.extraLarge
+            ) {
+                if (accounts.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(MaterialTheme.shapes.extraLarge),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        items(accounts, key = { it.uniqueUUID }) { account ->
+                            AccountItem(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp),
+                                currentAccount = currentAccount,
+                                account = account,
+                                enabled = !isOffline, //非正版状态下不允许选择任何状态
+                                onSelected = { AccountsManager.setCurrentAccount(it) },
+                                openChangeSkinDialog = {
+                                    if (!account.isAuthServerAccount()) {
+                                        actions.onIntent(
+                                            AccountManageIntent.UpdateAccountSkinOp(
+                                                AccountSkinOperation.ChangeSkin(account)
+                                            )
+                                        )
+                                    }
+                                },
+                                onRefreshClick = {
+                                    actions.onIntent(
+                                        AccountManageIntent.RefreshAccount(
+                                            account
+                                        )
+                                    )
+                                },
+                                onCopyUUID = {
+                                    copyText(COPY_LABEL_ACCOUNT_UUID, account.profileId, context, false)
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        context.getString(
+                                            R.string.account_local_uuid_copied,
+                                            account.username
+                                        ),
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                onDeleteClick = {
+                                    actions.onIntent(
+                                        AccountManageIntent.UpdateAccountOp(
+                                            AccountOperation.Delete(account)
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        ScalingLabel(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = stringResource(R.string.account_no_account)
+                        )
+                    }
+                }
+            }
+
+            // Import/Export buttons at bottom right
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilledTonalButton(
+                    onClick = {
+                        scope.launch {
+                            val file = SettingsTransferUtils.exportAccounts(context)
+                            withContext(Dispatchers.Main) {
+                                if (file != null) {
+                                    shareFile(context, file)
+                                } else {
+                                    android.widget.Toast.makeText(context, R.string.settings_export_failed, android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_share_filled),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.size(4.dp))
+                    Text(stringResource(R.string.settings_export_accounts), style = MaterialTheme.typography.labelMedium)
+                }
+                FilledTonalButton(
+                    onClick = {
+                        importLauncher.launch("application/json")
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_file_upload_filled),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.size(4.dp))
+                    Text(stringResource(R.string.settings_import_accounts), style = MaterialTheme.typography.labelMedium)
+                }
             }
         }
     }
