@@ -32,6 +32,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
@@ -46,6 +49,7 @@ import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.control.ControlManager
 import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.notification.NotificationManager
+import com.movtery.zalithlauncher.path.URL_ORIGINAL_PROJECT
 import com.movtery.zalithlauncher.path.URL_SUPPORT
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.base.BaseAppCompatActivity
@@ -423,6 +427,27 @@ class MainActivity : BaseAppCompatActivity() {
                     },
                     onLinkClick = { eventViewModel.sendEvent(EventViewModel.Event.OpenLink(it)) }
                 )
+
+                // 非官方版本声明
+                var showDisclaimer by rememberSaveable {
+                    mutableStateOf(!AllSettings.disclaimerAccepted.getValue())
+                }
+                if (showDisclaimer) {
+                    SimpleAlertDialog(
+                        title = stringResource(R.string.disclaimer_title),
+                        text = stringResource(R.string.disclaimer_content),
+                        confirmText = stringResource(R.string.generic_confirm),
+                        dismissText = stringResource(R.string.disclaimer_original_repo),
+                        onConfirm = {
+                            AllSettings.disclaimerAccepted.save(true)
+                            showDisclaimer = false
+                        },
+                        onDismiss = {
+                            openLink(URL_ORIGINAL_PROJECT)
+                        },
+                        dismissByDialog = false
+                    )
+                }
             }
         }
     }

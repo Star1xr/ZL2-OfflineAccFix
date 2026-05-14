@@ -582,6 +582,11 @@ object AllSettings : SettingsRegistry() {
     val lastUpgradeCheck = longSetting("lastUpgradeCheck", 0L)
 
     /**
+     * 是否已接受非官方声明
+     */
+    val disclaimerAccepted = boolSetting("disclaimerAccepted", false)
+
+    /**
      * 玩家结束运行游戏的次数
      */
     val finishedGame = intSetting("finishedGame", 0)

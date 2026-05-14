@@ -1197,9 +1197,14 @@
     <string name="about_launcher_title">About Launcher</string>
     <string name="about_launcher_version">Launcher Version: %s</string>
     <string name="about_launcher_author_movtery_title">MovTery</string>
-    <string name="about_launcher_author_movtery_text">Author of %s</string>
+    <string name="about_launcher_author_movtery_text">Author of Zalith Launcher 2</string>
+    <string name="about_launcher_author_star1xr_title">Star1xr</string>
+    <string name="about_launcher_author_star1xr_text">Author of %s</string>
     <string name="about_launcher_project_link">Project Link</string>
     <string name="about_sponsor">Sponsorship Support</string>
+    <string name="disclaimer_title">Unofficial Version</string>
+    <string name="disclaimer_content">This is an unofficial modified version of Zalith Launcher 2.</string>
+    <string name="disclaimer_original_repo">Original Repo</string>
     <string name="about_acknowledgements_title">Acknowledgements</string>
     <string name="about_acknowledgements_pojav_text">%s uses the launch backend from PojavLauncher</string>
     <string name="about_acknowledgements_pcl_text">%s references parts of the implementation from PCL2</string>
