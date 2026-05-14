@@ -11,10 +11,14 @@
 
 This fork aims to enhance and customize the original Zalith Launcher 2 experience. Some key improvements may include:
 
-- Code optimizations and improvements
-- Additional features and fixes
-- Community-driven enhancements
-- New systems
+[x] Cape system
+[x] Fixes
+[x] Offline accounts
+[x] Chroma names
+[x] Shortcuts in main screen
+[x] Importing/exporting settings
+[x] Importing/exporting accounts along with capes and skins
+[] Friend system
 
 
 ## 🔗 Upstream Project
