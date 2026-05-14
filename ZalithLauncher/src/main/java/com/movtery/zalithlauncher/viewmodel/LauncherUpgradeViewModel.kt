@@ -43,6 +43,7 @@ import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.path.GLOBAL_CLIENT
 import com.movtery.zalithlauncher.path.GLOBAL_JSON
 import com.movtery.zalithlauncher.path.URL_PROJECT_INFO
+import com.movtery.zalithlauncher.path.URL_PROJECT_RELEASES_LATEST
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.components.MarqueeText
 import com.movtery.zalithlauncher.ui.components.SimpleListDialog
@@ -50,6 +51,7 @@ import com.movtery.zalithlauncher.ui.screens.content.elements.DisabledAlpha
 import com.movtery.zalithlauncher.ui.upgrade.UpgradeDialog
 import com.movtery.zalithlauncher.ui.upgrade.UpgradeFilesDialog
 import com.movtery.zalithlauncher.upgrade.GithubContentApi
+import com.movtery.zalithlauncher.upgrade.GithubReleaseApi
 import com.movtery.zalithlauncher.upgrade.RemoteData
 import com.movtery.zalithlauncher.upgrade.TooFrequentOperationException
 import com.movtery.zalithlauncher.utils.logging.Logger.lInfo
@@ -189,17 +191,51 @@ class LauncherUpgradeViewModel: ViewModel() {
      */
     private suspend fun fetchRemoteData(): RemoteData? {
         return withContext(Dispatchers.IO) {
+            // 首先尝试获取自定义的 JSON 信息（原始项目的机制）
             runCatching {
-                withRetry(logTag = "LauncherUpgrade", maxRetries = 2) {
-                    //获取最新的启动器信息
+                withRetry(logTag = "LauncherUpgrade_Custom", maxRetries = 1) {
                     val api = GLOBAL_CLIENT.get(LATEST_API_URL).safeBodyAsJson<GithubContentApi>()
-                    //需要Base64解密
                     val contentString = decodeBase64(api.content)
                     GLOBAL_JSON.decodeFromString(RemoteData.serializer(), contentString)
                 }
-            }.getOrElse { e ->
-                lWarning("Failed to check for launcher upgrade!", e)
-                null
+            }.getOrElse { e1 ->
+                // 如果失败，尝试直接从 GitHub Releases 获取（更通用的机制）
+                runCatching {
+                    lInfo("Custom info not found, trying GitHub Releases API...")
+                    withRetry(logTag = "LauncherUpgrade_Releases", maxRetries = 2) {
+                        val release = GLOBAL_CLIENT.get(URL_PROJECT_RELEASES_LATEST).safeBodyAsJson<GithubReleaseApi>()
+                        
+                        // 将 GitHub Release 转换为 RemoteData
+                        // 我们需要一个 versionCode (Int)，尝试从 tag_name 提取数字
+                        val code = release.tagName.filter { it.isDigit() }.toIntOrNull() ?: 0
+                        
+                        RemoteData(
+                            code = code,
+                            version = release.tagName,
+                            createdAt = release.publishedAt,
+                            files = release.assets.map { asset ->
+                                val arch = when {
+                                    asset.name.contains("arm64", true) -> RemoteData.RemoteFile.Arch.ARM64
+                                    asset.name.contains("armeabi", true) || asset.name.contains("arm", true) -> RemoteData.RemoteFile.Arch.ARM
+                                    asset.name.contains("x86_64", true) -> RemoteData.RemoteFile.Arch.X86_64
+                                    asset.name.contains("x86", true) -> RemoteData.RemoteFile.Arch.X86
+                                    else -> RemoteData.RemoteFile.Arch.ALL
+                                }
+                                RemoteData.RemoteFile(
+                                    fileName = asset.name,
+                                    uri = asset.browserDownloadUrl,
+                                    arch = arch,
+                                    size = asset.size
+                                )
+                            },
+                            defaultBody = RemoteData.RemoteBody(language = "en", markdown = release.body),
+                            bodies = listOf(RemoteData.RemoteBody(language = "en", markdown = release.body))
+                        )
+                    }
+                }.getOrElse { e2 ->
+                    lWarning("Failed to check for launcher upgrade from both custom and releases API!", e2)
+                    null
+                }
             }
         }
     }

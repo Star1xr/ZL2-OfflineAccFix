@@ -20,6 +20,7 @@ package com.movtery.zalithlauncher.game.account
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 import com.movtery.zalithlauncher.game.account.wardrobe.CapeFileDownloader
 import com.movtery.zalithlauncher.game.account.wardrobe.SkinFileDownloader
 import com.movtery.zalithlauncher.game.account.wardrobe.SkinModelType
@@ -36,6 +37,7 @@ import java.io.File
 import java.util.UUID
 
 @Entity(tableName = "accounts")
+@Serializable
 data class Account(
     /**
      * 唯一 UUID，标识该账号

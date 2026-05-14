@@ -58,6 +58,7 @@
     <string name="generic_follow_system">Follow System</string>
     <string name="generic_edit">Edit</string>
     <string name="generic_view">View</string>
+    <string name="generic_info">Info</string>
     <!-- Page Title -->
     <string name="page_title_version_list">Version List</string>
     <string name="page_title_version_manage">Manage Versions</string>
@@ -1200,7 +1201,7 @@
     <string name="about_launcher_author_movtery_text">Author of Zalith Launcher 2</string>
     <string name="about_launcher_author_star1xr_title">Star1xr</string>
     <string name="about_launcher_author_star1xr_text">Author of %s</string>
-    <string name="about_launcher_project_link">Project Link</string>
+    <string name="about_launcher_project_link">GitHub Link</string>
     <string name="about_sponsor">Sponsorship Support</string>
     <string name="disclaimer_title">Unofficial Version</string>
     <string name="disclaimer_content">This is an unofficial modified version of Zalith Launcher 2.</string>

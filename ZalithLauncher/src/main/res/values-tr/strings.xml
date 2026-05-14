@@ -664,7 +664,7 @@
     <string name="about_launcher_author_movtery_text">Zalith Launcher 2\'nin Oluşturucusu</string>
     <string name="about_launcher_author_star1xr_title">Star1xr</string>
     <string name="about_launcher_author_star1xr_text">%s\'ın Oluşturucusu</string>
-    <string name="about_launcher_project_link">Proje Linki</string>
+    <string name="about_launcher_project_link">GitHub Linki</string>
     <string name="about_sponsor">Sponsorluk Desteği</string>
     <string name="disclaimer_title">Resmi Olmayan Sürüm</string>
     <string name="disclaimer_content">Bu, Zalith Launcher 2\'nin resmi olmayan, değiştirilmiş bir versiyonudur.</string>
@@ -1196,6 +1196,7 @@
     <string name="notification_jvm_running_name">JVM Sürdürme Servisi</string>
     <string name="generic_edit">Düzenle</string>
     <string name="generic_view">Görüntüle</string>
+    <string name="generic_info">Bilgi</string>
     <string name="page_title_home_page_editor">Ana Sayfa Editörü</string>
     <string name="versions_overview_log">Çalıştırma Günlüğü</string>
     <string name="settings_launcher_home_page_title">Ana Sayfa</string>
