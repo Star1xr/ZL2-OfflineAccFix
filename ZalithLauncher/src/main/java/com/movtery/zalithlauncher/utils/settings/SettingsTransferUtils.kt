@@ -12,6 +12,7 @@ package com.movtery.zalithlauncher.utils.settings
 
 import android.content.Context
 import android.net.Uri
+import android.util.Base64
 import com.movtery.zalithlauncher.database.AppDatabase
 import com.movtery.zalithlauncher.game.account.Account
 import com.movtery.zalithlauncher.game.account.AccountsManager
@@ -24,13 +25,16 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.apache.commons.io.FileUtils
 import java.io.File
 
 @Serializable
 data class SettingsExport(
     val settings: Map<String, String>,
     val accounts: List<Account>? = null,
-    val authServers: List<AuthServer>? = null
+    val authServers: List<AuthServer>? = null,
+    val skins: Map<String, String>? = null,
+    val capes: Map<String, String>? = null
 )
 
 object SettingsTransferUtils {
@@ -67,11 +71,30 @@ object SettingsTransferUtils {
             val db = AppDatabase.getInstance(context)
             val accounts = db.accountDao().getAllAccounts()
             val authServers = db.authServerDao().getAllServers()
+            
+            val skinsMap = mutableMapOf<String, String>()
+            val capesMap = mutableMapOf<String, String>()
+            
+            accounts.forEach { account ->
+                val skinFile = account.getSkinFile()
+                if (skinFile.exists()) {
+                    val bytes = FileUtils.readFileToByteArray(skinFile)
+                    skinsMap[account.uniqueUUID] = Base64.encodeToString(bytes, Base64.NO_WRAP)
+                }
+                
+                val capeFile = account.getCapeFile()
+                if (capeFile.exists()) {
+                    val bytes = FileUtils.readFileToByteArray(capeFile)
+                    capesMap[account.uniqueUUID] = Base64.encodeToString(bytes, Base64.NO_WRAP)
+                }
+            }
 
             val export = SettingsExport(
                 settings = emptyMap(),
                 accounts = accounts,
-                authServers = authServers
+                authServers = authServers,
+                skins = skinsMap,
+                capes = capesMap
             )
             val jsonString = json.encodeToString(export)
             
@@ -97,8 +120,6 @@ object SettingsTransferUtils {
                 AllSettings.allSettings.forEach { unit ->
                     export.settings[unit.key]?.let { valueStr ->
                         try {
-                            // This is a bit hacky because we don't have a generic "parse" in SettingUnit
-                            // But for simple types it works. For Enums/Parcelables we might need more logic.
                             when (unit.defaultValue) {
                                 is Boolean -> (unit as? com.movtery.zalithlauncher.setting.unit.AbstractSettingUnit<Boolean>)?.save(valueStr.toBoolean())
                                 is Int -> (unit as? com.movtery.zalithlauncher.setting.unit.AbstractSettingUnit<Int>)?.save(valueStr.toInt())
@@ -120,10 +141,34 @@ object SettingsTransferUtils {
             export.accounts?.forEach { account ->
                 db.accountDao().saveAccount(account)
             }
+            
+            // Import skins and capes
+            export.skins?.forEach { (uuid, base64) ->
+                try {
+                    val bytes = Base64.decode(base64, Base64.DEFAULT)
+                    // We need to recreate the account object or path manager logic to find the file
+                    // Or just use the known directory
+                    val skinFile = File(com.movtery.zalithlauncher.path.PathManager.DIR_ACCOUNT_SKIN, "$uuid.png")
+                    FileUtils.writeByteArrayToFile(skinFile, bytes)
+                } catch (e: Exception) {
+                    lError("Failed to import skin for $uuid", e)
+                }
+            }
+            
+            export.capes?.forEach { (uuid, base64) ->
+                try {
+                    val bytes = Base64.decode(base64, Base64.DEFAULT)
+                    val capeFile = File(com.movtery.zalithlauncher.path.PathManager.DIR_ACCOUNT_CAPE, "$uuid.png")
+                    FileUtils.writeByteArrayToFile(capeFile, bytes)
+                } catch (e: Exception) {
+                    lError("Failed to import cape for $uuid", e)
+                }
+            }
 
             if (export.accounts != null || export.authServers != null) {
                 AccountsManager.reloadAccounts()
                 AccountsManager.reloadAuthServers()
+                AccountsManager.refreshWardrobe()
             }
             
             lInfo("Data imported successfully")
