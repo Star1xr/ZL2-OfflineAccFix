@@ -85,6 +85,7 @@ fun LauncherScreen(
     onLaunchGame: () -> Unit,
     onOpenLink: (String) -> Unit,
     onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
+    onModsClick: () -> Unit,
 ) {
     var showQuickRamDialog by remember { mutableStateOf<Boolean>(false) }
     var showQuickFpsDialog by remember { mutableStateOf<Boolean>(false) }
@@ -179,10 +180,10 @@ private fun CategoryHeader(
         Spacer(modifier = Modifier.width(2.dp))
         Text(
             text = title,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.titleSmall, // Larger (was labelMedium)
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(16.dp)) // More gap
         androidx.compose.material3.HorizontalDivider(
             modifier = Modifier.weight(1f),
             thickness = 0.5.dp,
@@ -307,14 +308,16 @@ private fun RightActionSidebar(
     onFolders: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isSelected = version != null
+
     Column(
         modifier = modifier
-            .padding(horizontal = 4.dp, vertical = 8.dp),
+            .padding(horizontal = 6.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(
-            modifier = Modifier.size(120.dp),
-            shape = RoundedCornerShape(4.dp),
+            modifier = Modifier.size(140.dp), // One-click larger (was 120)
+            shape = RoundedCornerShape(6.dp),
             color = MaterialTheme.colorScheme.surfaceVariant
         ) {
             VersionIconImage(
@@ -323,76 +326,84 @@ private fun RightActionSidebar(
             )
         }
         
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         
         Text(
-            text = version?.getVersionName() ?: "No Instance Selected",
-            style = MaterialTheme.typography.labelLarge,
+            text = version?.getVersionName() ?: stringResource(R.string.sidebar_no_instance_selected),
+            style = MaterialTheme.typography.titleMedium, // Larger font
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2
         )
 
         androidx.compose.material3.HorizontalDivider(
-            modifier = Modifier.padding(vertical = 12.dp),
+            modifier = Modifier.padding(vertical = 14.dp),
             thickness = 0.5.dp,
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
         )
 
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp) // More spacing
         ) {
             SidebarActionItem(
                 icon = R.drawable.ic_play_arrow_filled,
-                label = "Launch",
+                label = stringResource(R.string.main_launch_game),
                 onClick = onLaunch,
-                isPrimary = true
+                isPrimary = true,
+                enabled = isSelected
             )
             SidebarActionItem(
                 icon = R.drawable.ic_close,
-                label = "Kill",
+                label = stringResource(R.string.sidebar_action_kill),
                 onClick = { },
                 enabled = false
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             SidebarActionItem(
                 icon = R.drawable.ic_edit_filled,
-                label = "Edit",
-                onClick = onEdit
+                label = stringResource(R.string.versions_manage_settings),
+                onClick = onEdit,
+                enabled = isSelected
             )
             SidebarActionItem(
                 icon = R.drawable.ic_sort,
-                label = "Change Group",
-                onClick = { }
+                label = stringResource(R.string.sidebar_action_change_group),
+                onClick = { },
+                enabled = isSelected
             )
             SidebarActionItem(
-                icon = R.drawable.ic_folder_outlined,
-                label = "Folder",
-                onClick = onFolders
+                icon = R.drawable.ic_extension_outlined,
+                label = stringResource(R.string.topbar_mods),
+                onClick = onModsClick,
+                enabled = isSelected
             )
             SidebarActionItem(
                 icon = R.drawable.ic_share_filled,
-                label = "Export",
-                onClick = { }
+                label = stringResource(R.string.sidebar_action_export),
+                onClick = { },
+                enabled = isSelected
             )
             SidebarActionItem(
                 icon = R.drawable.ic_copy_all_filled,
-                label = "Copy",
-                onClick = { }
+                label = stringResource(R.string.sidebar_action_copy),
+                onClick = { },
+                enabled = isSelected
             )
             SidebarActionItem(
                 icon = R.drawable.ic_delete_filled,
-                label = "Delete",
+                label = stringResource(R.string.generic_delete),
                 onClick = onDelete,
-                contentColor = MaterialTheme.colorScheme.error
+                contentColor = MaterialTheme.colorScheme.error,
+                enabled = isSelected
             )
             SidebarActionItem(
                 icon = R.drawable.ic_add,
-                label = "Create Shortcut",
-                onClick = { }
+                label = stringResource(R.string.sidebar_action_create_shortcut),
+                onClick = { },
+                enabled = isSelected
             )
         }
     }
@@ -407,35 +418,35 @@ private fun SidebarActionItem(
     enabled: Boolean = true,
     contentColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
-    val alpha = if (enabled) 1f else 0.4f
+    val alpha = if (enabled) 1f else 0.3f
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(32.dp),
+            .height(36.dp), // Larger (was 32)
         onClick = if (enabled) onClick else ({}),
         color = Color.Transparent,
         contentColor = (if (isPrimary) MaterialTheme.colorScheme.primary else contentColor).copy(alpha = alpha),
-        shape = RoundedCornerShape(2.dp)
+        shape = RoundedCornerShape(4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 4.dp),
+            modifier = Modifier.padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Icon(
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(18.dp), // Larger
                 painter = painterResource(icon),
                 contentDescription = label
             )
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelLarge, // Larger
                 maxLines = 1
             )
             if (isPrimary) {
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
-                    modifier = Modifier.size(14.dp),
+                    modifier = Modifier.size(16.dp),
                     painter = painterResource(R.drawable.ic_arrow_drop_down_rounded),
                     contentDescription = null
                 )

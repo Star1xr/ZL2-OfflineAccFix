@@ -73,8 +73,10 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
@@ -82,7 +84,9 @@ import androidx.navigation3.ui.NavDisplay
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.coroutine.TaskSystem
+import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.game.version.installed.Version
+import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.info.InfoDistributor
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.ui.base.applyFullscreen
@@ -125,6 +129,7 @@ import com.movtery.zalithlauncher.viewmodel.LocalBackgroundViewModel
 import com.movtery.zalithlauncher.viewmodel.ModpackImportViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 import com.movtery.zalithlauncher.viewmodel.sendKeepScreen
+import java.io.File
 
 @Composable
 fun MainScreen(
@@ -135,12 +140,10 @@ fun MainScreen(
 ) {
     val tasks by TaskSystem.tasksFlow.collectAsStateWithLifecycle()
 
-    //监控当前是否有任务正在进行
     LaunchedEffect(tasks) {
         if (tasks.isEmpty()) {
             eventViewModel.sendKeepScreen(false)
         } else {
-            //有任务正在进行，避免熄屏
             eventViewModel.sendKeepScreen(true)
         }
     }
@@ -151,7 +154,6 @@ fun MainScreen(
         AllSettings.launcherTaskMenuExpanded.save(!isTaskMenuExpanded)
     }
 
-    /** 回到主页面通用函数 */
     val toMainScreen: () -> Unit = {
         screenBackStackModel.mainScreen.clearWith(NormalNavKey.LauncherMain)
     }
@@ -166,6 +168,21 @@ fun MainScreen(
         backgroundColor().copy(alpha = launcherBackgroundOpacity)
     } else backgroundColor()
 
+    var showQuickRamDialog by remember { mutableStateOf<Boolean>(false) }
+    var showQuickFpsDialog by remember { mutableStateOf<Boolean>(false) }
+
+    if (showQuickRamDialog) {
+        com.movtery.zalithlauncher.ui.screens.content.QuickRamDialog(
+            onDismissRequest = { showQuickRamDialog = false }
+        )
+    }
+
+    if (showQuickFpsDialog) {
+        com.movtery.zalithlauncher.ui.screens.content.QuickFpsDialog(
+            onDismissRequest = { showQuickFpsDialog = false }
+        )
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = backgroundColor,
@@ -178,7 +195,7 @@ fun MainScreen(
             TopBar(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp),
+                    .height(48.dp), // Height increased (was 40)
                 mainScreenKey = mainScreenKey,
                 inLauncherScreen = inLauncherScreen,
                 taskRunning = tasks.isEmpty(),
@@ -207,6 +224,24 @@ fun MainScreen(
                     screenBackStackModel.mainScreen.navigateTo(
                         screenKey = NormalNavKey.AccountManager(FirstLoginMenu.NONE)
                     )
+                },
+                toModsScreen = {
+                    VersionsManager.currentVersion.value?.let {
+                        screenBackStackModel.mainScreen.navigateTo(NormalNavKey.Versions.ModsManager)
+                    }
+                },
+                toVersionManageScreen = {
+                    screenBackStackModel.mainScreen.navigateTo(NormalNavKey.VersionsManager)
+                },
+                onQuickRamClick = { showQuickRamDialog = true },
+                onQuickFpsClick = { showQuickFpsDialog = true },
+                onLogViewerClick = {
+                    VersionsManager.currentVersion.value?.let { version ->
+                        val logFile = File(version.getGameDir(), "logs/latest.log")
+                        if (logFile.exists()) {
+                            screenBackStackModel.mainScreen.backStack.navigateToLogView(logFile.absolutePath)
+                        }
+                    }
                 },
                 changeExpandedState = {
                     changeTasksExpandedState()
@@ -243,9 +278,14 @@ fun MainScreen(
             BottomPanel(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(32.dp)
+                    .height(36.dp) // Increased height (was 32)
                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                contentColor = onBackgroundColor()
+                contentColor = onBackgroundColor(),
+                toAccountManageScreen = {
+                    screenBackStackModel.mainScreen.navigateTo(
+                        screenKey = NormalNavKey.AccountManager(FirstLoginMenu.NORMAL)
+                    )
+                }
             )
         }
     }
@@ -254,12 +294,16 @@ fun MainScreen(
 @Composable
 private fun BottomPanel(
     modifier: Modifier = Modifier,
-    contentColor: Color
+    contentColor: Color,
+    toAccountManageScreen: () -> Unit
 ) {
     val context = LocalContext.current
     val playTimeMs = AllSettings.playTime.state
     val rankName = com.movtery.zalithlauncher.utils.PlayTimeUtils.getRankName(context, playTimeMs)
     val formattedPlayTime = com.movtery.zalithlauncher.utils.PlayTimeUtils.formatPlayTime(context, playTimeMs)
+
+    val currentAccount by AccountsManager.currentAccountFlow.collectAsStateWithLifecycle()
+    val noAccount = currentAccount == null
 
     Row(
         modifier = modifier
@@ -268,16 +312,27 @@ private fun BottomPanel(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = rankName,
-            style = MaterialTheme.typography.labelSmall,
-            color = contentColor.copy(alpha = 0.7f)
-        )
-        Text(
-            text = formattedPlayTime,
-            style = MaterialTheme.typography.labelSmall,
-            color = contentColor.copy(alpha = 0.7f)
-        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                text = rankName,
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, fontSize = 14.sp),
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = formattedPlayTime,
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium, fontSize = 13.sp),
+                color = contentColor
+            )
+        }
+
+        if (noAccount) {
+            Text(
+                text = stringResource(R.string.account_no_account_warning),
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.clickable(onClick = toAccountManageScreen)
+            )
+        }
     }
 }
 
@@ -295,11 +350,14 @@ private fun <E: TitledNavKey> TopBar(
     toDownloadScreen: () -> Unit,
     toMultiplayerScreen: () -> Unit,
     toAccountManageScreen: () -> Unit,
+    toModsScreen: () -> Unit,
+    toVersionManageScreen: () -> Unit,
+    onQuickRamClick: () -> Unit,
+    onQuickFpsClick: () -> Unit,
+    onLogViewerClick: () -> Unit,
     changeExpandedState: () -> Unit,
 ) {
-    val festivals = LocalFestivals.current
-
-    val inAccountManager = mainScreenKey is NormalNavKey.AccountManager
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     CompositionLocalProvider(
         LocalContentColor provides contentColor
@@ -310,10 +368,25 @@ private fun <E: TitledNavKey> TopBar(
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Back Button (If not on main screen)
+            if (!inLauncherScreen) {
+                IconButton(
+                    onClick = {
+                        backDispatcher?.onBackPressed() ?: onScreenBack()
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_back),
+                        contentDescription = stringResource(R.string.generic_back)
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
+            }
+
             // Left Side: Prism Style Buttons
             Row(
                 modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp), // Increased spacing
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Add Instance
@@ -325,9 +398,9 @@ private fun <E: TitledNavKey> TopBar(
 
                 // Mods
                 TopBarTextButton(
-                    icon = R.drawable.ic_extension_outlined, // Using extension icon for Mods
-                    text = "Mods",
-                    onClick = { /* Mods management or view */ }
+                    icon = R.drawable.ic_extension_outlined,
+                    text = stringResource(R.string.topbar_mods),
+                    onClick = toModsScreen
                 )
 
                 // Settings
@@ -337,12 +410,12 @@ private fun <E: TitledNavKey> TopBar(
                     onClick = toSettingsScreen
                 )
 
-                // Shortcuts (Dropdown containing the 4 specific ones)
+                // Shortcuts (Dropdown)
                 var showShortcuts by remember { mutableStateOf<Boolean>(false) }
                 Box {
                     TopBarTextButton(
                         icon = R.drawable.ic_sort,
-                        text = "Shortcuts",
+                        text = stringResource(R.string.shortcuts_title),
                         onClick = { showShortcuts = true },
                         hasDropdown = true
                     )
@@ -353,53 +426,46 @@ private fun <E: TitledNavKey> TopBar(
                     ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.page_title_version_list)) },
-                            leadingIcon = { Icon(painterResource(R.drawable.ic_sort), null, modifier = Modifier.size(18.dp)) },
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_sort), null, modifier = Modifier.size(20.dp)) },
                             onClick = { 
                                 showShortcuts = false
+                                toVersionManageScreen()
                             }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.settings_game_java_memory_title)) },
-                            leadingIcon = { Icon(painterResource(R.drawable.ic_build_filled), null, modifier = Modifier.size(18.dp)) },
-                            onClick = { showShortcuts = false }
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_build_filled), null, modifier = Modifier.size(20.dp)) },
+                            onClick = { 
+                                showShortcuts = false
+                                onQuickRamClick()
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.game_menu_option_switch_fps)) },
-                            leadingIcon = { Icon(painterResource(R.drawable.ic_video_settings), null, modifier = Modifier.size(18.dp)) },
-                            onClick = { showShortcuts = false }
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_video_settings), null, modifier = Modifier.size(20.dp)) },
+                            onClick = { 
+                                showShortcuts = false
+                                onQuickFpsClick()
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.versions_overview_log)) },
-                            leadingIcon = { Icon(painterResource(R.drawable.ic_terminal_outlined), null, modifier = Modifier.size(18.dp)) },
-                            onClick = { showShortcuts = false }
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_terminal_outlined), null, modifier = Modifier.size(20.dp)) },
+                            onClick = { 
+                                showShortcuts = false
+                                onLogViewerClick()
+                            }
                         )
                     }
                 }
             }
 
-            // Right Side: Accounts (Dropdown)
-            var showAccounts by remember { mutableStateOf<Boolean>(false) }
-            Box {
-                TopBarTextButton(
-                    icon = R.drawable.ic_person_outlined,
-                    text = stringResource(R.string.page_title_account_list),
-                    onClick = { showAccounts = true },
-                    hasDropdown = true
-                )
-                DropdownMenu(
-                    expanded = showAccounts,
-                    onDismissRequest = { showAccounts = false },
-                    containerColor = MaterialTheme.colorScheme.surface
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Manage Accounts") },
-                        onClick = { 
-                            showAccounts = false
-                            toAccountManageScreen()
-                        }
-                    )
-                }
-            }
+            // Right Side: Accounts (Direct navigation as requested)
+            TopBarTextButton(
+                icon = R.drawable.ic_person_outlined,
+                text = stringResource(R.string.page_title_account_list),
+                onClick = toAccountManageScreen
+            )
         }
     }
 }
@@ -416,24 +482,24 @@ private fun TopBarTextButton(
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
             .clickable(onClick = onClick)
-            .padding(horizontal = 6.dp, vertical = 4.dp),
+            .padding(horizontal = 10.dp, vertical = 6.dp), // Increased padding
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp) // Increased gap
     ) {
         Icon(
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(20.dp), // Increased icon size (was 16)
             painter = painterResource(icon),
             contentDescription = text,
-            tint = if (text == "Add Instance") Color(0xFF50AF55) else MaterialTheme.colorScheme.primary // Green for Add like in ref
+            tint = if (text == "Add Instance") Color(0xFF50AF55) else MaterialTheme.colorScheme.primary
         )
         Text(
             text = text,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelLarge, // Larger font (was labelMedium)
             color = MaterialTheme.colorScheme.onBackground
         )
         if (hasDropdown) {
             Icon(
-                modifier = Modifier.size(12.dp),
+                modifier = Modifier.size(14.dp),
                 painter = painterResource(R.drawable.ic_arrow_drop_down_rounded),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -494,14 +560,12 @@ private fun NavigationUI(
     }
 
     if (backStack.isNotEmpty()) {
-        /** 导航至版本详细信息屏幕 */
         val navigateToVersions: (Version) -> Unit = { version ->
             screenBackStackModel.mainScreen.navigateTo(
                 screenKey = NestedNavKey.VersionSettings(version),
                 useClassEquality = true
             )
         }
-        /** 导航至整合包导出屏幕 */
         val navigateToExport: (Version) -> Unit = { version ->
             screenBackStackModel.mainScreen.removeAndNavigateTo(
                 remove = NestedNavKey.VersionSettings::class,
@@ -533,6 +597,11 @@ private fun NavigationUI(
                         },
                         onHomePageEvent = { event ->
                             eventViewModel.sendEvent(EventViewModel.Event.HomePage.Event(event))
+                        },
+                        onModsClick = {
+                            VersionsManager.currentVersion.value?.let {
+                                screenBackStackModel.mainScreen.navigateTo(NormalNavKey.Versions.ModsManager)
+                            }
                         }
                     )
                 }
@@ -719,7 +788,6 @@ private fun TaskMenu(
                                 .fillMaxWidth()
                                 .padding(vertical = 6.dp)
                         ) {
-                            //取消任务
                             TaskSystem.cancelTask(task.id)
                         }
                     }
@@ -780,7 +848,7 @@ private fun TaskItem(
                     )
                 }
 
-                if (taskProgress < 0) { //负数则代表不确定
+                if (taskProgress < 0) {
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth()
                     )

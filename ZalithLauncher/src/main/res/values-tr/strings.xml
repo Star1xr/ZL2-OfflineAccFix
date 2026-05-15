@@ -68,6 +68,15 @@
     <string name="theme_color_urban_ash">Şehir Külü</string>
     <string name="theme_color_verdant_dawn">Sessiz Orman Şafağı</string>
     <string name="theme_color_picker_title">Renk Seçici</string>
+    <string name="shortcuts_title">Kısayollar</string>
+    <string name="topbar_mods">Modlar</string>
+    <string name="account_no_account_warning">Hesap yok! Oluşturulsun mu?</string>
+    <string name="sidebar_no_instance_selected">Sürüm Seçilmedi</string>
+    <string name="sidebar_action_kill">Durdur</string>
+    <string name="sidebar_action_change_group">Grubu Değiştir</string>
+    <string name="sidebar_action_export">Dışa Aktar</string>
+    <string name="sidebar_action_copy">Kopyala</string>
+    <string name="sidebar_action_create_shortcut">Kısayol Oluştur</string>
     <string name="theme_color_picker_edit_hex">Hex Kodunu Düzenle</string>
     <string name="theme_color_picker_edit_hex_invalid">Geçersiz Hex</string>
     <string name="animate_type_bounce">Zıplat</string>
