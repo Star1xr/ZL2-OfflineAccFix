@@ -27,6 +27,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +45,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -55,7 +58,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -63,6 +68,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -90,15 +96,17 @@ import com.movtery.zalithlauncher.ui.screens.TitledNavKey
 import com.movtery.zalithlauncher.ui.screens.content.AccountManageScreen
 import com.movtery.zalithlauncher.ui.screens.content.DownloadScreen
 import com.movtery.zalithlauncher.ui.screens.content.FileSelectorScreen
+import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
 import com.movtery.zalithlauncher.ui.screens.content.HomePageEditorScreen
 import com.movtery.zalithlauncher.ui.screens.content.LauncherScreen
 import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
 import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
 import com.movtery.zalithlauncher.ui.screens.content.MultiplayerScreen
+import com.movtery.zalithlauncher.ui.screens.content.SearchAssetsScreen
 import com.movtery.zalithlauncher.ui.screens.content.SettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionExportScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionSettingsScreen
-import com.movtery.zalithlauncher.ui.screens.content.VersionsManageScreen
+import com.movtery.zalithlauncher.ui.screens.content.VersionsManagerScreen
 import com.movtery.zalithlauncher.ui.screens.content.WebViewScreen
 import com.movtery.zalithlauncher.ui.screens.content.navigateToDownload
 import com.movtery.zalithlauncher.ui.screens.navigateTo
@@ -290,7 +298,6 @@ private fun <E: TitledNavKey> TopBar(
     toAccountManageScreen: () -> Unit,
     changeExpandedState: () -> Unit,
 ) {
-    val context = LocalContext.current
     val festivals = LocalFestivals.current
 
     val inAccountManager = mainScreenKey is NormalNavKey.AccountManager
@@ -319,7 +326,7 @@ private fun <E: TitledNavKey> TopBar(
 
                 // Mods
                 TopBarTextButton(
-                    icon = R.drawable.ic_extension_filled, // Using extension icon for Mods
+                    icon = R.drawable.ic_extension_outlined, // Using extension icon for Mods
                     text = "Mods",
                     onClick = { /* Mods management or view */ }
                 )
@@ -332,7 +339,7 @@ private fun <E: TitledNavKey> TopBar(
                 )
 
                 // Shortcuts (Dropdown containing the 4 specific ones)
-                var showShortcuts by remember { mutableStateOf(false) }
+                var showShortcuts by remember { mutableStateOf<Boolean>(false) }
                 Box {
                     TopBarTextButton(
                         icon = R.drawable.ic_sort,
@@ -340,30 +347,29 @@ private fun <E: TitledNavKey> TopBar(
                         onClick = { showShortcuts = true },
                         hasDropdown = true
                     )
-                    androidx.compose.material3.DropdownMenu(
+                    DropdownMenu(
                         expanded = showShortcuts,
                         onDismissRequest = { showShortcuts = false },
                         containerColor = MaterialTheme.colorScheme.surface
                     ) {
-                        androidx.compose.material3.DropdownMenuItem(
+                        DropdownMenuItem(
                             text = { Text(stringResource(R.string.page_title_version_list)) },
                             leadingIcon = { Icon(painterResource(R.drawable.ic_sort), null, modifier = Modifier.size(18.dp)) },
                             onClick = { 
                                 showShortcuts = false
-                                // Navigation to VersionManager
                             }
                         )
-                        androidx.compose.material3.DropdownMenuItem(
+                        DropdownMenuItem(
                             text = { Text(stringResource(R.string.settings_game_java_memory_title)) },
                             leadingIcon = { Icon(painterResource(R.drawable.ic_build_filled), null, modifier = Modifier.size(18.dp)) },
                             onClick = { showShortcuts = false }
                         )
-                        androidx.compose.material3.DropdownMenuItem(
+                        DropdownMenuItem(
                             text = { Text(stringResource(R.string.game_menu_option_switch_fps)) },
                             leadingIcon = { Icon(painterResource(R.drawable.ic_video_settings), null, modifier = Modifier.size(18.dp)) },
                             onClick = { showShortcuts = false }
                         )
-                        androidx.compose.material3.DropdownMenuItem(
+                        DropdownMenuItem(
                             text = { Text(stringResource(R.string.versions_overview_log)) },
                             leadingIcon = { Icon(painterResource(R.drawable.ic_terminal_outlined), null, modifier = Modifier.size(18.dp)) },
                             onClick = { showShortcuts = false }
@@ -373,20 +379,20 @@ private fun <E: TitledNavKey> TopBar(
             }
 
             // Right Side: Accounts (Dropdown)
-            var showAccounts by remember { mutableStateOf(false) }
+            var showAccounts by remember { mutableStateOf<Boolean>(false) }
             Box {
                 TopBarTextButton(
-                    icon = R.drawable.ic_account_circle_filled,
-                    text = stringResource(R.string.page_title_account_manager),
+                    icon = R.drawable.ic_person_outlined,
+                    text = stringResource(R.string.page_title_account_list),
                     onClick = { showAccounts = true },
                     hasDropdown = true
                 )
-                androidx.compose.material3.DropdownMenu(
+                DropdownMenu(
                     expanded = showAccounts,
                     onDismissRequest = { showAccounts = false },
                     containerColor = MaterialTheme.colorScheme.surface
                 ) {
-                    androidx.compose.material3.DropdownMenuItem(
+                    DropdownMenuItem(
                         text = { Text("Manage Accounts") },
                         onClick = { 
                             showAccounts = false
@@ -429,7 +435,7 @@ private fun TopBarTextButton(
         if (hasDropdown) {
             Icon(
                 modifier = Modifier.size(12.dp),
-                painter = painterResource(R.drawable.ic_arrow_drop_down),
+                painter = painterResource(R.drawable.ic_arrow_drop_down_rounded),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
