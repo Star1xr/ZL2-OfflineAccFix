@@ -11,12 +11,12 @@ Thank you for your interest in contributing to **Zalith Launcher 2+**! This is a
 
 ## Types of Contributions We Welcome
 
-- 🐛 **Bug Fixes** - Help us squash bugs and improve stability
-- ✨ **Features** - New features and enhancements (discuss in issues first!)
-- 📚 **Documentation** - Improve README, comments, and guides
-- 🌐 **Translations** - Help translate the app (consider contributing upstream)
-- 🔍 **Code Review** - Review pull requests and provide feedback
-- 💡 **Ideas** - Suggest improvements via GitHub Issues
+-  **Bug Fixes** - Help us squash bugs and improve stability
+-  **Features** - New features and enhancements (discuss in issues first!)
+-  **Documentation** - Improve README, comments, and guides
+-  **Translations** - Help translate the app (consider contributing upstream)
+-  **Code Review** - Review pull requests and provide feedback
+-  **Ideas** - Suggest improvements via GitHub Issues
 
 ## Getting Started
 
@@ -321,10 +321,10 @@ All contributions must comply with **GPL-3.0**:
 
 ## Getting Help
 
-- 📖 Check existing issues and discussions
-- 💬 Comment on relevant issues for clarification
-- 📧 Contact maintainers for private concerns
-- 🔗 See README.md for more resources
+-  Check existing issues and discussions
+-  Comment on relevant issues for clarification
+-  Contact maintainers for private concerns
+-  See README.md for more resources
 
 ## Recognition
 
@@ -336,9 +336,9 @@ Contributors are recognized through:
 
 ## Questions?
 
-- 🐙 Open a GitHub Discussion
-- 📝 Create an Issue (if a bug)
-- 💭 Comment on related PRs/Issues
+-  Open a GitHub Discussion
+-  Create an Issue (if a bug)
+-  Comment on related PRs/Issues
 
 ---
 
