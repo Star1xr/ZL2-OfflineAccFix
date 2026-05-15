@@ -123,6 +123,9 @@ fun LauncherScreen(
         )
     }
 
+    val versions by VersionsManager.isRefreshing.collectAsStateWithLifecycle()
+    val currentVersion by VersionsManager.currentVersion.collectAsStateWithLifecycle()
+
     BaseScreen(
         screenKey = NormalNavKey.LauncherMain,
         currentKey = backStackViewModel.mainScreen.currentKey
@@ -130,61 +133,338 @@ fun LauncherScreen(
         Row(
             modifier = Modifier.fillMaxSize()
         ) {
-            CompositionLocalProvider(
-                LocalUriHandler provides object : UriHandler {
-                    override fun openUri(uri: String) {
-                        onOpenLink(uri)
-                    }
-                }
-            ) {
-                ContentMenu(
-                    modifier = Modifier.weight(7f),
-                    isVisible = isVisible,
-                    onHomePageEvent = onHomePageEvent
-                )
-            }
-
-            val toAccountManageScreen: () -> Unit = {
-                backStackViewModel.mainScreen.navigateTo(
-                    screenKey = NormalNavKey.AccountManager(FirstLoginMenu.NONE)
-                )
-            }
-            val toVersionManageScreen: () -> Unit = {
-                backStackViewModel.mainScreen.removeAndNavigateTo(
-                    remove = NestedNavKey.VersionSettings::class,
-                    screenKey = NormalNavKey.VersionsManager
-                )
-            }
-            val toVersionSettingsScreen: () -> Unit = {
-                VersionsManager.currentVersion.value?.let { version ->
-                    navigateToVersions(version)
-                }
-            }
-
-            RightMenu(
-                isVisible = isVisible,
+            // Main Content: Categorized Grid
+            Box(
                 modifier = Modifier
-                    .weight(3f)
+                    .weight(1f)
                     .fillMaxHeight()
-                    .padding(top = 12.dp, end = 12.dp, bottom = 12.dp),
-                onLaunchGame = onLaunchGame,
-                toAccountManageScreen = toAccountManageScreen,
-                toVersionManageScreen = toVersionManageScreen,
-                toVersionSettingsScreen = toVersionSettingsScreen,
-                onQuickRamClick = { showQuickRamDialog = true },
-                onQuickFpsClick = { showQuickFpsDialog = true },
-                onLogViewerClick = {
-                    VersionsManager.currentVersion.value?.let { version ->
-                        val logFile = File(version.getGameDir(), "logs/latest.log")
-                        if (logFile.exists()) {
-                            backStackViewModel.mainScreen.backStack.navigateToLogView(logFile.absolutePath)
-                        }
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                VersionGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    versions = VersionsManager.versions,
+                    currentVersion = currentVersion,
+                    onVersionClick = { version ->
+                        VersionsManager.saveCurrentVersion(version.getVersionName())
                     }
+                )
+            }
+
+            // Right Sidebar: Action Panel
+            RightActionSidebar(
+                modifier = Modifier
+                    .width(240.dp)
+                    .fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.surface),
+                version = currentVersion,
+                onLaunch = onLaunchGame,
+                onEdit = {
+                    currentVersion?.let { navigateToVersions(it) }
                 },
-                onModsFolderClick = {
+                onDelete = {
+                    currentVersion?.let { VersionsManager.deleteVersion(it) }
+                },
+                onFolders = {
                     backStackViewModel.mainScreen.navigateTo(NormalNavKey.Versions.ModsManager)
                 }
             )
+        }
+    }
+}
+
+@Composable
+private fun CategoryHeader(
+    title: String,
+    isExpanded: Boolean,
+    onExpandClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val rotation by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (isExpanded) 0f else -90f, label = ""
+    )
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onExpandClick)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            modifier = Modifier
+                .size(14.dp)
+                .androidx.compose.ui.draw.rotate(rotation),
+            painter = painterResource(R.drawable.ic_arrow_drop_down),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.width(2.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        androidx.compose.material3.HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = 0.5.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+        )
+    }
+}
+
+@Composable
+private fun VersionGrid(
+    versions: List<Version>,
+    currentVersion: Version?,
+    onVersionClick: (Version) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val pinned = versions.filter { it.pinnedState }
+    val unpinned = versions.filter { !it.pinnedState }
+    
+    var pinnedExpanded by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(true) }
+    var unpinnedExpanded by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(true) }
+
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (pinned.isNotEmpty()) {
+            item { 
+                CategoryHeader(
+                    title = "Pinned", 
+                    isExpanded = pinnedExpanded,
+                    onExpandClick = { pinnedExpanded = !pinnedExpanded }
+                ) 
+            }
+            if (pinnedExpanded) {
+                item {
+                    androidx.compose.foundation.layout.FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        pinned.forEach { version ->
+                            VersionGridItem(
+                                version = version,
+                                isSelected = version == currentVersion,
+                                onClick = { onVersionClick(version) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        if (unpinned.isNotEmpty()) {
+            item { 
+                CategoryHeader(
+                    title = "Ungrouped", 
+                    isExpanded = unpinnedExpanded,
+                    onExpandClick = { unpinnedExpanded = !unpinnedExpanded }
+                ) 
+            }
+            if (unpinnedExpanded) {
+                item {
+                    androidx.compose.foundation.layout.FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        unpinned.forEach { version ->
+                            VersionGridItem(
+                                version = version,
+                                isSelected = version == currentVersion,
+                                onClick = { onVersionClick(version) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun VersionGridItem(
+    version: Version,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .width(110.dp)
+            .clip(RoundedCornerShape(4.dp)) // Desktop-class angular approach
+            .clickable(onClick = onClick)
+            .background(if (isSelected) Color(0xFF3DAEE9) else Color.Transparent) // Solid blue for selected state
+            .padding(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        VersionIconImage(
+            version = version,
+            modifier = Modifier
+                .size(72.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = version.getVersionName(),
+            style = MaterialTheme.typography.labelSmall,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            maxLines = 2,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+            lineHeight = androidx.compose.ui.unit.TextUnit.Unspecified
+        )
+    }
+}
+
+@Composable
+private fun RightActionSidebar(
+    version: Version?,
+    onLaunch: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onFolders: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .padding(horizontal = 4.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Preview Image (Larger and centered)
+        Surface(
+            modifier = Modifier.size(120.dp),
+            shape = RoundedCornerShape(4.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant
+        ) {
+            VersionIconImage(
+                version = version,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Text(
+            text = version?.getVersionName() ?: "No Instance Selected",
+            style = MaterialTheme.typography.labelLarge,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2
+        )
+
+        androidx.compose.material3.HorizontalDivider(
+            modifier = Modifier.padding(vertical = 12.dp),
+            thickness = 0.5.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        )
+
+        // Action List - Very Compact
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            SidebarActionItem(
+                icon = R.drawable.ic_play_arrow_filled,
+                label = "Launch",
+                onClick = onLaunch,
+                isPrimary = true
+            )
+            SidebarActionItem(
+                icon = R.drawable.ic_close,
+                label = "Kill",
+                onClick = { /* Kill logic if running */ },
+                enabled = false // Greyed out like in ref
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+
+            SidebarActionItem(
+                icon = R.drawable.ic_edit_filled,
+                label = "Edit",
+                onClick = onEdit
+            )
+            SidebarActionItem(
+                icon = R.drawable.ic_sort,
+                label = "Change Group",
+                onClick = { /* Change group logic */ }
+            )
+            SidebarActionItem(
+                icon = R.drawable.ic_folder_filled,
+                label = "Folder",
+                onClick = onFolders
+            )
+            SidebarActionItem(
+                icon = R.drawable.ic_share,
+                label = "Export",
+                onClick = { /* Export logic */ }
+            )
+            SidebarActionItem(
+                icon = R.drawable.ic_content_copy,
+                label = "Copy",
+                onClick = { /* Copy logic */ }
+            )
+            SidebarActionItem(
+                icon = R.drawable.ic_delete_filled,
+                label = "Delete",
+                onClick = onDelete,
+                contentColor = MaterialTheme.colorScheme.error
+            )
+            SidebarActionItem(
+                icon = R.drawable.ic_add,
+                label = "Create Shortcut",
+                onClick = { /* Shortcut logic */ }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SidebarActionItem(
+    icon: Int,
+    label: String,
+    onClick: () -> Unit,
+    isPrimary: Boolean = false,
+    enabled: Boolean = true,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface
+) {
+    val alpha = if (enabled) 1f else 0.4f
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(32.dp),
+        onClick = if (enabled) onClick else ({}),
+        color = if (isPrimary) Color.Transparent else Color.Transparent,
+        contentColor = (if (isPrimary) MaterialTheme.colorScheme.primary else contentColor).copy(alpha = alpha),
+        shape = RoundedCornerShape(2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                modifier = Modifier.size(16.dp),
+                painter = painterResource(icon),
+                contentDescription = label
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 1
+            )
+            if (isPrimary) {
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    modifier = Modifier.size(14.dp),
+                    painter = painterResource(R.drawable.ic_arrow_drop_down),
+                    contentDescription = null
+                )
+            }
         }
     }
 }

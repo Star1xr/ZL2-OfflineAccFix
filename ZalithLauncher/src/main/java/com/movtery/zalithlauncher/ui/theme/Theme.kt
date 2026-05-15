@@ -712,6 +712,27 @@ private fun customDark(color: Color): ColorScheme {
     )
 }
 
+private val prismDark = darkColorScheme(
+    primary = Color(0xFF3DAEE9),
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFF3DAEE9),
+    onPrimaryContainer = Color.White,
+    secondary = Color(0xFF3DAEE9),
+    onSecondary = Color.White,
+    background = Color(0xFF121212),
+    onBackground = Color.White,
+    surface = Color(0xFF1E1E1E),
+    onSurface = Color.White,
+    surfaceVariant = Color(0xFF1E1E1E),
+    onSurfaceVariant = Color.White,
+    outline = Color(0xFF3DAEE9),
+    surfaceContainer = Color(0xFF1E1E1E),
+    surfaceContainerHigh = Color(0xFF252525),
+    surfaceContainerHighest = Color(0xFF2A2A2A),
+    surfaceContainerLow = Color(0xFF1A1A1A),
+    surfaceContainerLowest = Color(0xFF151515)
+)
+
 @Composable
 fun ZalithLauncherTheme(
     darkTheme: Boolean = isLauncherInDarkTheme(),
@@ -734,7 +755,7 @@ fun ZalithLauncherTheme(
             }
 
             darkTheme -> when (colorTheme) {
-                ColorThemeType.EMBERMIRE -> embermireDark
+                ColorThemeType.EMBERMIRE -> prismDark
                 ColorThemeType.VELVET_ROSE -> velvetRoseDark
                 ColorThemeType.MISTWAVE -> mistwaveDark
                 ColorThemeType.GLACIER -> glacierDark
@@ -742,7 +763,7 @@ fun ZalithLauncherTheme(
                 ColorThemeType.URBAN_ASH -> urbanAshDark
                 ColorThemeType.VERDANT_DAWN -> verdantDawnDark
                 ColorThemeType.CUSTOM -> customDark(customColor)
-                else -> embermireDark
+                else -> prismDark
             }
 
             else -> when (colorTheme) {

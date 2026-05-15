@@ -418,7 +418,7 @@ class MainActivity : BaseAppCompatActivity() {
                     }
                 )
 
-                //检查更新操作流程
+                // 檢查更新操作流程
                 LauncherUpgradeOperation(
                     operation = launcherUpgradeViewModel.operation,
                     onChanged = { launcherUpgradeViewModel.operation = it },
@@ -427,27 +427,6 @@ class MainActivity : BaseAppCompatActivity() {
                     },
                     onLinkClick = { eventViewModel.sendEvent(EventViewModel.Event.OpenLink(it)) }
                 )
-
-                // 非官方版本声明
-                var showDisclaimer by rememberSaveable {
-                    mutableStateOf(!AllSettings.disclaimerAccepted.getValue())
-                }
-                if (showDisclaimer) {
-                    SimpleAlertDialog(
-                        title = stringResource(R.string.disclaimer_title),
-                        text = stringResource(R.string.disclaimer_content),
-                        confirmText = stringResource(R.string.generic_confirm),
-                        dismissText = stringResource(R.string.disclaimer_original_repo),
-                        onConfirm = {
-                            AllSettings.disclaimerAccepted.save(true)
-                            showDisclaimer = false
-                        },
-                        onDismiss = {
-                            openLink(URL_ORIGINAL_PROJECT)
-                        },
-                        dismissByDialog = false
-                    )
-                }
             }
         }
     }

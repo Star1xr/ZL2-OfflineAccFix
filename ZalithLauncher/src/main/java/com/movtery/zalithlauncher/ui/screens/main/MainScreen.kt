@@ -196,6 +196,11 @@ fun MainScreen(
                         screenKey = NormalNavKey.Multiplayer
                     )
                 },
+                toAccountManageScreen = {
+                    screenBackStackModel.mainScreen.navigateTo(
+                        screenKey = NormalNavKey.AccountManager(FirstLoginMenu.NONE)
+                    )
+                },
                 changeExpandedState = {
                     changeTasksExpandedState()
                 },
@@ -227,7 +232,45 @@ fun MainScreen(
                     changeTasksExpandedState()
                 }
             }
+
+            BottomPanel(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(32.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                contentColor = onBackgroundColor()
+            )
         }
+    }
+}
+
+@Composable
+private fun BottomPanel(
+    modifier: Modifier = Modifier,
+    contentColor: Color
+) {
+    val context = LocalContext.current
+    val playTimeMs = AllSettings.playTime.state
+    val rankName = com.movtery.zalithlauncher.utils.PlayTimeUtils.getRankName(context, playTimeMs)
+    val formattedPlayTime = com.movtery.zalithlauncher.utils.PlayTimeUtils.formatPlayTime(context, playTimeMs)
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = rankName,
+            style = MaterialTheme.typography.labelSmall,
+            color = contentColor.copy(alpha = 0.7f)
+        )
+        Text(
+            text = formattedPlayTime,
+            style = MaterialTheme.typography.labelSmall,
+            color = contentColor.copy(alpha = 0.7f)
+        )
     }
 }
 
@@ -244,189 +287,152 @@ private fun <E: TitledNavKey> TopBar(
     toSettingsScreen: () -> Unit,
     toDownloadScreen: () -> Unit,
     toMultiplayerScreen: () -> Unit,
+    toAccountManageScreen: () -> Unit,
     changeExpandedState: () -> Unit,
 ) {
+    val context = LocalContext.current
     val festivals = LocalFestivals.current
 
-    val inMultiplayerScreen = mainScreenKey is NormalNavKey.Multiplayer
-    val inDownloadScreen = mainScreenKey is NestedNavKey.Download
-    val inSettingsScreen = mainScreenKey is NestedNavKey.Settings
+    val inAccountManager = mainScreenKey is NormalNavKey.AccountManager
 
     CompositionLocalProvider(
         LocalContentColor provides contentColor
     ) {
-        ConstraintLayout(modifier = modifier) {
-            val (backCenter, title, endButtons) = createRefs()
-
-            val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Left Side: Prism Style Buttons
             Row(
-                modifier = Modifier
-                    .constrainAs(backCenter) {
-                        start.linkTo(parent.start)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    }
-                    .fillMaxHeight()
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                AnimatedVisibility(
-                    visible = !inLauncherScreen
-                ) {
-                    Row(modifier = Modifier.fillMaxHeight()) {
-                        Spacer(Modifier.width(12.dp))
+                // Add Instance
+                TopBarTextButton(
+                    icon = R.drawable.ic_add,
+                    text = "Add Instance",
+                    onClick = toDownloadScreen
+                )
 
-                        IconButton(
-                            modifier = Modifier.fillMaxHeight(),
-                            onClick = {
-                                if (!inLauncherScreen) {
-                                    //不在主屏幕时才允许返回
-                                    backDispatcher?.onBackPressed() ?: run {
-                                        onScreenBack()
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(R.drawable.ic_arrow_back),
-                                contentDescription = stringResource(R.string.generic_back)
-                            )
-                        }
+                // Mods
+                TopBarTextButton(
+                    icon = R.drawable.ic_extension_filled, // Using extension icon for Mods
+                    text = "Mods",
+                    onClick = { /* Mods management or view */ }
+                )
 
-                        IconButton(
-                            modifier = Modifier.fillMaxHeight(),
-                            onClick = {
-                                if (!inLauncherScreen) {
-                                    //不在主屏幕时才允许回到主页面
-                                    toMainScreen()
-                                }
+                // Settings
+                TopBarTextButton(
+                    icon = R.drawable.ic_settings_filled,
+                    text = stringResource(R.string.generic_setting),
+                    onClick = toSettingsScreen
+                )
+
+                // Shortcuts (Dropdown containing the 4 specific ones)
+                var showShortcuts by remember { mutableStateOf(false) }
+                Box {
+                    TopBarTextButton(
+                        icon = R.drawable.ic_sort,
+                        text = "Shortcuts",
+                        onClick = { showShortcuts = true },
+                        hasDropdown = true
+                    )
+                    androidx.compose.material3.DropdownMenu(
+                        expanded = showShortcuts,
+                        onDismissRequest = { showShortcuts = false },
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ) {
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(stringResource(R.string.page_title_version_list)) },
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_sort), null, modifier = Modifier.size(18.dp)) },
+                            onClick = { 
+                                showShortcuts = false
+                                // Navigation to VersionManager
                             }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_home_filled),
-                                contentDescription = stringResource(R.string.generic_main_menu)
-                            )
-                        }
+                        )
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(stringResource(R.string.settings_game_java_memory_title)) },
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_build_filled), null, modifier = Modifier.size(18.dp)) },
+                            onClick = { showShortcuts = false }
+                        )
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(stringResource(R.string.game_menu_option_switch_fps)) },
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_video_settings), null, modifier = Modifier.size(18.dp)) },
+                            onClick = { showShortcuts = false }
+                        )
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(stringResource(R.string.versions_overview_log)) },
+                            leadingIcon = { Icon(painterResource(R.drawable.ic_terminal_outlined), null, modifier = Modifier.size(18.dp)) },
+                            onClick = { showShortcuts = false }
+                        )
                     }
                 }
             }
-            val parentRes = mainScreenKey?.title
-            val childRes = (mainScreenKey as? BackStackNavKey<*>)?.currentKey?.title
 
-            Crossfade(
-                modifier = Modifier.constrainAs(title) {
-                    centerVerticallyTo(parent)
-                    start.linkTo(backCenter.end, margin = 16.dp)
-                },
-                targetState = parentRes to childRes
-            ) { (parent, child) ->
-                val style = MaterialTheme.typography.titleMedium
-                val softWarp = false
-                val maxLines = 1
-
-                if (parent == null) {
-                    Column(
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        if (festivals.isEmpty()) {
-                            Text(
-                                text = InfoDistributor.LAUNCHER_IDENTIFIER,
-                                style = style,
-                                softWrap = softWarp,
-                                maxLines = maxLines
-                            )
-                        } else {
-                            FestivalTitleText(
-                                festivals = festivals,
-                                style = style,
-                                maxLines = maxLines
-                            )
+            // Right Side: Accounts (Dropdown)
+            var showAccounts by remember { mutableStateOf(false) }
+            Box {
+                TopBarTextButton(
+                    icon = R.drawable.ic_account_circle_filled,
+                    text = stringResource(R.string.page_title_account_manager),
+                    onClick = { showAccounts = true },
+                    hasDropdown = true
+                )
+                androidx.compose.material3.DropdownMenu(
+                    expanded = showAccounts,
+                    onDismissRequest = { showAccounts = false },
+                    containerColor = MaterialTheme.colorScheme.surface
+                ) {
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text("Manage Accounts") },
+                        onClick = { 
+                            showAccounts = false
+                            toAccountManageScreen()
                         }
-                        Text(
-                            text = stringResource(R.string.launcher_fork_subtitle),
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.alpha(0.7f),
-                            softWrap = softWarp,
-                            maxLines = 1
-                        )
-                    }
-                } else {
-                    val parentText = stringResource(parent)
-                    val childText = child?.let { stringResource(it) }
-
-                    Text(
-                        text = if (childText != null) "$parentText - $childText" else parentText,
-                        style = style,
-                        softWrap = softWarp,
-                        maxLines = maxLines
                     )
                 }
             }
+        }
+    }
+}
 
-            Row(
-                modifier = Modifier
-                    .constrainAs(endButtons) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, margin = 12.dp)
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                AnimatedVisibility(
-                    visible = !(isTasksExpanded || taskRunning),
-                    enter = slideInVertically(
-                        initialOffsetY = { -50 }
-                    ) + fadeIn(),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -50 }
-                    ) + fadeOut()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(shape = MaterialTheme.shapes.large)
-                            .clickable { changeExpandedState() }
-                            .padding(all = 8.dp)
-                            .width(120.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        LinearProgressIndicator(modifier = Modifier.weight(1f))
-                        Icon(
-                            modifier = Modifier.size(22.dp),
-                            painter = painterResource(R.drawable.ic_assignment_filled),
-                            contentDescription = stringResource(R.string.main_task_menu)
-                        )
-                    }
-                }
-
-                TopBarRailItem(
-                    selected = inMultiplayerScreen,
-                    painter = painterResource(R.drawable.ic_group_filled),
-                    text = stringResource(R.string.terracotta),
-                    onClick = {
-                        if (!inMultiplayerScreen) toMultiplayerScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inDownloadScreen,
-                    painter = painterResource(R.drawable.ic_download_2_filled),
-                    text = stringResource(R.string.generic_download),
-                    onClick = {
-                        if (!inDownloadScreen) toDownloadScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inSettingsScreen,
-                    painter = painterResource(R.drawable.ic_settings_filled),
-                    text = stringResource(R.string.generic_setting),
-                    onClick = {
-                        if (!inSettingsScreen) toSettingsScreen()
-                    },
-                )
-            }
+@Composable
+private fun TopBarTextButton(
+    icon: Int,
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    hasDropdown: Boolean = false
+) {
+    Row(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.small)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Icon(
+            modifier = Modifier.size(16.dp),
+            painter = painterResource(icon),
+            contentDescription = text,
+            tint = if (text == "Add Instance") Color(0xFF50AF55) else MaterialTheme.colorScheme.primary // Green for Add like in ref
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        if (hasDropdown) {
+            Icon(
+                modifier = Modifier.size(12.dp),
+                painter = painterResource(R.drawable.ic_arrow_drop_down),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
