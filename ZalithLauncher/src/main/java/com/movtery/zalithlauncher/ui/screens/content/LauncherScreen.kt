@@ -143,9 +143,7 @@ fun LauncherScreen(
                 onDelete = {
                     currentVersion?.let { VersionsManager.deleteVersion(it) }
                 },
-                onFolders = {
-                    backStackViewModel.mainScreen.navigateTo(NormalNavKey.Versions.ModsManager)
-                }
+                onModsClick = onModsClick
             )
         }
     }
@@ -305,7 +303,7 @@ private fun RightActionSidebar(
     onLaunch: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onFolders: () -> Unit,
+    onModsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isSelected = version != null
@@ -456,7 +454,7 @@ private fun SidebarActionItem(
 }
 
 @Composable
-private fun QuickFpsDialog(
+fun QuickFpsDialog(
     onDismissRequest: () -> Unit
 ) {
     val showFps = AllSettings.showFPS.state
@@ -534,7 +532,7 @@ private fun QuickFpsDialog(
 }
 
 @Composable
-private fun QuickRamDialog(
+fun QuickRamDialog(
     onDismissRequest: () -> Unit
 ) {
     val context = LocalContext.current
