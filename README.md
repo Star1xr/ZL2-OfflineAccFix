@@ -3,7 +3,7 @@
 
 > **⚠️ UNOFFICIAL MODIFIED VERSION**
 >
-> This project will soon be changed its name to: TreeLauncher (in summer, when school and exams are done) and ill scope for better features then.
+> This project will soon be changed its name to: TreeLauncher (in summer, when school and exams are done) and ill scope for better features and new ui, codebase then.
 > 
 > This is an unofficial fork of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2). This project is **not affiliated with or endorsed by the official Zalith Launcher project**.
 
