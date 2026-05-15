@@ -1241,4 +1241,6 @@
     <string name="settings_import_failed">İçe aktarma başarısız!</string>
     <string name="settings_export_success">Dışa aktarıldı: %s</string>
     <string name="settings_export_failed">Dışa aktarma başarısız!</string>
+    <string name="storage_permission_request_title">Depolama İzni Gerekli</string>
+    <string name="storage_permission_request_message">Ayarları/Hesapları genel depolama alanına aktarmak için depolama iznine ihtiyacımız var.</string>
 </resources>

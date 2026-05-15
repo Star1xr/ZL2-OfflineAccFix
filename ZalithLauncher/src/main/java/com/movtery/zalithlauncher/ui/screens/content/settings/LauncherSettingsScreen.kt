@@ -89,6 +89,7 @@ import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SwitchSett
 import com.movtery.zalithlauncher.ui.theme.ColorThemeType
 import com.movtery.zalithlauncher.utils.animation.TransitionAnimationType
 import com.movtery.zalithlauncher.utils.file.shareFile
+import com.movtery.zalithlauncher.utils.checkStoragePermissions
 import com.movtery.zalithlauncher.utils.isChinaMainland
 import com.movtery.zalithlauncher.utils.logging.Logger
 import com.movtery.zalithlauncher.utils.logging.Logger.lError
@@ -161,16 +162,24 @@ fun LauncherSettingsScreen(
                         position = CardPosition.Top,
                         title = stringResource(R.string.settings_export),
                         onClick = {
-                            coroutineScope.launch {
-                                val file = SettingsTransferUtils.exportSettings(context)
-                                withContext(Dispatchers.Main) {
-                                    if (file != null) {
-                                        shareFile(context, file)
-                                    } else {
-                                        Toast.makeText(context, R.string.settings_export_failed, Toast.LENGTH_SHORT).show()
+                            val activity = context as? android.app.Activity ?: return@SettingsCard
+                            checkStoragePermissions(
+                                activity = activity,
+                                title = R.string.storage_permission_request_title,
+                                message = context.getString(R.string.storage_permission_request_message),
+                                hasPermission = {
+                                    coroutineScope.launch {
+                                        val file = SettingsTransferUtils.exportSettings(context)
+                                        withContext(Dispatchers.Main) {
+                                            if (file != null) {
+                                                Toast.makeText(context, context.getString(R.string.settings_export_success, file.absolutePath), Toast.LENGTH_LONG).show()
+                                            } else {
+                                                Toast.makeText(context, R.string.settings_export_failed, Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
                                     }
                                 }
-                            }
+                            )
                         }
                     )
                     SettingsCard(

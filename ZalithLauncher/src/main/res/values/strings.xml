@@ -1295,4 +1295,6 @@
     <string name="settings_import_failed">Import failed!</string>
     <string name="settings_export_success">Exported to: %s</string>
     <string name="settings_export_failed">Export failed!</string>
+    <string name="storage_permission_request_title">Storage Permission Required</string>
+    <string name="storage_permission_request_message">To export settings/accounts to public storage, we need storage permission.</string>
 </resources>

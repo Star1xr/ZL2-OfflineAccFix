@@ -107,6 +107,7 @@ import com.movtery.zalithlauncher.ui.screens.content.elements.OtherServerLoginDi
 import com.movtery.zalithlauncher.ui.screens.content.elements.ServerOperation
 import com.movtery.zalithlauncher.ui.screens.main.control_editor.InfoLayoutTextItem
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
+import com.movtery.zalithlauncher.utils.checkStoragePermissions
 import com.movtery.zalithlauncher.utils.copyText
 import com.movtery.zalithlauncher.utils.file.shareFile
 import com.movtery.zalithlauncher.utils.settings.SettingsTransferUtils
@@ -874,16 +875,24 @@ private fun AccountsLayout(
             ) {
                 FilledTonalButton(
                     onClick = {
-                        scope.launch {
-                            val file = SettingsTransferUtils.exportAccounts(context)
-                            withContext(Dispatchers.Main) {
-                                if (file != null) {
-                                    shareFile(context, file)
-                                } else {
-                                    android.widget.Toast.makeText(context, R.string.settings_export_failed, android.widget.Toast.LENGTH_SHORT).show()
+                        val activity = context as? android.app.Activity ?: return@FilledTonalButton
+                        checkStoragePermissions(
+                            activity = activity,
+                            title = R.string.storage_permission_request_title,
+                            message = context.getString(R.string.storage_permission_request_message),
+                            hasPermission = {
+                                scope.launch {
+                                    val file = SettingsTransferUtils.exportAccounts(context)
+                                    withContext(Dispatchers.Main) {
+                                        if (file != null) {
+                                            Toast.makeText(context, context.getString(R.string.settings_export_success, file.absolutePath), Toast.LENGTH_LONG).show()
+                                        } else {
+                                            Toast.makeText(context, R.string.settings_export_failed, Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        )
                     }
                 ) {
                     Icon(
