@@ -100,11 +100,18 @@ private class VersionsScreenViewModel : ViewModel() {
     var versionCategory by mutableStateOf(VersionCategory.ALL)
         private set
 
+    /** 当前选择的分组 */
+    var selectedGroup by mutableStateOf<String?>(null)
+        private set
+
     /** 游戏路径相关操作 */
     var gamePathOperation by mutableStateOf<GamePathOperation>(GamePathOperation.None)
 
     private val _versions = MutableStateFlow<List<Version>>(emptyList())
     val versions = _versions.asStateFlow()
+
+    private val _groups = MutableStateFlow<List<String>>(emptyList())
+    val groups = _groups.asStateFlow()
 
     /** 全部版本的数量 */
     var allVersionsCount by mutableIntStateOf(0)
@@ -135,7 +142,7 @@ private class VersionsScreenViewModel : ViewModel() {
                 _versions.update { emptyList() }
             }
 
-            val filteredVersions = withContext(Dispatchers.Default) {
+            val (filteredVersions, groups) = withContext(Dispatchers.Default) {
                 allVersionsCount = currentVersions.size
 
                 val vanillaVersions = currentVersions
@@ -145,13 +152,24 @@ private class VersionsScreenViewModel : ViewModel() {
                     .filter { ver -> ver.versionType == VersionType.MODLOADERS }
                     .also { modloaderVersionsCount = it.size }
 
-                when (versionCategory) {
+                val typeFiltered = when (versionCategory) {
                     VersionCategory.ALL -> currentVersions
                     VersionCategory.VANILLA -> vanillaVersions
                     VersionCategory.MODLOADER -> modloaderVersions
                 }
+
+                val allGroups = currentVersions.mapNotNull { it.getVersionConfig().group.takeIf { g -> g.isNotEmpty() } }.distinct().sorted()
+
+                val groupFiltered = if (selectedGroup != null) {
+                    typeFiltered.filter { it.getVersionConfig().group == selectedGroup }
+                } else {
+                    typeFiltered
+                }
+
+                Pair(groupFiltered, allGroups)
             }
 
+            _groups.update { groups }
             _versions.update {
                 filteredVersions.sortedWith(VersionComparator)
             }
@@ -169,6 +187,19 @@ private class VersionsScreenViewModel : ViewModel() {
         currentJob = viewModelScope.launch {
             mutex.withLock {
                 this@VersionsScreenViewModel.versionCategory = category
+                refreshVersions(VersionsManager.versions, false)
+            }
+        }
+    }
+
+    /**
+     * 变更当前选择的分组
+     */
+    fun changeGroup(group: String?) {
+        currentJob?.cancel()
+        currentJob = viewModelScope.launch {
+            mutex.withLock {
+                this@VersionsScreenViewModel.selectedGroup = group
                 refreshVersions(VersionsManager.versions, false)
             }
         }
@@ -305,6 +336,9 @@ fun VersionsManageScreen(
                 isVisible = isVisible,
                 isRefreshing = isRefreshing,
                 versions = versions,
+                groups = viewModel.groups.collectAsStateWithLifecycle().value,
+                selectedGroup = viewModel.selectedGroup,
+                onGroupChange = { viewModel.changeGroup(it) },
                 currentVersion = currentVersion,
                 versionCategory = viewModel.versionCategory,
                 onCategoryChange = { viewModel.changeCategory(it) },
@@ -453,6 +487,9 @@ private fun VersionsLayout(
     isVisible: Boolean,
     isRefreshing: Boolean,
     versions: List<Version>,
+    groups: List<String>,
+    selectedGroup: String?,
+    onGroupChange: (String?) -> Unit,
     currentVersion: Version?,
     versionCategory: VersionCategory,
     onCategoryChange: (VersionCategory) -> Unit,
@@ -537,6 +574,31 @@ private fun VersionsLayout(
                             selected = versionCategory == VersionCategory.MODLOADER,
                             onClick = { onCategoryChange(VersionCategory.MODLOADER) }
                         )
+
+                        // Grup Seçici
+                        if (groups.isNotEmpty()) {
+                            Row(
+                                modifier = Modifier.padding(start = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                ScalingActionButton(
+                                    selected = selectedGroup == null,
+                                    onClick = { onGroupChange(null) }
+                                ) {
+                                    Text("Tüm Gruplar")
+                                }
+
+                                groups.forEach { group ->
+                                    ScalingActionButton(
+                                        selected = selectedGroup == group,
+                                        onClick = { onGroupChange(group) }
+                                    ) {
+                                        Text(group)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -570,6 +632,7 @@ private fun VersionsLayout(
                                 },
                                 onRenameClick = { versionsOperation = VersionsOperation.Rename(version) },
                                 onCopyClick = { versionsOperation = VersionsOperation.Copy(version) },
+                                onChangeGroupClick = { versionsOperation = VersionsOperation.ChangeGroup(version) },
                                 onExportClick = { navigateToExport(version) },
                                 onDeleteClick = { versionsOperation = VersionsOperation.Delete(version) },
                                 onPinned = onVersionPinned

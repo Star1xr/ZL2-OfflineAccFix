@@ -409,7 +409,14 @@ private fun <E: TitledNavKey> TopBar(
                 TopBarTextButton(
                     icon = R.drawable.ic_extension_outlined,
                     text = stringResource(R.string.topbar_mods),
-                    onClick = toModsScreen
+                    onClick = { toDownloadScreen() }
+                )
+
+                // Versions
+                TopBarTextButton(
+                    icon = R.drawable.ic_sort,
+                    text = stringResource(R.string.page_title_version_list),
+                    onClick = toVersionManageScreen
                 )
 
                 // Settings
@@ -423,7 +430,7 @@ private fun <E: TitledNavKey> TopBar(
                 var showShortcuts by remember { mutableStateOf<Boolean>(false) }
                 Box {
                     TopBarTextButton(
-                        icon = R.drawable.ic_sort,
+                        icon = R.drawable.ic_build_filled,
                         text = stringResource(R.string.shortcuts_title),
                         onClick = { showShortcuts = true },
                         hasDropdown = true
@@ -433,14 +440,6 @@ private fun <E: TitledNavKey> TopBar(
                         onDismissRequest = { showShortcuts = false },
                         containerColor = MaterialTheme.colorScheme.surface
                     ) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.page_title_version_list)) },
-                            leadingIcon = { Icon(painterResource(R.drawable.ic_sort), null, modifier = Modifier.size(20.dp)) },
-                            onClick = { 
-                                showShortcuts = false
-                                toVersionManageScreen()
-                            }
-                        )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.settings_game_java_memory_title)) },
                             leadingIcon = { Icon(painterResource(R.drawable.ic_build_filled), null, modifier = Modifier.size(20.dp)) },
@@ -475,7 +474,7 @@ private fun <E: TitledNavKey> TopBar(
                 text = stringResource(R.string.page_title_account_list),
                 onClick = toAccountManageScreen,
                 iconSize = 24.dp,
-                iconTint = if (hasAccount) Color.Unspecified else null,
+                iconTint = if (hasAccount) null else null,
                 isGrayscale = !hasAccount
             )
         }

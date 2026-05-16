@@ -94,6 +94,9 @@ class VersionConfig(
         get() = getStringNotNull(field)
     @SerializedName("ramAllocation")
     var ramAllocation: Int = -1
+    @SerializedName("group")
+    var group: String = ""
+        get() = getStringNotNull(field)
     @SerializedName("touchVibrateDuration")
     var touchVibrateDuration: Int = 100
     @SerializedName("touchVibrateKind")
@@ -114,6 +117,7 @@ class VersionConfig(
         versionSummary: String = "",
         serverIp: String = "",
         ramAllocation: Int = -1,
+        group: String = "",
         touchVibrateDuration: Int = 100,
         touchVibrateKind: VibrationHandler.VibrateKind? = null,
     ) : this(filePath) {
@@ -130,6 +134,7 @@ class VersionConfig(
         this.versionSummary = versionSummary
         this.serverIp = serverIp
         this.ramAllocation = ramAllocation
+        this.group = group
         this.touchVibrateDuration = touchVibrateDuration
         this.touchVibrateKind = touchVibrateKind
     }
@@ -149,6 +154,7 @@ class VersionConfig(
         getStringNotNull(versionSummary),
         getStringNotNull(serverIp),
         ramAllocation,
+        getStringNotNull(group),
         touchVibrateDuration,
         touchVibrateKind,
     )
@@ -208,6 +214,7 @@ class VersionConfig(
             writeString(getStringNotNull(versionSummary))
             writeString(getStringNotNull(serverIp))
             writeInt(ramAllocation)
+            writeString(getStringNotNull(group))
             writeInt(touchVibrateDuration)
             writeInt(touchVibrateKind?.ordinal ?: -1)
         }
@@ -229,6 +236,7 @@ class VersionConfig(
             val versionSummary = parcel.readString().orEmpty()
             val serverIp = parcel.readString().orEmpty()
             val ramAllocation = parcel.readInt()
+            val group = parcel.readString().orEmpty()
             val touchVibrateDuration = parcel.readInt()
             val touchVibrateKind = VibrationHandler.VibrateKind.entries.getOrNull(parcel.readInt())
 
@@ -247,6 +255,7 @@ class VersionConfig(
                 versionSummary,
                 serverIp,
                 ramAllocation,
+                group,
                 touchVibrateDuration,
                 touchVibrateKind,
             )

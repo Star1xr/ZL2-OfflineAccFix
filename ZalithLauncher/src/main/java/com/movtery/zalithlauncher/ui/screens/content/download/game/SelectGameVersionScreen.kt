@@ -368,13 +368,6 @@ private fun VersionHeader(
                         },
                         text = stringResource(R.string.download_game_type_april_fools)
                     )
-                    VersionTypeItem(
-                        selected = versionFilter.old,
-                        onClick = {
-                            onVersionFilterChange(versionFilter.copy(old = versionFilter.old.not()))
-                        },
-                        text = stringResource(R.string.download_game_type_old)
-                    )
                 }
 
                 //搜索、刷新
@@ -482,6 +475,10 @@ private fun VersionItemLayout(
 
     val (icon, versionType, wikiUrl, summary) = getVersionComponents(version)
 
+    val iconBackground = remember(version) {
+        if (version.type == MinecraftVersion.Type.AprilFools) Color.White else Color.Transparent
+    }
+
     Surface(
         modifier = modifier.graphicsLayer(scaleY = scale.value, scaleX = scale.value),
         onClick = onClick,
@@ -496,11 +493,17 @@ private fun VersionItemLayout(
             verticalAlignment = Alignment.CenterVertically
         ) {
             icon?.let { versionIcon ->
-                Image(
-                    modifier = Modifier.size(32.dp),
-                    painter = versionIcon,
-                    contentDescription = null
-                )
+                Surface(
+                    color = iconBackground,
+                    shape = MaterialTheme.shapes.extraSmall,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Image(
+                        painter = versionIcon,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
                 Spacer(modifier = Modifier.width(12.dp))
             }
 
@@ -585,22 +588,6 @@ private fun getVersionComponents(
                 painterResource(R.drawable.img_version_cake),
                 stringResource(R.string.download_game_type_april_fools),
                 stringResource(R.string.url_wiki_minecraft_game_snapshot, urlSuffix),
-                summary
-            )
-        }
-        MinecraftVersion.Type.OldBeta -> {
-            Quadruple(
-                painterResource(R.drawable.img_old_cobblestone),
-                stringResource(R.string.download_game_type_old_beta),
-                null,
-                summary
-            )
-        }
-        MinecraftVersion.Type.OldAlpha -> {
-            Quadruple(
-                painterResource(R.drawable.img_old_grass_block),
-                stringResource(R.string.download_game_type_old_alpha),
-                null,
                 summary
             )
         }

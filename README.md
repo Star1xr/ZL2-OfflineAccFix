@@ -21,6 +21,9 @@ This fork aims to enhance and customize the original Zalith Launcher 2 experienc
 - [x] Importing/exporting settings
 - [x] Importing/exporting accounts along with capes and skins
 - [x] New UI
+- [x] Functional groups 
+- [x] Instance cloning 
+- [x] Top bar navigation rework
 - [ ] Friend system
 - [ ] First ever performance update
 

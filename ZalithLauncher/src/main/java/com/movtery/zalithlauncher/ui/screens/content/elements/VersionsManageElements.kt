@@ -112,6 +112,7 @@ sealed interface VersionsOperation {
     data object None: VersionsOperation
     data class Rename(val version: Version): VersionsOperation
     data class Copy(val version: Version): VersionsOperation
+    data class ChangeGroup(val version: Version): VersionsOperation
     data class Delete(val version: Version, val text: String? = null): VersionsOperation
     data class InvalidDelete(val version: Version): VersionsOperation
     data class RunTask(val title: Int, val task: suspend () -> Unit): VersionsOperation
@@ -398,6 +399,26 @@ fun VersionsOperation(
                 }
             )
         }
+        is VersionsOperation.ChangeGroup -> {
+            ChangeGroupDialog(
+                version = versionsOperation.version,
+                onDismissRequest = { updateVersionsOperation(VersionsOperation.None) },
+                onConfirm = { group ->
+                    updateVersionsOperation(
+                        VersionsOperation.RunTask(
+                            title = R.string.generic_setting,
+                            task = {
+                                versionsOperation.version.getVersionConfig().apply {
+                                    this.group = group
+                                    saveWithThrowable()
+                                }
+                                VersionsManager.refresh("VersionsOperation.ChangeGroup")
+                            }
+                        )
+                    )
+                }
+            )
+        }
         is VersionsOperation.InvalidDelete -> {
             updateVersionsOperation(
                 VersionsOperation.Delete(
@@ -441,6 +462,27 @@ fun VersionsOperation(
             )
         }
     }
+}
+
+@Composable
+fun ChangeGroupDialog(
+    version: Version,
+    onDismissRequest: () -> Unit = {},
+    onConfirm: (value: String) -> Unit = {}
+) {
+    var group by remember { mutableStateOf(version.getVersionConfig().group) }
+
+    SimpleEditDialog(
+        title = stringResource(R.string.generic_setting),
+        value = group,
+        onValueChange = { group = it },
+        label = { Text(text = "Grup") },
+        singleLine = true,
+        onDismissRequest = onDismissRequest,
+        onConfirm = {
+            onConfirm(group.trim())
+        }
+    )
 }
 
 @Composable
@@ -921,7 +963,7 @@ fun VersionIconImage(
     refreshKey: Any? = null
 ) {
     val defaultIconRes = remember(version) {
-        version?.let { getLoaderIconRes(it) } ?: R.drawable.img_minecraft
+        version?.let { getLoaderIconRes(it) } ?: R.drawable.img_version_neoforge
     }
     val defaultIcon = painterResource(defaultIconRes)
 
@@ -943,29 +985,40 @@ fun VersionIconImage(
         } ?: defaultIcon
     }
 
-    when (model) {
-        is Painter -> {
-            Image(
-                painter = model,
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = modifier
-            )
-        }
-        else -> {
-            AsyncImage(
-                model = model,
-                imageLoader = loader,
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = modifier
-            )
+    val iconBackground = remember(version) {
+        val info = version?.getVersionInfo()
+        if (info?.type == "april_fools") Color.White else Color.Transparent
+    }
+
+    Surface(
+        color = iconBackground,
+        shape = MaterialTheme.shapes.extraSmall,
+        modifier = modifier
+    ) {
+        when (model) {
+            is Painter -> {
+                Image(
+                    painter = model,
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            else -> {
+                AsyncImage(
+                    model = model,
+                    imageLoader = loader,
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }
 
 private fun getLoaderIconRes(version: Version): Int {
-    val info = version.getVersionInfo() ?: return R.drawable.img_minecraft
+    val info = version.getVersionInfo() ?: return R.drawable.img_version_neoforge
     if (info.type == "snapshot") return R.drawable.img_version_snapshot
     if (info.type == "april_fools") return R.drawable.img_version_cake
 
@@ -976,11 +1029,11 @@ private fun getLoaderIconRes(version: Version): Int {
 
         ModLoader.FORGE -> R.drawable.img_version_forge
         ModLoader.QUILT -> R.drawable.img_version_quilt
-        ModLoader.NEOFORGE -> R.drawable.img_version_neoforge
+        ModLoader.NEOFORGE -> R.drawable.img_version_vanilla
 
         ModLoader.OPTIFINE -> R.drawable.img_loader_optifine
         ModLoader.LITE_LOADER -> R.drawable.img_chicken_old
         ModLoader.CLEANROOM -> R.drawable.img_loader_cleanroom
-        else -> R.drawable.img_version_vanilla
+        else -> R.drawable.img_version_neoforge
     }
 }
