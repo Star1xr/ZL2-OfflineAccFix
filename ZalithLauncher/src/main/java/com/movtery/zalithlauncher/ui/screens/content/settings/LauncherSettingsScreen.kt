@@ -115,7 +115,7 @@ private sealed interface CustomColorOperation {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LauncherSettingsScreen(
-    key: NormalNavKey.Settings.Launcher,
+    key: NestedNavKey.Settings,
     settingsScreenKey: TitledNavKey?,
     mainScreenKey: TitledNavKey?,
     eventViewModel: EventViewModel,

@@ -225,9 +225,9 @@ private fun NavigationUI(
                 transitionSpec = rememberTransitionSpec(),
                 popTransitionSpec = rememberTransitionSpec(),
                 entryProvider = entryProvider {
-                    entry<NormalNavKey.Settings.Renderer> { rendererKey ->
+                    entry<NormalNavKey.Settings.Renderer> {
                         RendererSettingsScreen(
-                            key = rendererKey,
+                            key = key,
                             screenBackStackModel = backStackViewModel,
                             settingsScreenKey = settingsScreenKey,
                             mainScreenKey = mainScreenKey,
@@ -243,9 +243,9 @@ private fun NavigationUI(
                     entry<NormalNavKey.Settings.Gamepad> {
                         GamepadSettingsScreen(key, settingsScreenKey, mainScreenKey)
                     }
-                    entry<NormalNavKey.Settings.Launcher> { launcherKey ->
+                    entry<NormalNavKey.Settings.Launcher> {
                         LauncherSettingsScreen(
-                            key = launcherKey,
+                            key = key,
                             settingsScreenKey = settingsScreenKey,
                             mainScreenKey = mainScreenKey,
                             eventViewModel = eventViewModel,
@@ -272,9 +272,9 @@ private fun NavigationUI(
                             }
                         )
                     }
-                    entry<NormalNavKey.Settings.VulkanDriverDownloader> { vulkanKey ->
+                    entry<NormalNavKey.Settings.VulkanDriverDownloader> {
                         VulkanDriverDownloaderScreen(
-                            key = vulkanKey,
+                            key = key,
                             settingsScreenKey = settingsScreenKey,
                             mainScreenKey = mainScreenKey,
                             submitError = submitError

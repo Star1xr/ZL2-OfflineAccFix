@@ -60,7 +60,7 @@ import com.movtery.zalithlauncher.viewmodel.VulkanDriverViewModel
 
 @Composable
 fun VulkanDriverDownloaderScreen(
-    key: NormalNavKey.Settings.VulkanDriverDownloader,
+    key: NestedNavKey.Settings,
     settingsScreenKey: TitledNavKey?,
     mainScreenKey: TitledNavKey?,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit,

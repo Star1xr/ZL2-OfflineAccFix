@@ -75,7 +75,7 @@ import com.movtery.zalithlauncher.viewmodel.sendDLPlugin
 
 @Composable
 fun RendererSettingsScreen(
-    key: NormalNavKey.Settings.Renderer,
+    key: NestedNavKey.Settings,
     screenBackStackModel: ScreenBackStackViewModel,
     settingsScreenKey: TitledNavKey?,
     mainScreenKey: TitledNavKey?,
