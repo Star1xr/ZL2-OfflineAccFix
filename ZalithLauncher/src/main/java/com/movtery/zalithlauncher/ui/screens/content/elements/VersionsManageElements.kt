@@ -986,7 +986,7 @@ fun VersionIconImage(
     refreshKey: Any? = null
 ) {
     val defaultIconRes = remember(version) {
-        version?.let { getLoaderIconRes(it) } ?: R.drawable.img_version_neoforge
+        version?.let { getLoaderIconRes(it) } ?: R.drawable.img_version_vanilla
     }
     val defaultIcon = painterResource(defaultIconRes)
 
@@ -1016,7 +1016,7 @@ fun VersionIconImage(
     Surface(
         color = iconBackground,
         shape = MaterialTheme.shapes.extraSmall,
-        modifier = modifier
+        modifier = modifier.then(if (version == null) Modifier.alpha(0.5f) else Modifier)
     ) {
         when (model) {
             is Painter -> {

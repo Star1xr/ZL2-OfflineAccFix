@@ -517,7 +517,9 @@ private fun TopBarTextButton(
                 modifier = Modifier.size(iconSize),
                 painter = painter,
                 contentDescription = text,
-                tint = if (text == stringResource(R.string.sidebar_action_add_instance)) Color(0xFF50AF55) else MaterialTheme.colorScheme.primary
+                tint = if (text == stringResource(R.string.page_title_account_list)) Color.Unspecified
+                else if (text == stringResource(R.string.sidebar_action_add_instance)) Color(0xFF50AF55)
+                else MaterialTheme.colorScheme.primary
             )
         }
         Text(
