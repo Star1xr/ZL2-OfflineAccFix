@@ -89,7 +89,7 @@ fun VersionConfigScreen(
     mainScreenKey: TitledNavKey?,
     versionsScreenKey: TitledNavKey?,
     version: Version,
-    backStackViewModel: ScreenBackStackViewModel,
+    screenBackStackModel: ScreenBackStackViewModel,
     backToMainScreen: () -> Unit,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
@@ -241,7 +241,7 @@ private fun VersionConfigs(
             trailingIcon = {
                 IconButton(
                     onClick = {
-                        backStackViewModel.settingsScreen.navigateTo(NormalNavKey.Settings.VulkanDriverDownloader)
+                        screenBackStackModel.settingsScreen.navigateTo(NormalNavKey.Settings.VulkanDriverDownloader)
                     }
                 ) {
                     Icon(

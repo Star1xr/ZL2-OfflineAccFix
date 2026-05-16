@@ -69,15 +69,15 @@ class VulkanDriverViewModel : ViewModel() {
         TaskSystem.submitTask(
             Task.runTask(
                 dispatcher = Dispatchers.IO,
-                task = {
+                task = { task ->
                     val tempFile = File(PathManager.DIR_CACHE, asset.name)
                     
                     // 1. Download
-                    TaskSystem.updateCurrentTaskInfo(R.string.vulkan_driver_downloader_downloading, asset.name)
+                    task.updateMessage(R.string.vulkan_driver_downloader_downloading, asset.name)
                     GLOBAL_CLIENT.get(asset.browser_download_url).bodyAsChannel().copyTo(FileOutputStream(tempFile))
 
                     // 2. Extract
-                    TaskSystem.updateCurrentTaskInfo(R.string.vulkan_driver_downloader_extracting, asset.name)
+                    task.updateMessage(R.string.vulkan_driver_downloader_extracting, asset.name)
                     val targetDir = File(VulkanDriverManager.getDriversHome(), driverName)
                     targetDir.mkdirs()
                     VulkanDriverManager.extractZip(tempFile, targetDir)

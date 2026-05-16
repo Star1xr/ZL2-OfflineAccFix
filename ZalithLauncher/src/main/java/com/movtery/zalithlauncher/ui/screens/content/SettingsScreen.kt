@@ -68,7 +68,9 @@ import com.movtery.zalithlauncher.ui.screens.content.settings.LauncherSettingsSc
 import com.movtery.zalithlauncher.ui.screens.content.settings.RendererSettingsScreen
 import com.movtery.zalithlauncher.ui.screens.navigateOnce
 import com.movtery.zalithlauncher.ui.screens.onBack
-import com.movtery.zalithlauncher.ui.screens.rememberTransitionSpec
+import com.movtery.zalithlauncher.ui.screens.content.settings.VulkanDriverDownloaderScreen
+import com.movtery.zalithlauncher.ui.theme.rememberTransitionSpec
+
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
@@ -220,36 +222,42 @@ private fun NavigationUI(
                 transitionSpec = rememberTransitionSpec(),
                 popTransitionSpec = rememberTransitionSpec(),
                 entryProvider = entryProvider {
-                    entry<NormalNavKey.Settings.Renderer> {
-                        RendererSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel)
+                    entry<NormalNavKey.Settings.Renderer> { rendererKey ->
+                        RendererSettingsScreen(
+                            key = rendererKey,
+                            screenBackStackModel = backStackViewModel,
+                            settingsScreenKey = settingsScreenKey,
+                            mainScreenKey = mainScreenKey,
+                            eventViewModel = eventViewModel
+                        )
                     }
-                    entry<NormalNavKey.Settings.Game> {
-                        GameSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel)
+                    entry<NormalNavKey.Settings.Game> { gameKey ->
+                        GameSettingsScreen(gameKey, settingsScreenKey, mainScreenKey, eventViewModel)
                     }
-                    entry<NormalNavKey.Settings.Control> {
-                        ControlSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
+                    entry<NormalNavKey.Settings.Control> { controlKey ->
+                        ControlSettingsScreen(controlKey, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
                     }
-                    entry<NormalNavKey.Settings.Gamepad> {
-                        GamepadSettingsScreen(key, settingsScreenKey, mainScreenKey)
+                    entry<NormalNavKey.Settings.Gamepad> { gamepadKey ->
+                        GamepadSettingsScreen(gamepadKey, settingsScreenKey, mainScreenKey)
                     }
-                    entry<NormalNavKey.Settings.Launcher> {
+                    entry<NormalNavKey.Settings.Launcher> { launcherKey ->
                         LauncherSettingsScreen(
-                            key = key,
+                            key = launcherKey,
                             settingsScreenKey = settingsScreenKey,
                             mainScreenKey = mainScreenKey,
                             eventViewModel = eventViewModel,
                             submitError = submitError,
                         )
                     }
-                    entry<NormalNavKey.Settings.JavaManager> {
-                        JavaManageScreen(key, settingsScreenKey, mainScreenKey, submitError)
+                    entry<NormalNavKey.Settings.JavaManager> { javaKey ->
+                        JavaManageScreen(javaKey, settingsScreenKey, mainScreenKey, submitError)
                     }
-                    entry<NormalNavKey.Settings.ControlManager> {
-                        ControlManageScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
+                    entry<NormalNavKey.Settings.ControlManager> { controlKey ->
+                        ControlManageScreen(controlKey, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
                     }
-                    entry<NormalNavKey.Settings.AboutInfo> {
+                    entry<NormalNavKey.Settings.AboutInfo> { aboutKey ->
                         AboutInfoScreen(
-                            key = key,
+                            key = aboutKey,
                             settingsScreenKey = settingsScreenKey,
                             mainScreenKey = mainScreenKey,
                             checkUpdate = {
@@ -261,9 +269,9 @@ private fun NavigationUI(
                             }
                         )
                     }
-                    entry<NormalNavKey.Settings.VulkanDriverDownloader> {
+                    entry<NormalNavKey.Settings.VulkanDriverDownloader> { vulkanKey ->
                         VulkanDriverDownloaderScreen(
-                            key = key,
+                            key = vulkanKey,
                             settingsScreenKey = settingsScreenKey,
                             mainScreenKey = mainScreenKey,
                             submitError = submitError

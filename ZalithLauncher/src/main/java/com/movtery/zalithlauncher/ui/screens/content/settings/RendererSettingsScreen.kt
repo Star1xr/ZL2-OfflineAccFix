@@ -70,11 +70,13 @@ import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SwitchSett
 import com.movtery.zalithlauncher.utils.device.checkVulkanSupport
 import com.movtery.zalithlauncher.utils.isAdrenoGPU
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
+import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 import com.movtery.zalithlauncher.viewmodel.sendDLPlugin
 
 @Composable
 fun RendererSettingsScreen(
-    key: NestedNavKey.Settings,
+    key: NormalNavKey.Settings.Renderer,
+    screenBackStackModel: ScreenBackStackViewModel,
     settingsScreenKey: TitledNavKey?,
     mainScreenKey: TitledNavKey?,
     eventViewModel: EventViewModel,
@@ -147,7 +149,7 @@ fun RendererSettingsScreen(
                             Row {
                                 IconButton(
                                     onClick = {
-                                        backStackViewModel.settingsScreen.navigateTo(NormalNavKey.Settings.VulkanDriverDownloader)
+                                        screenBackStackModel.settingsScreen.navigateTo(NormalNavKey.Settings.VulkanDriverDownloader)
                                     }
                                 ) {
                                     Icon(
@@ -169,7 +171,7 @@ fun RendererSettingsScreen(
                                     }
                                 ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_open_in_new),
+                                        painter = painterResource(R.drawable.ic_link),
                                         contentDescription = stringResource(R.string.generic_download)
                                     )
                                 }

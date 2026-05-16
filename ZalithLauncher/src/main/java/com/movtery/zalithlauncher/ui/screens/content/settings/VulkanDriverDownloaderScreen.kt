@@ -20,8 +20,8 @@ package com.movtery.zalithlauncher.ui.screens.content.settings
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,13 +49,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.plugin.driver.DriverPluginManager
 import com.movtery.zalithlauncher.ui.base.BaseScreen
-import com.movtery.zalithlauncher.ui.components.AnimatedColumn
-import com.movtery.zalithlauncher.ui.components.AnimatedItem
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.TitledNavKey
-import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPosition
-import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCard
-import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCardColumn
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.VulkanDriverDownloadState
 import com.movtery.zalithlauncher.viewmodel.VulkanDriverViewModel
@@ -164,7 +159,7 @@ private fun ReleaseItem(
                     Text(text = asset.name, style = MaterialTheme.typography.labelMedium)
                     IconButton(onClick = { onDownload(asset) }) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_download_2_outlined),
+                            painter = painterResource(R.drawable.ic_download_2_filled),
                             contentDescription = stringResource(R.string.generic_download)
                         )
                     }
