@@ -123,7 +123,7 @@ object VersionTransferUtils {
                             } else {
                                 targetFile.parentFile?.mkdirs()
                                 zip.getInputStream(entry).use { input ->
-                                    targetFile.outputStream().use { output ->
+                                    FileOutputStream(targetFile).use { output ->
                                         input.copyTo(output)
                                     }
                                 }

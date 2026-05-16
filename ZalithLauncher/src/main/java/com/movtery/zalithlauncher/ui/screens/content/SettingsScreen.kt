@@ -68,13 +68,14 @@ import com.movtery.zalithlauncher.ui.screens.content.settings.LauncherSettingsSc
 import com.movtery.zalithlauncher.ui.screens.content.settings.RendererSettingsScreen
 import com.movtery.zalithlauncher.ui.screens.navigateOnce
 import com.movtery.zalithlauncher.ui.screens.onBack
+import com.movtery.zalithlauncher.ui.screens.rememberTransitionSpec
 import com.movtery.zalithlauncher.ui.screens.content.settings.VulkanDriverDownloaderScreen
-import com.movtery.zalithlauncher.ui.theme.rememberTransitionSpec
 
 import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
+
 @Composable
 fun SettingsScreen(
     key: NestedNavKey.Settings,
@@ -100,6 +101,7 @@ fun SettingsScreen(
             )
             NavigationUI(
                 key = key,
+                backStackViewModel = backStackViewModel,
                 mainScreenKey = backStackViewModel.mainScreen.currentKey,
                 settingsScreenKey = backStackViewModel.settingsScreen.currentKey,
                 onCurrentKeyChange = { newKey ->
@@ -186,6 +188,7 @@ private fun TabMenu(
 @Composable
 private fun NavigationUI(
     key: NestedNavKey.Settings,
+    backStackViewModel: ScreenBackStackViewModel,
     mainScreenKey: TitledNavKey?,
     settingsScreenKey: TitledNavKey?,
     onCurrentKeyChange: (TitledNavKey?) -> Unit,
@@ -231,14 +234,14 @@ private fun NavigationUI(
                             eventViewModel = eventViewModel
                         )
                     }
-                    entry<NormalNavKey.Settings.Game> { gameKey ->
-                        GameSettingsScreen(gameKey, settingsScreenKey, mainScreenKey, eventViewModel)
+                    entry<NormalNavKey.Settings.Game> {
+                        GameSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel)
                     }
-                    entry<NormalNavKey.Settings.Control> { controlKey ->
-                        ControlSettingsScreen(controlKey, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
+                    entry<NormalNavKey.Settings.Control> {
+                        ControlSettingsScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
                     }
-                    entry<NormalNavKey.Settings.Gamepad> { gamepadKey ->
-                        GamepadSettingsScreen(gamepadKey, settingsScreenKey, mainScreenKey)
+                    entry<NormalNavKey.Settings.Gamepad> {
+                        GamepadSettingsScreen(key, settingsScreenKey, mainScreenKey)
                     }
                     entry<NormalNavKey.Settings.Launcher> { launcherKey ->
                         LauncherSettingsScreen(
@@ -249,15 +252,15 @@ private fun NavigationUI(
                             submitError = submitError,
                         )
                     }
-                    entry<NormalNavKey.Settings.JavaManager> { javaKey ->
-                        JavaManageScreen(javaKey, settingsScreenKey, mainScreenKey, submitError)
+                    entry<NormalNavKey.Settings.JavaManager> {
+                        JavaManageScreen(key, settingsScreenKey, mainScreenKey, submitError)
                     }
-                    entry<NormalNavKey.Settings.ControlManager> { controlKey ->
-                        ControlManageScreen(controlKey, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
+                    entry<NormalNavKey.Settings.ControlManager> {
+                        ControlManageScreen(key, settingsScreenKey, mainScreenKey, eventViewModel, submitError)
                     }
-                    entry<NormalNavKey.Settings.AboutInfo> { aboutKey ->
+                    entry<NormalNavKey.Settings.AboutInfo> {
                         AboutInfoScreen(
-                            key = aboutKey,
+                            key = key,
                             settingsScreenKey = settingsScreenKey,
                             mainScreenKey = mainScreenKey,
                             checkUpdate = {
