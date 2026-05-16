@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -716,6 +717,7 @@ fun VersionItemLayout(
     onSettingsClick: () -> Unit = {},
     onRenameClick: () -> Unit = {},
     onCopyClick: () -> Unit = {},
+    onChangeGroupClick: () -> Unit = {},
     onExportClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
     onPinned: () -> Unit = {}
@@ -847,6 +849,20 @@ fun VersionItemLayout(
                         }
                     )
                     DropdownMenuItem(
+                        text = { Text(text = "Grubu Değiştir") },
+                        leadingIcon = {
+                            Icon(
+                                modifier = Modifier.size(20.dp),
+                                painter = painterResource(R.drawable.ic_sort),
+                                contentDescription = "Grubu Değiştir"
+                            )
+                        },
+                        onClick = {
+                            onChangeGroupClick()
+                            menuExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
                         text = { Text(text = stringResource(R.string.versions_export)) },
                         leadingIcon = {
                             Icon(
@@ -889,6 +905,7 @@ fun CommonVersionInfoLayout(
     val versionName = remember(version) { version.getVersionName() }
     val isSummaryValid = remember(version) { version.isSummaryValid() }
     val versionInfo = remember(version) { version.getVersionInfo() }
+    val group = remember(version) { version.getVersionConfig().group }
 
     Row(modifier = modifier) {
         VersionIconImage(
@@ -902,12 +919,18 @@ fun CommonVersionInfoLayout(
             modifier = Modifier.weight(1f)
         ) {
             //版本名称
-            Text(
-                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
-                maxLines = 1,
-                text = versionName,
-                style = MaterialTheme.typography.labelLarge
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
+                    maxLines = 1,
+                    text = versionName,
+                    style = MaterialTheme.typography.labelLarge
+                )
+                if (group.isNotEmpty()) {
+                    Spacer(Modifier.width(8.dp))
+                    LittleTextLabel(text = group)
+                }
+            }
             //版本描述
             if (isValid && isSummaryValid) {
                 val versionSummary = remember(version) {

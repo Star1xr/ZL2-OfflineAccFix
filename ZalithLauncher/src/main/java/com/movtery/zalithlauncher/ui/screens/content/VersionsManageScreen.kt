@@ -34,8 +34,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -583,7 +585,7 @@ private fun VersionsLayout(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 ScalingActionButton(
-                                    selected = selectedGroup == null,
+                                    colors = if (selectedGroup == null) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors(),
                                     onClick = { onGroupChange(null) }
                                 ) {
                                     Text("Tüm Gruplar")
@@ -591,7 +593,7 @@ private fun VersionsLayout(
 
                                 groups.forEach { group ->
                                     ScalingActionButton(
-                                        selected = selectedGroup == group,
+                                        colors = if (selectedGroup == group) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors(),
                                         onClick = { onGroupChange(group) }
                                     ) {
                                         Text(group)
