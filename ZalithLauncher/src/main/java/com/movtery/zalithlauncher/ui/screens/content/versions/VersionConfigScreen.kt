@@ -59,7 +59,6 @@ import com.movtery.zalithlauncher.setting.unit.floatRange
 import com.movtery.zalithlauncher.setting.unit.getOrMin
 import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.components.AnimatedColumn
-import com.movtery.zalithlauncher.ui.components.AnimatedItem
 import com.movtery.zalithlauncher.ui.components.IDItem
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
