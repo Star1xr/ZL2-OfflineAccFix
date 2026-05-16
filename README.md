@@ -52,7 +52,7 @@ Soon.
 ### Build Steps
 
 ```bash
-git clone https://github.com/Star1xr/ZalithLauncher2Plus.git
+git clone https://github.com/Star1xr/TreeLauncher.git
 # Open the project in Android Studio and build or use terminal: ./gradlew assembleRelease or ./gradlew assembleDebug
 ```
 
@@ -96,9 +96,9 @@ This is a community fork. Before contributing:
 ## 📞 Contact & Links
 
 - **Original Project:** https://github.com/ZalithLauncher/ZalithLauncher2
-- **This Fork:** https://github.com/Star1xr/ZalithLauncher2Plus
+- **This Fork:** https://github.com/Star1xr/TreeLauncher
 
 ---
 
 **Zalith Launcher 2** is the original project created and maintained by the Zalith Launcher team.  
-**Zalith Launcher 2+** is an unofficial community fork created to provide enhanced features and modifications.
+**TreeLauncher** is an unofficial community fork created to provide enhanced features and modifications.

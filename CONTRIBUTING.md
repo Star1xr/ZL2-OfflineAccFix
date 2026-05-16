@@ -1,10 +1,10 @@
-# Contributing to Zalith Launcher 2+
+# Contributing to TreeLauncher
 
-Thank you for your interest in contributing to **Zalith Launcher 2+**! This is a community-driven fork, and we welcome contributions from developers of all skill levels.
+Thank you for your interest in contributing to **TreeLauncher**! This is a community-driven fork, and we welcome contributions from developers of all skill levels.
 
 ## Before You Start
 
-- This is an **unofficial fork** of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2)
+- This is an **unofficial remake** of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2)
 - Please review the [upstream project](https://github.com/ZalithLauncher/ZalithLauncher2) to understand the original codebase
 - All contributions are governed by the **[GPL-3.0 license](LICENSE)**
 - By contributing, you agree to license your changes under GPL-3.0
@@ -24,12 +24,8 @@ Thank you for your interest in contributing to **Zalith Launcher 2+**! This is a
 
 ```bash
 # Fork the repository on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/ZalithLauncher2Plus.git
-cd ZalithLauncher2Plus
-
-# Add upstream as a remote to stay synced
-git remote add upstream https://github.com/ZalithLauncher/ZalithLauncher2.git
-```
+git clone https://github.com/Star1xr/TreeLauncher.git
+cd TreeLauncher
 
 ### 2. Set Up Development Environment
 
@@ -342,4 +338,4 @@ Contributors are recognized through:
 
 ---
 
-Thank you for making Zalith Launcher 2+ better! 🚀
+Thank you for making TreeLauncher better! 🚀
