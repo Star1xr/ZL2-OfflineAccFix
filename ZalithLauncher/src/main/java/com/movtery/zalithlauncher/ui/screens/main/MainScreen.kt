@@ -212,8 +212,8 @@ fun MainScreen(
                         screenKey = screenBackStackModel.settingsScreen
                     )
                 },
-                toDownloadScreen = {
-                    screenBackStackModel.navigateToDownload()
+                toDownloadScreen = { target ->
+                    screenBackStackModel.navigateToDownload(target)
                 },
                 toMultiplayerScreen = {
                     screenBackStackModel.mainScreen.removeAndNavigateTo(
@@ -354,7 +354,7 @@ private fun <E: TitledNavKey> TopBar(
     onScreenBack: () -> Unit,
     toMainScreen: () -> Unit,
     toSettingsScreen: () -> Unit,
-    toDownloadScreen: () -> Unit,
+    toDownloadScreen: (target: TitledNavKey?) -> Unit,
     toMultiplayerScreen: () -> Unit,
     toAccountManageScreen: () -> Unit,
     toModsScreen: () -> Unit,
@@ -402,14 +402,14 @@ private fun <E: TitledNavKey> TopBar(
                 TopBarTextButton(
                     icon = R.drawable.ic_add,
                     text = stringResource(R.string.sidebar_action_add_instance),
-                    onClick = toDownloadScreen
+                    onClick = { toDownloadScreen(null) }
                 )
 
                 // Mods
                 TopBarTextButton(
                     icon = R.drawable.ic_extension_outlined,
                     text = stringResource(R.string.topbar_mods),
-                    onClick = { toDownloadScreen() }
+                    onClick = { toDownloadScreen(NormalNavKey.SearchMod) }
                 )
 
                 // Versions
@@ -636,7 +636,8 @@ private fun NavigationUI(
                                     useClassEquality = true
                                 )
                             }
-                        }
+                        },
+                        submitError = submitError
                     )
                 }
                 entry<NestedNavKey.Settings> { key ->

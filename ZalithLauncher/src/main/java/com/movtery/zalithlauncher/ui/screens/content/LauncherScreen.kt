@@ -53,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -68,6 +69,10 @@ import com.movtery.zalithlauncher.ui.base.BaseScreen
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.MemoryPreview
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
+import com.movtery.zalithlauncher.ui.screens.content.elements.VersionsOperation
+import com.movtery.zalithlauncher.ui.screens.content.elements.CopyVersionDialog
+import com.movtery.zalithlauncher.ui.screens.content.elements.ChangeGroupDialog
+import com.movtery.zalithlauncher.ui.screens.content.elements.SimpleTaskDialog
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPosition
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCardColumn
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SwitchSettingsCard
@@ -75,8 +80,12 @@ import com.movtery.zalithlauncher.ui.screens.content.versions.layouts.Toggleable
 import com.movtery.zalithlauncher.ui.screens.main.custom_home.MarkdownBlock
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor
+import com.movtery.zalithlauncher.utils.getMessageOrToString
+import com.movtery.zalithlauncher.utils.logging.lError
 import com.movtery.zalithlauncher.utils.platform.getMaxMemoryForSettings
+import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
+import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun LauncherScreen(
@@ -86,6 +95,7 @@ fun LauncherScreen(
     onOpenLink: (String) -> Unit,
     onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
     onModsClick: () -> Unit,
+    submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
     var showQuickRamDialog by remember { mutableStateOf<Boolean>(false) }
     var showQuickFpsDialog by remember { mutableStateOf<Boolean>(false) }
@@ -100,6 +110,64 @@ fun LauncherScreen(
         QuickFpsDialog(
             onDismissRequest = { showQuickFpsDialog = false }
         )
+    }
+
+    var versionsOperation by remember { mutableStateOf<VersionsOperation>(VersionsOperation.None) }
+
+    when (val operation = versionsOperation) {
+        is VersionsOperation.Copy -> {
+            CopyVersionDialog(
+                onConfirm = { name, copyAll ->
+                    versionsOperation = VersionsOperation.RunTask(
+                        title = R.string.versions_manage_copy_version,
+                        task = { VersionsManager.copyVersion(operation.version, name, copyAll) }
+                    )
+                },
+                onDismissRequest = { versionsOperation = VersionsOperation.None }
+            )
+        }
+
+        is VersionsOperation.ChangeGroup -> {
+            ChangeGroupDialog(
+                version = operation.version,
+                onDismissRequest = { versionsOperation = VersionsOperation.None },
+                onConfirm = { group ->
+                    versionsOperation = VersionsOperation.RunTask(
+                        title = R.string.generic_setting,
+                        task = {
+                            operation.version.getVersionConfig().apply {
+                                this.group = group
+                                saveWithThrowable()
+                            }
+                        }
+                    )
+                }
+            )
+        }
+
+        is VersionsOperation.RunTask -> {
+            val errorMessage = stringResource(R.string.versions_manage_task_error)
+            SimpleTaskDialog(
+                title = stringResource(operation.title),
+                task = operation.task,
+                context = Dispatchers.IO,
+                onDismiss = {
+                    VersionsManager.refresh("LauncherScreen.RunTask")
+                    versionsOperation = VersionsOperation.None
+                },
+                onError = { e ->
+                    lError("Failed to run task.", e)
+                    submitError(
+                        ErrorViewModel.ThrowableMessage(
+                            title = errorMessage,
+                            message = e.getMessageOrToString()
+                        )
+                    )
+                }
+            )
+        }
+
+        else -> {}
     }
 
     val versions by VersionsManager.isRefreshing.collectAsStateWithLifecycle()
@@ -142,6 +210,12 @@ fun LauncherScreen(
                 },
                 onDelete = {
                     currentVersion?.let { VersionsManager.deleteVersion(it) }
+                },
+                onCopyClick = {
+                    currentVersion?.let { versionsOperation = VersionsOperation.Copy(it) }
+                },
+                onChangeGroupClick = {
+                    currentVersion?.let { versionsOperation = VersionsOperation.ChangeGroup(it) }
                 },
                 onModsClick = onModsClick
             )
@@ -199,9 +273,11 @@ private fun VersionGrid(
 ) {
     val pinned = versions.filter { it.pinnedState }
     val unpinned = versions.filter { !it.pinnedState }
-    
-    var pinnedExpanded by rememberSaveable { mutableStateOf<Boolean>(true) }
-    var unpinnedExpanded by rememberSaveable { mutableStateOf<Boolean>(true) }
+
+    val grouped = unpinned.groupBy { it.getVersionConfig().group }
+    val sortedGroupNames = grouped.keys.filter { it.isNotEmpty() }.sorted()
+
+    var collapsedGroups by rememberSaveable { mutableStateOf(setOf<String>()) }
 
     LazyColumn(
         modifier = modifier,
@@ -209,14 +285,17 @@ private fun VersionGrid(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         if (pinned.isNotEmpty()) {
-            item { 
+            val isExpanded = "pinned" !in collapsedGroups
+            item {
                 CategoryHeader(
-                    title = stringResource(R.string.category_pinned), 
-                    isExpanded = pinnedExpanded,
-                    onExpandClick = { pinnedExpanded = !pinnedExpanded }
-                ) 
+                    title = stringResource(R.string.category_pinned),
+                    isExpanded = isExpanded,
+                    onExpandClick = {
+                        collapsedGroups = if (isExpanded) collapsedGroups + "pinned" else collapsedGroups - "pinned"
+                    }
+                )
             }
-            if (pinnedExpanded) {
+            if (isExpanded) {
                 item {
                     androidx.compose.foundation.layout.FlowRow(
                         modifier = Modifier.fillMaxWidth(),
@@ -235,27 +314,66 @@ private fun VersionGrid(
             }
         }
 
-        if (unpinned.isNotEmpty()) {
-            item { 
+        // Ungrouped
+        val ungrouped = grouped[""] ?: emptyList()
+        if (ungrouped.isNotEmpty()) {
+            val isExpanded = "ungrouped" !in collapsedGroups
+            item {
                 CategoryHeader(
-                    title = stringResource(R.string.category_ungrouped), 
-                    isExpanded = unpinnedExpanded,
-                    onExpandClick = { unpinnedExpanded = !unpinnedExpanded }
-                ) 
+                    title = stringResource(R.string.category_ungrouped),
+                    isExpanded = isExpanded,
+                    onExpandClick = {
+                        collapsedGroups = if (isExpanded) collapsedGroups + "ungrouped" else collapsedGroups - "ungrouped"
+                    }
+                )
             }
-            if (unpinnedExpanded) {
+            if (isExpanded) {
                 item {
                     androidx.compose.foundation.layout.FlowRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        unpinned.forEach { version ->
+                        ungrouped.forEach { version ->
                             VersionGridItem(
                                 version = version,
                                 isSelected = version == currentVersion,
                                 onClick = { onVersionClick(version) }
                             )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Groups
+        sortedGroupNames.forEach { groupName ->
+            val groupVersions = grouped[groupName] ?: emptyList()
+            if (groupVersions.isNotEmpty()) {
+                val isExpanded = groupName !in collapsedGroups
+                item(key = groupName) {
+                    CategoryHeader(
+                        title = groupName,
+                        isExpanded = isExpanded,
+                        onExpandClick = {
+                            collapsedGroups = if (isExpanded) collapsedGroups + groupName else collapsedGroups - groupName
+                        }
+                    )
+                }
+                if (isExpanded) {
+                    item {
+                        androidx.compose.foundation.layout.FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            groupVersions.forEach { version ->
+                                VersionGridItem(
+                                    version = version,
+                                    isSelected = version == currentVersion,
+                                    onClick = { onVersionClick(version) }
+                                )
+                            }
                         }
                     }
                 }
@@ -303,6 +421,8 @@ private fun RightActionSidebar(
     onLaunch: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onCopyClick: () -> Unit,
+    onChangeGroupClick: () -> Unit,
     onModsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -369,7 +489,7 @@ private fun RightActionSidebar(
             SidebarActionItem(
                 icon = R.drawable.ic_sort,
                 label = stringResource(R.string.sidebar_action_change_group),
-                onClick = { },
+                onClick = onChangeGroupClick,
                 enabled = isSelected
             )
             SidebarActionItem(
@@ -387,7 +507,7 @@ private fun RightActionSidebar(
             SidebarActionItem(
                 icon = R.drawable.ic_copy_all_filled,
                 label = stringResource(R.string.sidebar_action_copy),
-                onClick = { },
+                onClick = onCopyClick,
                 enabled = isSelected
             )
             SidebarActionItem(
