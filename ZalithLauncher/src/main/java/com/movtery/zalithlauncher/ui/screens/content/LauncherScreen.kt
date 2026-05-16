@@ -211,7 +211,7 @@ private fun VersionGrid(
         if (pinned.isNotEmpty()) {
             item { 
                 CategoryHeader(
-                    title = "Pinned", 
+                    title = stringResource(R.string.category_pinned), 
                     isExpanded = pinnedExpanded,
                     onExpandClick = { pinnedExpanded = !pinnedExpanded }
                 ) 
@@ -238,7 +238,7 @@ private fun VersionGrid(
         if (unpinned.isNotEmpty()) {
             item { 
                 CategoryHeader(
-                    title = "Ungrouped", 
+                    title = stringResource(R.string.category_ungrouped), 
                     isExpanded = unpinnedExpanded,
                     onExpandClick = { unpinnedExpanded = !unpinnedExpanded }
                 ) 

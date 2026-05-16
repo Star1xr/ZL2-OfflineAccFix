@@ -399,7 +399,7 @@ private fun <E: TitledNavKey> TopBar(
                 // Add Instance
                 TopBarTextButton(
                     icon = R.drawable.ic_add,
-                    text = "Add Instance",
+                    text = stringResource(R.string.sidebar_action_add_instance),
                     onClick = toDownloadScreen
                 )
 
@@ -497,7 +497,7 @@ private fun TopBarTextButton(
             modifier = Modifier.size(20.dp), // Increased icon size (was 16)
             painter = painterResource(icon),
             contentDescription = text,
-            tint = if (text == "Add Instance") Color(0xFF50AF55) else MaterialTheme.colorScheme.primary
+            tint = if (text == stringResource(R.string.sidebar_action_add_instance)) Color(0xFF50AF55) else MaterialTheme.colorScheme.primary
         )
         Text(
             text = text,

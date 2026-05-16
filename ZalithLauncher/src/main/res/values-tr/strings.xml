@@ -77,6 +77,9 @@
     <string name="sidebar_action_export">Dışa Aktar</string>
     <string name="sidebar_action_copy">Kopyala</string>
     <string name="sidebar_action_create_shortcut">Kısayol Oluştur</string>
+    <string name="category_pinned">Sabitlenenler</string>
+    <string name="category_ungrouped">Gruplanmamışlar</string>
+    <string name="sidebar_action_add_instance">Sürüm Ekle</string>
     <string name="theme_color_picker_edit_hex">Hex Kodunu Düzenle</string>
     <string name="theme_color_picker_edit_hex_invalid">Geçersiz Hex</string>
     <string name="animate_type_bounce">Zıplat</string>

@@ -107,6 +107,9 @@
     <string name="sidebar_action_export">Export</string>
     <string name="sidebar_action_copy">Copy</string>
     <string name="sidebar_action_create_shortcut">Create Shortcut</string>
+    <string name="category_pinned">Pinned</string>
+    <string name="category_ungrouped">Ungrouped</string>
+    <string name="sidebar_action_add_instance">Add Instance</string>
     <string name="theme_color_picker_edit_hex">Edit Hex</string>
     <string name="theme_color_picker_edit_hex_invalid">Invalid Hex</string>
     <!-- Animations -->
