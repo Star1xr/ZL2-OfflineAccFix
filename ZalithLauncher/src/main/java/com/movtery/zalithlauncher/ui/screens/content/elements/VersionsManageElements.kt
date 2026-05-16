@@ -967,6 +967,7 @@ fun VersionIconImage(
 private fun getLoaderIconRes(version: Version): Int {
     val info = version.getVersionInfo() ?: return R.drawable.img_minecraft
     if (info.type == "snapshot") return R.drawable.img_version_snapshot
+    if (info.type == "april_fools") return R.drawable.img_version_cake
 
     return when (info.loaderInfo?.loader) {
         ModLoader.FABRIC,

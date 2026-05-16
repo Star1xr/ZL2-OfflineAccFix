@@ -474,7 +474,9 @@ private fun <E: TitledNavKey> TopBar(
                 icon = R.drawable.img_steve_account,
                 text = stringResource(R.string.page_title_account_list),
                 onClick = toAccountManageScreen,
-                iconTint = if (hasAccount) Color.Unspecified else Color.Gray
+                iconSize = 24.dp,
+                iconTint = if (hasAccount) Color.Unspecified else null,
+                isGrayscale = !hasAccount
             )
         }
     }
@@ -487,7 +489,9 @@ private fun TopBarTextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     hasDropdown: Boolean = false,
-    iconTint: Color? = null
+    iconSize: androidx.compose.ui.unit.Dp = 20.dp,
+    iconTint: Color? = null,
+    isGrayscale: Boolean = false
 ) {
     Row(
         modifier = modifier
@@ -497,12 +501,26 @@ private fun TopBarTextButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp) // Increased gap
     ) {
-        Icon(
-            modifier = Modifier.size(20.dp), // Increased icon size (was 16)
-            painter = painterResource(icon),
-            contentDescription = text,
-            tint = iconTint ?: (if (text == stringResource(R.string.sidebar_action_add_instance)) Color(0xFF50AF55) else MaterialTheme.colorScheme.primary)
-        )
+        val painter = painterResource(icon)
+        val colorFilter = if (isGrayscale) {
+            androidx.compose.ui.graphics.ColorFilter.colorMatrix(androidx.compose.ui.graphics.ColorMatrix().apply { setToSaturation(0f) })
+        } else null
+
+        if (iconTint != null || isGrayscale) {
+            androidx.compose.foundation.Image(
+                painter = painter,
+                contentDescription = text,
+                modifier = Modifier.size(iconSize),
+                colorFilter = iconTint?.let { androidx.compose.ui.graphics.ColorFilter.tint(it) } ?: colorFilter
+            )
+        } else {
+            Icon(
+                modifier = Modifier.size(iconSize),
+                painter = painter,
+                contentDescription = text,
+                tint = if (text == stringResource(R.string.sidebar_action_add_instance)) Color(0xFF50AF55) else MaterialTheme.colorScheme.primary
+            )
+        }
         Text(
             text = text,
             style = MaterialTheme.typography.labelLarge, // Larger font (was labelMedium)

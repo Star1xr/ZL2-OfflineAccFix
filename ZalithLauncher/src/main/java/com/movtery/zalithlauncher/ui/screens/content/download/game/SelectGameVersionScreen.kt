@@ -582,7 +582,7 @@ private fun getVersionComponents(
         }
         MinecraftVersion.Type.AprilFools -> {
             Quadruple(
-                painterResource(R.drawable.img_diamond_block),
+                painterResource(R.drawable.img_version_cake),
                 stringResource(R.string.download_game_type_april_fools),
                 stringResource(R.string.url_wiki_minecraft_game_snapshot, urlSuffix),
                 summary
