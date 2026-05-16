@@ -38,6 +38,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -73,15 +76,14 @@ fun VulkanDriverDownloaderScreen(
 
     var deleteConfirmRelease by remember { mutableStateOf<com.movtery.zalithlauncher.game.plugin.driver.GitHubRelease?>(null) }
 
-    if (deleteConfirmRelease != null) {
+    deleteConfirmRelease?.let { release ->
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { deleteConfirmRelease = null },
             title = { Text(stringResource(R.string.generic_tip)) },
-            text = { Text(stringResource(R.string.vulkan_driver_downloader_delete_confirm, deleteConfirmRelease!!.name)) },
+            text = { Text(stringResource(R.string.vulkan_driver_downloader_delete_confirm, release.name)) },
             confirmButton = {
                 androidx.compose.material3.TextButton(
                     onClick = {
-                        val release = deleteConfirmRelease!!
                         viewModel.deleteDriver(release.name) {
                             DriverPluginManager.initDriver(context)
                         }
@@ -186,7 +188,7 @@ private fun ReleaseItem(
                         )
                         IconButton(onClick = onDelete) {
                             Icon(
-                                painter = painterResource(R.drawable.ic_delete),
+                                painter = painterResource(R.drawable.ic_delete_outlined),
                                 contentDescription = stringResource(R.string.generic_delete),
                                 tint = MaterialTheme.colorScheme.error
                             )

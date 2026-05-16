@@ -867,6 +867,7 @@
     <string name="vulkan_driver_downloader_downloading">Downloading: %s</string>
     <string name="vulkan_driver_downloader_extracting">Extracting: %s</string>
     <string name="vulkan_driver_downloader_success">Driver installed successfully: %s</string>
+    <string name="download_state_finished">Installed</string>
     <string name="vulkan_driver_downloader_delete_confirm">Are you sure you want to delete the driver %s?</string>
 
     <string name="settings_renderer_resolution_scale_title">Resolution Scale</string>
