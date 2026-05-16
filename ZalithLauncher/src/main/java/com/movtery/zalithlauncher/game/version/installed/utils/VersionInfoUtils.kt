@@ -83,7 +83,8 @@ fun parseJsonToVersionInfo(jsonFile: File): VersionInfo? {
             )
         }
         val (versionId, loaderInfo) = detectMinecraftAndLoader(jsonObject)
-        VersionInfo(versionId, quickPlay, loaderInfo)
+        val type = jsonObject.get("type")?.asString ?: "release"
+        VersionInfo(versionId, quickPlay, loaderInfo, type)
     }.getOrElse {
         lError("Error parsing version json", it)
         null

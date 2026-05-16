@@ -965,17 +965,21 @@ fun VersionIconImage(
 }
 
 private fun getLoaderIconRes(version: Version): Int {
-    return when (version.getVersionInfo()?.loaderInfo?.loader) {
-        ModLoader.FABRIC,
-        ModLoader.BABRIC -> R.drawable.img_loader_fabric
-        ModLoader.LEGACY_FABRIC -> R.drawable.img_loader_legacy_fabric
+    val info = version.getVersionInfo() ?: return R.drawable.img_minecraft
+    if (info.type == "snapshot") return R.drawable.img_version_snapshot
 
-        ModLoader.FORGE -> R.drawable.img_anvil
-        ModLoader.QUILT -> R.drawable.img_loader_quilt
-        ModLoader.NEOFORGE -> R.drawable.img_loader_neoforge
+    return when (info.loaderInfo?.loader) {
+        ModLoader.FABRIC,
+        ModLoader.BABRIC,
+        ModLoader.LEGACY_FABRIC -> R.drawable.img_version_fabric
+
+        ModLoader.FORGE -> R.drawable.img_version_forge
+        ModLoader.QUILT -> R.drawable.img_version_quilt
+        ModLoader.NEOFORGE -> R.drawable.img_version_neoforge
+
         ModLoader.OPTIFINE -> R.drawable.img_loader_optifine
         ModLoader.LITE_LOADER -> R.drawable.img_chicken_old
         ModLoader.CLEANROOM -> R.drawable.img_loader_cleanroom
-        else -> R.drawable.img_minecraft
+        else -> R.drawable.img_version_vanilla
     }
 }

@@ -735,15 +735,15 @@ private fun VersionIconPreview(
 ) {
     val iconRes = remember(refreshIcon) {
         when {
-            currentAddon.optifineVersion.value != null && currentAddon.forgeVersion.value != null -> R.drawable.img_anvil //OptiFine & Forge 同时选择
+            currentAddon.optifineVersion.value != null && currentAddon.forgeVersion.value != null -> R.drawable.img_version_forge //OptiFine & Forge 同时选择
             currentAddon.optifineVersion.value != null -> R.drawable.img_loader_optifine
-            currentAddon.forgeVersion.value != null -> R.drawable.img_anvil
-            currentAddon.neoforgeVersion.value != null -> R.drawable.img_loader_neoforge
-            currentAddon.fabricVersion.value != null -> R.drawable.img_loader_fabric
-            currentAddon.legacyFabricVersion.value != null -> R.drawable.img_loader_legacy_fabric
-            currentAddon.quiltVersion.value != null -> R.drawable.img_loader_quilt
+            currentAddon.forgeVersion.value != null -> R.drawable.img_version_forge
+            currentAddon.neoforgeVersion.value != null -> R.drawable.img_version_neoforge
+            currentAddon.fabricVersion.value != null -> R.drawable.img_version_fabric
+            currentAddon.legacyFabricVersion.value != null -> R.drawable.img_version_fabric
+            currentAddon.quiltVersion.value != null -> R.drawable.img_version_quilt
             currentAddon.cleanroomVersion.value != null -> R.drawable.img_loader_cleanroom
-            else -> R.drawable.img_minecraft
+            else -> R.drawable.img_version_vanilla
         }
     }
 

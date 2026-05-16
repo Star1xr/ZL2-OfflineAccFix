@@ -26,7 +26,8 @@ import kotlinx.parcelize.Parcelize
 class VersionInfo(
     val minecraftVersion: String,
     val quickPlay: QuickPlay,
-    val loaderInfo: LoaderInfo?
+    val loaderInfo: LoaderInfo?,
+    val type: String
 ): Parcelable {
     /**
      * 拼接Minecraft的版本信息，包括ModLoader信息

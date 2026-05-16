@@ -365,6 +365,8 @@ private fun <E: TitledNavKey> TopBar(
     changeExpandedState: () -> Unit,
 ) {
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val currentAccount by AccountsManager.currentAccountFlow.collectAsStateWithLifecycle()
+    val hasAccount = currentAccount != null
 
     CompositionLocalProvider(
         LocalContentColor provides contentColor
@@ -469,9 +471,10 @@ private fun <E: TitledNavKey> TopBar(
 
             // Right Side: Accounts (Direct navigation as requested)
             TopBarTextButton(
-                icon = R.drawable.ic_person_outlined,
+                icon = R.drawable.img_steve_account,
                 text = stringResource(R.string.page_title_account_list),
-                onClick = toAccountManageScreen
+                onClick = toAccountManageScreen,
+                iconTint = if (hasAccount) Color.Unspecified else Color.Gray
             )
         }
     }
@@ -483,7 +486,8 @@ private fun TopBarTextButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    hasDropdown: Boolean = false
+    hasDropdown: Boolean = false,
+    iconTint: Color? = null
 ) {
     Row(
         modifier = modifier
@@ -497,7 +501,7 @@ private fun TopBarTextButton(
             modifier = Modifier.size(20.dp), // Increased icon size (was 16)
             painter = painterResource(icon),
             contentDescription = text,
-            tint = if (text == stringResource(R.string.sidebar_action_add_instance)) Color(0xFF50AF55) else MaterialTheme.colorScheme.primary
+            tint = iconTint ?: (if (text == stringResource(R.string.sidebar_action_add_instance)) Color(0xFF50AF55) else MaterialTheme.colorScheme.primary)
         )
         Text(
             text = text,
