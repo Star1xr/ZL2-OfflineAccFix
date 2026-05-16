@@ -227,8 +227,14 @@ fun MainScreen(
                     )
                 },
                 toModsScreen = {
-                    VersionsManager.currentVersion.value?.let {
-                        screenBackStackModel.mainScreen.navigateTo(NormalNavKey.Versions.ModsManager)
+                    VersionsManager.currentVersion.value?.let { version ->
+                        val settingsKey = NestedNavKey.VersionSettings(version)
+                        settingsKey.backStack.clear()
+                        settingsKey.backStack.add(NormalNavKey.Versions.ModsManager)
+                        screenBackStackModel.mainScreen.navigateTo(
+                            screenKey = settingsKey,
+                            useClassEquality = true
+                        )
                     }
                 },
                 toVersionManageScreen = {
@@ -600,8 +606,14 @@ private fun NavigationUI(
                             eventViewModel.sendEvent(EventViewModel.Event.HomePage.Event(event))
                         },
                         onModsClick = {
-                            VersionsManager.currentVersion.value?.let {
-                                screenBackStackModel.mainScreen.navigateTo(NormalNavKey.Versions.ModsManager)
+                            VersionsManager.currentVersion.value?.let { version ->
+                                val settingsKey = NestedNavKey.VersionSettings(version)
+                                settingsKey.backStack.clear()
+                                settingsKey.backStack.add(NormalNavKey.Versions.ModsManager)
+                                screenBackStackModel.mainScreen.navigateTo(
+                                    screenKey = settingsKey,
+                                    useClassEquality = true
+                                )
                             }
                         }
                     )
