@@ -53,6 +53,21 @@ class VulkanDriverViewModel : ViewModel() {
     private val _state = MutableStateFlow<VulkanDriverDownloadState>(VulkanDriverDownloadState.Idle)
     val state = _state.asStateFlow()
 
+    private val _installedDrivers = MutableStateFlow<Set<String>>(emptySet())
+    val installedDrivers = _installedDrivers.asStateFlow()
+
+    init {
+        refreshInstalledDrivers()
+    }
+
+    fun refreshInstalledDrivers() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val drivers = VulkanDriverManager.getDriversHome().listFiles { file -> file.isDirectory }
+                ?.map { it.name }?.toSet() ?: emptySet()
+            _installedDrivers.value = drivers
+        }
+    }
+
     fun fetchReleases() {
         viewModelScope.launch {
             _state.value = VulkanDriverDownloadState.Fetching
@@ -84,11 +99,23 @@ class VulkanDriverViewModel : ViewModel() {
 
                     tempFile.delete()
 
+                    refreshInstalledDrivers()
+
                     withContext(Dispatchers.Main) {
                         onFinished()
                     }
                 }
             )
         )
+    }
+
+    fun deleteDriver(driverName: String, onFinished: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            VulkanDriverManager.deleteDriver(driverName)
+            refreshInstalledDrivers()
+            withContext(Dispatchers.Main) {
+                onFinished()
+            }
+        }
     }
 }

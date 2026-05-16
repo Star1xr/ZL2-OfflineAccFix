@@ -65,9 +65,38 @@ fun VulkanDriverDownloaderScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val installedDrivers by viewModel.installedDrivers.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.fetchReleases()
+    }
+
+    var deleteConfirmRelease by remember { mutableStateOf<com.movtery.zalithlauncher.game.plugin.driver.GitHubRelease?>(null) }
+
+    if (deleteConfirmRelease != null) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { deleteConfirmRelease = null },
+            title = { Text(stringResource(R.string.generic_tip)) },
+            text = { Text(stringResource(R.string.vulkan_driver_downloader_delete_confirm, deleteConfirmRelease!!.name)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        val release = deleteConfirmRelease!!
+                        viewModel.deleteDriver(release.name) {
+                            DriverPluginManager.initDriver(context)
+                        }
+                        deleteConfirmRelease = null
+                    }
+                ) {
+                    Text(stringResource(R.string.generic_confirm))
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { deleteConfirmRelease = null }) {
+                    Text(stringResource(R.string.generic_cancel))
+                }
+            }
+        )
     }
 
     BaseScreen(
@@ -98,6 +127,7 @@ fun VulkanDriverDownloaderScreen(
                         items(currentState.releases) { release ->
                             ReleaseItem(
                                 release = release,
+                                isInstalled = installedDrivers.contains(release.name),
                                 onDownload = { asset ->
                                     viewModel.downloadDriver(asset, release.name) {
                                         Toast.makeText(
@@ -107,6 +137,9 @@ fun VulkanDriverDownloaderScreen(
                                         ).show()
                                         DriverPluginManager.initDriver(context)
                                     }
+                                },
+                                onDelete = {
+                                    deleteConfirmRelease = release
                                 }
                             )
                         }
@@ -127,7 +160,9 @@ fun VulkanDriverDownloaderScreen(
 @Composable
 private fun ReleaseItem(
     release: com.movtery.zalithlauncher.game.plugin.driver.GitHubRelease,
-    onDownload: (com.movtery.zalithlauncher.game.plugin.driver.GitHubAsset) -> Unit
+    isInstalled: Boolean,
+    onDownload: (com.movtery.zalithlauncher.game.plugin.driver.GitHubAsset) -> Unit,
+    onDelete: () -> Unit
 ) {
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -135,7 +170,30 @@ private fun ReleaseItem(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = release.name, style = MaterialTheme.typography.titleMedium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = release.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                if (isInstalled) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = stringResource(R.string.download_state_finished),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 4.dp)
+                        )
+                        IconButton(onClick = onDelete) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_delete),
+                                contentDescription = stringResource(R.string.generic_delete),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
+            }
             release.body?.let {
                 Text(
                     text = it,
@@ -156,7 +214,7 @@ private fun ReleaseItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = asset.name, style = MaterialTheme.typography.labelMedium)
+                    Text(text = asset.name, style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
                     IconButton(onClick = { onDownload(asset) }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_download_2_filled),

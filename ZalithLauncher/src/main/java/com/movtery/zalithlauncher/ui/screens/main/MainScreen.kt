@@ -214,6 +214,7 @@ fun MainScreen(
                 toDownloadScreen = { target ->
                     screenBackStackModel.navigateToDownload(target)
                 },
+                downloadModScreenKey = screenBackStackModel.downloadModScreen,
                 toMultiplayerScreen = {
                     screenBackStackModel.mainScreen.removeAndNavigateTo(
                         removes = screenBackStackModel.clearBeforeNavKeys,
@@ -354,6 +355,7 @@ private fun <E: TitledNavKey> TopBar(
     toMainScreen: () -> Unit,
     toSettingsScreen: () -> Unit,
     toDownloadScreen: (target: TitledNavKey?) -> Unit,
+    downloadModScreenKey: TitledNavKey,
     toMultiplayerScreen: () -> Unit,
     toAccountManageScreen: () -> Unit,
     toModsScreen: () -> Unit,
@@ -408,7 +410,7 @@ private fun <E: TitledNavKey> TopBar(
                 TopBarTextButton(
                     icon = R.drawable.ic_extension_outlined,
                     text = stringResource(R.string.topbar_mods),
-                    onClick = { toDownloadScreen(NormalNavKey.SearchMod) }
+                    onClick = { toDownloadScreen(downloadModScreenKey) }
                 )
 
                 // Versions
