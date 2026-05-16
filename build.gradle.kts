@@ -13,11 +13,9 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven("https://storage.googleapis.com/r8-releases/raw")
     }
     dependencies {
         classpath(libs.stringfog.gradle.plugin)
         classpath(libs.stringfog.xor)
-        classpath("com.android.tools:r8:8.8.32") 
     }
 }
