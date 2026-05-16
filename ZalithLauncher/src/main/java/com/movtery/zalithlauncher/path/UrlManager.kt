@@ -41,6 +41,7 @@ const val URL_MINECRAFT_ASSETS_INDEX: String = "https://launchermeta.mojang.com/
 const val URL_MINECRAFT_PURCHASE = "https://www.xbox.com/games/store/minecraft-java-bedrock-edition-for-pc/9nxp44l49shj"
 const val URL_ORIGINAL_PROJECT: String = "https://github.com/ZalithLauncher/ZalithLauncher2"
 const val URL_PROJECT: String = "https://github.com/Star1xr/TreeLauncher"
+const val URL_STAR1XR: String = "https://github.com/Star1xr"
 const val URL_PROJECT_INFO: String = "https://api.github.com/repos/Star1xr/TreeLauncher/contents/v2"
 const val URL_PROJECT_RELEASES_LATEST: String = "https://api.github.com/repos/Star1xr/TreeLauncher/releases/latest"
 const val URL_COMMUNITY: String = "https://github.com/Star1xr/TreeLauncher/graphs/contributors"
