@@ -1,13 +1,13 @@
 
-# Zalith Launcher 2+ (PLUS)
+# TREELAUNCHER
 
-> **⚠️ UNOFFICIAL MODIFIED VERSION**
+> **⚠️ REMAKE**
 >
-> This project will soon be changed its name to: TreeLauncher (in summer, when school and exams are done) and ill scope for better features and new ui, codebase then.)
+> This project is a community remake. The upstream updates soon will be closed in this fork, until TreeLauncher is ready, we will continue from ZL2+.
 > 
-> This is an unofficial fork of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2). This project is **not affiliated with or endorsed by the official Zalith Launcher project**.
+> This is an unofficial community remake of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2). This project is **not affiliated with or endorsed by the official Zalith Launcher project**.
 
-**Zalith Launcher 2+** is a community-modified launcher for **Android devices** tailored for [Minecraft: Java Edition](https://www.minecraft.net/). It builds upon the foundation of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2), utilizing [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher/tree/v3_openjdk/app_pojavlauncher/src/main/jni) as its core launching engine with a modern UI built using **Jetpack Compose** and **Material Design 3**.
+**TreeLauncher** is a community-modified launcher for **Android devices** tailored for [Minecraft: Java Edition](https://www.minecraft.net/). It builds upon the foundation of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2), utilizing [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher/tree/v3_openjdk/app_pojavlauncher/src/main/jni) as its core launching engine with a modern UI built using **Jetpack Compose** and **Material Design 3**.
 
 ## 📋 What's New in This Fork?
 
@@ -20,8 +20,7 @@ This fork aims to enhance and customize the original Zalith Launcher 2 experienc
 - [x] Shortcuts in main screen
 - [x] Importing/exporting settings
 - [x] Importing/exporting accounts along with capes and skins
-
-**Soon:**
+- [x] New UI
 - [ ] Friend system
 - [ ] First ever performance update
 
@@ -32,17 +31,16 @@ This project is derived from the excellent work of the Zalith Launcher team:
 - **Original Project:** [ZalithLauncher2](https://github.com/ZalithLauncher/ZalithLauncher2)
 - **Original License:** GPL-3.0
 
-Please visit the upstream project if you want the official, unmodified version.
-
 ## 🌐 Language and Translation Support
 
-This fork uses translations of Zalith Launcher 2. To contribute translations or improvements, please consider contributing upstream to the [Zalith Launcher 2 Weblate project](https://hosted.weblate.org/projects/zalithlauncher2).
+Soon.
 
 ## 📦 Build Instructions (For Developers)
 
 ### Requirements
 
 * Android Studio **Bumblebee** or newer
+* Android SDK and NDK if building on terminal
 * Android SDK:
   * **Minimum API level**: 26
   * **Target API level**: 35
@@ -52,7 +50,7 @@ This fork uses translations of Zalith Launcher 2. To contribute translations or 
 
 ```bash
 git clone https://github.com/Star1xr/ZalithLauncher2Plus.git
-# Open the project in Android Studio and build
+# Open the project in Android Studio and build or use terminal: ./gradlew assembleRelease or ./gradlew assembleDebug
 ```
 
 ## 📜 License
@@ -63,7 +61,7 @@ This project is licensed under the **[GPL-3.0 license](LICENSE)**, inherited fro
 
 **Contributions and Attribution**
    - All modifications are clearly documented and attributed to this fork
-   - The upstream project is properly credited
+   - The ZalithLauncher2 project is properly credited
 
 ## 📦 Open Source Libraries and Licenses
 
@@ -80,9 +78,9 @@ This is a community fork. Before contributing:
 
 ## ⚠️ Support and Disclaimers
 
-- This is an **unofficial fork**. Official support should be sought from the [upstream Zalith Launcher 2 project](https://github.com/ZalithLauncher/ZalithLauncher2)
+- This is an **unofficial community remake**. Official support should be sought from the [upstream Zalith Launcher 2 project](https://github.com/ZalithLauncher/ZalithLauncher2)
 - Please report bugs to this repository's issue tracker
-- For upstream-related issues, consider reporting to the original project first
+- For upstream-related issues, we dont support it, you can deliver it to ZalithLauncher 2 issues page.
 - Use at your own risk. This fork comes with no official warranty or support
 
 ## 🔒 Security and Privacy
