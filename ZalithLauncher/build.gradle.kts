@@ -68,8 +68,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = zalithPackageName
-        applicationIdSuffix = ".v2"
+        applicationId = "com.star1xr.treelauncher"
+        // applicationIdSuffix = ".v2"
         minSdk = 26
         targetSdk = 35
         versionCode = launcherVersionCode
