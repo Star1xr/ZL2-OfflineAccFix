@@ -18,6 +18,6 @@ buildscript {
     dependencies {
         classpath(libs.stringfog.gradle.plugin)
         classpath(libs.stringfog.xor)
-        classpath("com.android.tools:r8:9.0.22") 
+        classpath("com.android.tools:r8:8.8.7") 
     }
 }
