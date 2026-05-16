@@ -474,7 +474,7 @@ private fun <E: TitledNavKey> TopBar(
                 text = stringResource(R.string.page_title_account_list),
                 onClick = toAccountManageScreen,
                 iconSize = 24.dp,
-                iconTint = if (hasAccount) null else null,
+                iconTint = null,
                 isGrayscale = !hasAccount
             )
         }
