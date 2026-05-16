@@ -247,6 +247,9 @@ fun LauncherScreen(
                 onChangeGroupClick = {
                     currentVersion?.let { versionsOperation = VersionsOperation.ChangeGroup(it) }
                 },
+                onExportClick = {
+                    currentVersion?.let { versionsOperation = VersionsOperation.Export(it) }
+                },
                 onModsClick = onModsClick
             )
         }
@@ -453,6 +456,7 @@ private fun RightActionSidebar(
     onDelete: () -> Unit,
     onCopyClick: () -> Unit,
     onChangeGroupClick: () -> Unit,
+    onExportClick: () -> Unit,
     onModsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -531,9 +535,7 @@ private fun RightActionSidebar(
             SidebarActionItem(
                 icon = R.drawable.ic_share_filled,
                 label = stringResource(R.string.sidebar_action_export),
-                onClick = {
-                    currentVersion?.let { versionsOperation = VersionsOperation.Export(it) }
-                },
+                onClick = onExportClick,
                 enabled = isSelected
             )
             SidebarActionItem(

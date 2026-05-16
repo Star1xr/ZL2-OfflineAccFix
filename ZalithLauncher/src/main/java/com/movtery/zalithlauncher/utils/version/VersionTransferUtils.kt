@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.utils.version
 
+import com.movtery.zalithlauncher.game.path.getVersionsHome
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.game.version.installed.VersionConfig
 import com.movtery.zalithlauncher.game.version.installed.VersionsManager
@@ -107,7 +108,7 @@ object VersionTransferUtils {
                     i++
                 }
 
-                val targetVersionDir = File(VersionsManager.getVersionsHome(), finalName)
+                val targetVersionDir = File(getVersionsHome(), finalName)
                 targetVersionDir.mkdirs()
 
                 // Extract version/ content

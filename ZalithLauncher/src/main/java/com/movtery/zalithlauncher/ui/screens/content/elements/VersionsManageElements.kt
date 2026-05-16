@@ -445,6 +445,7 @@ fun VersionsOperation(
                 }
             )
         }
+        is VersionsOperation.Export -> {}
         is VersionsOperation.RunTask -> {
             val errorMessage = stringResource(R.string.versions_manage_task_error)
             SimpleTaskDialog(

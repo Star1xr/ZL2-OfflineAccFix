@@ -63,6 +63,15 @@ import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.cardTitleColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor
 import com.movtery.zalithlauncher.viewmodel.GamepadViewModel
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.movtery.zalithlauncher.ui.components.IntegratedMenuSubscreen
 
 private data class IconTab(val iconRes: Int, val iconSize: Dp = 18.dp)
 
@@ -74,17 +83,9 @@ private val controlTabs = listOf(
     //手柄设置
     IconTab(R.drawable.ic_sports_esports_filled),
     //手势控制设置
-    IconTab(R.drawable.ic_touch_app_filled),
     //陀螺仪设置
     IconTab(R.drawable.ic_mobile_rotate_filled)
 )
-
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.NavigationRailItemDefaults
-import com.movtery.zalithlauncher.ui.components.IntegratedMenuSubscreen
 
 private enum class GameMenuCategory(val iconRes: Int, val titleRes: Int) {
     GENERAL(R.drawable.ic_settings_filled, R.string.generic_all),

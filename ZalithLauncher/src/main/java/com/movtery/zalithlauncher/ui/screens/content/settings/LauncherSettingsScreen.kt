@@ -101,7 +101,6 @@ import com.movtery.zalithlauncher.viewmodel.BackgroundViewModel
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.LocalBackgroundViewModel
-import com.movtery.zalithlauncher.viewmodel.LocalHomePageViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -116,13 +115,13 @@ private sealed interface CustomColorOperation {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LauncherSettingsScreen(
-    key: NestedNavKey.Settings,
+    key: NormalNavKey.Settings.Launcher,
     settingsScreenKey: TitledNavKey?,
     mainScreenKey: TitledNavKey?,
     eventViewModel: EventViewModel,
-    toHomePageEditor: () -> Unit,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit,
 ) {
+
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
