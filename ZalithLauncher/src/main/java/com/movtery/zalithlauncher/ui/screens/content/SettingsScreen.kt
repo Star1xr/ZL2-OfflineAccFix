@@ -261,6 +261,14 @@ private fun NavigationUI(
                             }
                         )
                     }
+                    entry<NormalNavKey.Settings.VulkanDriverDownloader> {
+                        VulkanDriverDownloaderScreen(
+                            key = key,
+                            settingsScreenKey = settingsScreenKey,
+                            mainScreenKey = mainScreenKey,
+                            submitError = submitError
+                        )
+                    }
                 }
             )
         } else {

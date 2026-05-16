@@ -27,6 +27,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -79,12 +82,14 @@ import com.movtery.zalithlauncher.utils.logging.Logger.lError
 import com.movtery.zalithlauncher.utils.platform.getMaxMemoryForSettings
 import com.movtery.zalithlauncher.utils.string.getMessageOrToString
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
+import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 
 @Composable
 fun VersionConfigScreen(
     mainScreenKey: TitledNavKey?,
     versionsScreenKey: TitledNavKey?,
     version: Version,
+    backStackViewModel: ScreenBackStackViewModel,
     backToMainScreen: () -> Unit,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
@@ -231,6 +236,18 @@ private fun VersionConfigs(
                 if (config.driver != item.id) {
                     config.driver = item.id
                     config.saveOrShowError(context, submitError)
+                }
+            },
+            trailingIcon = {
+                IconButton(
+                    onClick = {
+                        backStackViewModel.settingsScreen.navigateTo(NormalNavKey.Settings.VulkanDriverDownloader)
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_download_2_filled),
+                        contentDescription = stringResource(R.string.vulkan_driver_downloader_title)
+                    )
                 }
             }
         )

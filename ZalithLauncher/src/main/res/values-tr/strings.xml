@@ -1258,6 +1258,15 @@
     <string name="versions_manage_group_label">Grup</string>
     <string name="versions_manage_all_groups">Tüm Gruplar</string>
     <string name="versions_manage_change_group">Grubu Değiştir</string>
+    <string name="settings_renderer_from_local">Yerel Sürücü</string>
+
+    <string name="vulkan_driver_downloader_title">Vulkan Sürücü İndirici</string>
+    <string name="vulkan_driver_downloader_fetch_failed">Sürücü listesi alınamadı</string>
+    <string name="vulkan_driver_downloader_downloading">İndiriliyor: %s</string>
+    <string name="vulkan_driver_downloader_extracting">Ayıklanıyor: %s</string>
+    <string name="vulkan_driver_downloader_success">Sürücü başarıyla yüklendi: %s</string>
+    <string name="vulkan_driver_downloader_delete_confirm">%s sürücüsünü silmek istediğinizden emin misiniz?</string>
+
     <string name="versions_import_task_finished">Sürümünüz başarıyla içe aktarıldı!</string>
     <string name="versions_import_version">Sürümü İçe Aktar</string>
     <string name="versions_import_version_summary">Özel bir zip dosyasından bir sürümü içe aktarın</string>

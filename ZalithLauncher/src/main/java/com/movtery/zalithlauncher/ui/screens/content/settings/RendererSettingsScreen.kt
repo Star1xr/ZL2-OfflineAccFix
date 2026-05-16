@@ -144,23 +144,35 @@ fun RendererSettingsScreen(
                             DriverSummaryLayout(it)
                         },
                         trailingIcon = {
-                            IconButton(
-                                onClick = {
-                                    eventViewModel.sendDLPlugin(
-                                        githubLink = URL_GITHUB_DRIVER_PLUGINS,
-                                        cloudDrives = listOf(
-                                            EventViewModel.Event.DownloadPlugins.CloudDrive(
-                                                language = "zh",
-                                                link = URL_CLOUD_DRIVE_DRIVER_PLUGINS
-                                            )
-                                        )
+                            Row {
+                                IconButton(
+                                    onClick = {
+                                        backStackViewModel.settingsScreen.navigateTo(NormalNavKey.Settings.VulkanDriverDownloader)
+                                    }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_download_2_filled),
+                                        contentDescription = stringResource(R.string.vulkan_driver_downloader_title)
                                     )
                                 }
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_download_2_filled),
-                                    contentDescription = stringResource(R.string.generic_download)
-                                )
+                                IconButton(
+                                    onClick = {
+                                        eventViewModel.sendDLPlugin(
+                                            githubLink = URL_GITHUB_DRIVER_PLUGINS,
+                                            cloudDrives = listOf(
+                                                EventViewModel.Event.DownloadPlugins.CloudDrive(
+                                                    language = "zh",
+                                                    link = URL_CLOUD_DRIVE_DRIVER_PLUGINS
+                                                )
+                                            )
+                                        )
+                                    }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_open_in_new),
+                                        contentDescription = stringResource(R.string.generic_download)
+                                    )
+                                }
                             }
                         }
                     )

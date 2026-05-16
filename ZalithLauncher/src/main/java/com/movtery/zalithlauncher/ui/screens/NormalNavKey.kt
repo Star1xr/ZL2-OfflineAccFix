@@ -104,6 +104,10 @@ sealed interface NormalNavKey : TitledNavKey {
         @Serializable data object AboutInfo : Settings {
             override val title: Int = R.string.settings_tab_info_about
         }
+        /** Vulkan 驱动下载屏幕 */
+        @Serializable data object VulkanDriverDownloader : Settings {
+            override val title: Int = R.string.vulkan_driver_downloader_title
+        }
     }
 
     /** 版本详细设置嵌套子屏幕 */

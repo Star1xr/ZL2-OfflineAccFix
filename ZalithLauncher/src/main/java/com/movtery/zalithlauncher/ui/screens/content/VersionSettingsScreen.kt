@@ -406,6 +406,7 @@ private fun NavigationUI(
                         mainScreenKey = mainScreenKey,
                         versionsScreenKey = versionsScreenKey,
                         version = version,
+                        backStackViewModel = backScreenViewModel,
                         backToMainScreen = backToMainScreen,
                         submitError = submitError
                     )

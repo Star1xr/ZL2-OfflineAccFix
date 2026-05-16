@@ -24,7 +24,9 @@ import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.plugin.ApkPlugin
 import com.movtery.zalithlauncher.game.plugin.ApkPluginManager
 import com.movtery.zalithlauncher.game.plugin.cacheAppIcon
+import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.setting.AllSettings
+import java.io.File
 
 /**
  * FCL 驱动器插件
@@ -61,7 +63,29 @@ object DriverPluginManager: ApkPluginManager() {
                 path = applicationInfo.nativeLibraryDir
             )
         )
+        loadLocalDrivers(context)
         setDriverById(AllSettings.vulkanDriver.getValue())
+    }
+
+    private fun loadLocalDrivers(context: Context) {
+        val driversDir = PathManager.DIR_DRIVERS
+        if (!driversDir.exists() || !driversDir.isDirectory) return
+
+        driversDir.listFiles { file -> file.isDirectory }?.forEach { dir ->
+            val libDir = File(dir, "arm64-v8a")
+            val actualPath = if (libDir.exists() && libDir.isDirectory) libDir.absolutePath else dir.absolutePath
+
+            driverList.add(
+                Driver(
+                    id = "local_${dir.name}",
+                    appName = "Local",
+                    appVersion = "1.0",
+                    name = dir.name,
+                    summary = context.getString(R.string.settings_renderer_from_local),
+                    path = actualPath
+                )
+            )
+        }
     }
 
     /**

@@ -859,7 +859,16 @@
     <string name="settings_renderer_global_renderer_title">Global Renderer</string>
     <string name="settings_renderer_global_renderer_summary">The global default renderer uses a dynamic library translation layer to ensure the game runs smoothly on mobile devices</string>
     <string name="settings_renderer_global_vulkan_driver_title">Vulkan Driver</string>
-    <string name="settings_renderer_from_plugins">From %s plugin</string>
+    <string name="settings_renderer_from_plugins">From Plugin: %s</string>
+    <string name="settings_renderer_from_local">Local Driver</string>
+
+    <string name="vulkan_driver_downloader_title">Vulkan Driver Downloader</string>
+    <string name="vulkan_driver_downloader_fetch_failed">Failed to fetch driver list</string>
+    <string name="vulkan_driver_downloader_downloading">Downloading: %s</string>
+    <string name="vulkan_driver_downloader_extracting">Extracting: %s</string>
+    <string name="vulkan_driver_downloader_success">Driver installed successfully: %s</string>
+    <string name="vulkan_driver_downloader_delete_confirm">Are you sure you want to delete the driver %s?</string>
+
     <string name="settings_renderer_resolution_scale_title">Resolution Scale</string>
     <string name="settings_renderer_resolution_scale_summary">Lower values improve performance; higher values enhance graphics quality. Adjust according to your needs</string>
     <string name="settings_renderer_full_screen_title">Fullscreen game mode</string>
