@@ -118,6 +118,105 @@ enum class MenuState {
 }
 
 @Composable
+fun IntegratedMenuSubscreen(
+    state: MenuState,
+    closeScreen: () -> Unit,
+    shape: Shape = RoundedCornerShape(24.dp),
+    backgroundColor: Color = Color.Black.copy(alpha = 0.4f),
+    sidebarContent: @Composable ColumnScope.() -> Unit = {},
+    content: @Composable ColumnScope.() -> Unit = {}
+) {
+    val visible = state == MenuState.SHOW
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = backgroundColor)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = closeScreen
+                    )
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth(0.85f)
+                .fillMaxHeight(0.85f)
+        ) {
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn() + slideInHorizontally(
+                    animationSpec = getAnimateTweenJellyBounce()
+                ) {
+                    if (isRtl) -100 else 100
+                },
+                exit = fadeOut() + slideOutHorizontally {
+                    if (isRtl) -100 else 100
+                }
+            ) {
+                BackgroundCard(
+                    shape = shape,
+                    influencedByBackground = false,
+                    modifier = Modifier.fillMaxSize(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = backgroundColor(),
+                        contentColor = onBackgroundColor()
+                    ),
+                    content = {
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            // Sidebar
+                            Surface(
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .fillMaxHeight(),
+                                color = cardTitleColor().copy(alpha = 0.5f),
+                                contentColor = onCardColor()
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(vertical = 12.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    sidebarContent()
+                                }
+                            }
+
+                            androidx.compose.material3.VerticalDivider(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .width(1.dp),
+                                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                            )
+
+                            // Main Content
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .padding(16.dp)
+                            ) {
+                                content()
+                            }
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun MenuSubscreen(
     state: MenuState,
     closeScreen: () -> Unit,

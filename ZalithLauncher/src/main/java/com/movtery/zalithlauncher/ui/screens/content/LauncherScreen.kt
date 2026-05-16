@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.screens.content
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,16 +45,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -77,15 +79,17 @@ import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPositi
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCardColumn
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SwitchSettingsCard
 import com.movtery.zalithlauncher.ui.screens.content.versions.layouts.ToggleableIntSliderSettingsCard
-import com.movtery.zalithlauncher.ui.screens.main.custom_home.MarkdownBlock
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor
 import com.movtery.zalithlauncher.utils.string.getMessageOrToString
 import com.movtery.zalithlauncher.utils.logging.Logger.lError
 import com.movtery.zalithlauncher.utils.platform.getMaxMemoryForSettings
+import com.movtery.zalithlauncher.utils.version.VersionTransferUtils
+import com.movtery.zalithlauncher.utils.checkStoragePermissions
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LauncherScreen(
@@ -93,7 +97,6 @@ fun LauncherScreen(
     navigateToVersions: (Version) -> Unit,
     onLaunchGame: () -> Unit,
     onOpenLink: (String) -> Unit,
-    onHomePageEvent: (MarkdownBlock.Button.Event) -> Unit,
     onModsClick: () -> Unit,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
@@ -143,6 +146,33 @@ fun LauncherScreen(
                     )
                 }
             )
+        }
+
+        is VersionsOperation.Export -> {
+            val context = LocalContext.current
+            val activity = context as? android.app.Activity
+            if (activity != null) {
+                checkStoragePermissions(
+                    activity = activity,
+                    title = R.string.storage_permission_request_title,
+                    message = context.getString(R.string.storage_permission_request_message),
+                    hasPermission = {
+                        versionsOperation = VersionsOperation.RunTask(
+                            title = R.string.sidebar_action_export,
+                            task = {
+                                val file = VersionTransferUtils.exportVersion(operation.version)
+                                withContext(Dispatchers.Main) {
+                                    if (file != null) {
+                                        Toast.makeText(context, context.getString(R.string.settings_export_success, file.absolutePath), Toast.LENGTH_LONG).show()
+                                    } else {
+                                        Toast.makeText(context, R.string.settings_export_failed, Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        )
+                    }
+                )
+            }
         }
 
         is VersionsOperation.RunTask -> {
@@ -501,7 +531,9 @@ private fun RightActionSidebar(
             SidebarActionItem(
                 icon = R.drawable.ic_share_filled,
                 label = stringResource(R.string.sidebar_action_export),
-                onClick = { },
+                onClick = {
+                    currentVersion?.let { versionsOperation = VersionsOperation.Export(it) }
+                },
                 enabled = isSelected
             )
             SidebarActionItem(

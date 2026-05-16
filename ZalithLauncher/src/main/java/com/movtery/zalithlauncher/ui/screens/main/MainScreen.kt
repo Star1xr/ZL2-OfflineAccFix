@@ -101,7 +101,6 @@ import com.movtery.zalithlauncher.ui.screens.content.AccountManageScreen
 import com.movtery.zalithlauncher.ui.screens.content.DownloadScreen
 import com.movtery.zalithlauncher.ui.screens.content.FileSelectorScreen
 import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
-import com.movtery.zalithlauncher.ui.screens.content.HomePageEditorScreen
 import com.movtery.zalithlauncher.ui.screens.content.LauncherScreen
 import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
 import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
@@ -625,9 +624,6 @@ private fun NavigationUI(
                         onOpenLink = {
                             eventViewModel.sendEvent(EventViewModel.Event.OpenLink(it))
                         },
-                        onHomePageEvent = { event ->
-                            eventViewModel.sendEvent(EventViewModel.Event.HomePage.Event(event))
-                        },
                         onModsClick = {
                             VersionsManager.currentVersion.value?.let { version ->
                                 val settingsKey = NestedNavKey.VersionSettings(version)
@@ -727,11 +723,6 @@ private fun NavigationUI(
                     MultiplayerScreen(
                         backScreenViewModel = screenBackStackModel,
                         eventViewModel = eventViewModel
-                    )
-                }
-                entry<NormalNavKey.HomePageEditor> {
-                    HomePageEditorScreen(
-                        backStackViewModel = screenBackStackModel,
                     )
                 }
                 entry<NormalNavKey.LogView> { key ->

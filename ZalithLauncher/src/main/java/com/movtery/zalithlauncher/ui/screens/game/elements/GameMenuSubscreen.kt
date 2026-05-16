@@ -79,6 +79,20 @@ private val controlTabs = listOf(
     IconTab(R.drawable.ic_mobile_rotate_filled)
 )
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
+import com.movtery.zalithlauncher.ui.components.IntegratedMenuSubscreen
+
+private enum class GameMenuCategory(val iconRes: Int, val titleRes: Int) {
+    GENERAL(R.drawable.ic_settings_filled, R.string.generic_all),
+    VISUAL(R.drawable.ic_video_settings, R.string.settings_tab_renderer),
+    CONTROLS(R.drawable.ic_videogame_asset_outlined, R.string.settings_tab_control),
+    LAYOUT(R.drawable.ic_dashboard_filled, R.string.control_manage_info_edit)
+}
+
 @Composable
 fun GameMenuSubscreen(
     state: MenuState,
@@ -97,111 +111,148 @@ fun GameMenuSubscreen(
     onManageJoystick: () -> Unit,
     onEditLayout: () -> Unit
 ) {
-    DualMenuSubscreen(
+    var selectedCategory by remember { mutableStateOf(GameMenuCategory.GENERAL) }
+
+    IntegratedMenuSubscreen(
         state = state,
         closeScreen = closeScreen,
-        leftMenuContent = {
-            val pagerState = rememberPagerState(pageCount = { controlTabs.size })
-
-            LaunchedEffect(controlMenuTabIndex) {
-                pagerState.animateScrollToPage(controlMenuTabIndex)
-            }
-
-            Column {
-                //顶贴标签栏
-                SecondaryScrollableTabRow(
-                    selectedTabIndex = controlMenuTabIndex,
-                    edgePadding = 0.dp,
-                    minTabWidth = 58.dp,
-                    containerColor = cardTitleColor(),
-                ) {
-                    controlTabs.forEachIndexed { index, iconTab ->
-                        Tab(
-                            selected = index == controlMenuTabIndex,
-                            onClick = {
-                                onControlMenuTabChange(index)
-                            },
-                            icon = {
-                                Icon(
-                                    modifier = Modifier.size(iconTab.iconSize),
-                                    painter = painterResource(iconTab.iconRes),
-                                    contentDescription = null
-                                )
-                            }
-                        )
-                    }
-                }
-
-                HorizontalPager(
-                    state = pagerState,
-                    userScrollEnabled = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f, fill = false)
-                ) { page ->
-                    when (page) {
-                        0 -> {
-                            ControlOverview(
-                                modifier = Modifier.fillMaxSize(),
-                                closeScreen = closeScreen,
-                                onInputMethod = onInputMethod,
-                                onSendKeycode = onSendKeycode,
-                                onReplacementControl = onReplacementControl,
-                                onManageJoystick = onManageJoystick,
-                                onEditLayout = onEditLayout
-                            )
-                        }
-                        1 -> ControlMouse(modifier = Modifier.fillMaxSize())
-                        2 -> ControlGamepad(
-                            modifier = Modifier.fillMaxSize(),
-                            gamepadViewModel = gamepadViewModel
-                        )
-                        3 -> ControlGesture(modifier = Modifier.fillMaxSize())
-                        4 -> ControlGyroscope(modifier = Modifier.fillMaxSize())
-                    }
-                }
-            }
-        },
-        rightMenuTitle = {
+        sidebarContent = {
             Text(
-                modifier = Modifier.padding(all = 8.dp),
+                modifier = Modifier.padding(bottom = 16.dp),
                 text = stringResource(R.string.game_menu_title),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
             )
+
+            GameMenuCategory.entries.forEach { category ->
+                NavigationRailItem(
+                    selected = selectedCategory == category,
+                    onClick = { selectedCategory = category },
+                    icon = {
+                        Icon(
+                            painter = painterResource(category.iconRes),
+                            contentDescription = stringResource(category.titleRes)
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(category.titleRes),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    },
+                    colors = NavigationRailItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                    )
+                )
+            }
         },
-        rightMenuContent = {
-            GameActionContent(
-                modifier = Modifier.weight(1f),
-                onForceClose = onForceClose,
-                onSwitchLog = onSwitchLog,
-                enableTerracotta = enableTerracotta,
-                onOpenTerracottaMenu = onOpenTerracottaMenu,
-                onRefreshWindowSize = onRefreshWindowSize
+        content = {
+            Text(
+                text = stringResource(selectedCategory.titleRes),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
+
+            Box(modifier = Modifier.weight(1f)) {
+                when (selectedCategory) {
+                    GameMenuCategory.GENERAL -> {
+                        GeneralContent(
+                            onForceClose = onForceClose,
+                            onSwitchLog = onSwitchLog,
+                            enableTerracotta = enableTerracotta,
+                            onOpenTerracottaMenu = onOpenTerracottaMenu
+                        )
+                    }
+                    GameMenuCategory.VISUAL -> {
+                        VisualContent(
+                            onRefreshWindowSize = onRefreshWindowSize
+                        )
+                    }
+                    GameMenuCategory.CONTROLS -> {
+                        val pagerState = rememberPagerState(pageCount = { controlTabs.size - 1 }) // Exclude overview
+
+                        LaunchedEffect(controlMenuTabIndex) {
+                            if (controlMenuTabIndex > 0) {
+                                pagerState.animateScrollToPage(controlMenuTabIndex - 1)
+                            }
+                        }
+
+                        Column {
+                            SecondaryScrollableTabRow(
+                                selectedTabIndex = (controlMenuTabIndex - 1).coerceAtLeast(0),
+                                edgePadding = 0.dp,
+                                minTabWidth = 58.dp,
+                                containerColor = Color.Transparent,
+                            ) {
+                                controlTabs.drop(1).forEachIndexed { index, iconTab ->
+                                    Tab(
+                                        selected = index == (controlMenuTabIndex - 1),
+                                        onClick = {
+                                            onControlMenuTabChange(index + 1)
+                                        },
+                                        icon = {
+                                            Icon(
+                                                modifier = Modifier.size(iconTab.iconSize),
+                                                painter = painterResource(iconTab.iconRes),
+                                                contentDescription = null
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+
+                            HorizontalPager(
+                                state = pagerState,
+                                userScrollEnabled = false,
+                                modifier = Modifier.fillMaxWidth()
+                            ) { page ->
+                                when (page) {
+                                    0 -> ControlMouse(modifier = Modifier.fillMaxSize())
+                                    1 -> ControlGamepad(
+                                        modifier = Modifier.fillMaxSize(),
+                                        gamepadViewModel = gamepadViewModel
+                                    )
+                                    2 -> ControlGesture(modifier = Modifier.fillMaxSize())
+                                    3 -> ControlGyroscope(modifier = Modifier.fillMaxSize())
+                                }
+                            }
+                        }
+                    }
+                    GameMenuCategory.LAYOUT -> {
+                        ControlOverview(
+                            modifier = Modifier.fillMaxSize(),
+                            closeScreen = closeScreen,
+                            onInputMethod = onInputMethod,
+                            onSendKeycode = onSendKeycode,
+                            onReplacementControl = onReplacementControl,
+                            onManageJoystick = onManageJoystick,
+                            onEditLayout = onEditLayout
+                        )
+                    }
+                }
+            }
         }
     )
 }
 
 @Composable
-private fun GameActionContent(
+private fun GeneralContent(
     onForceClose: () -> Unit,
     onSwitchLog: () -> Unit,
     enableTerracotta: Boolean,
     onOpenTerracottaMenu: () -> Unit,
-    onRefreshWindowSize: () -> Unit,
     modifier: Modifier = Modifier,
     color: Color = cardColor(false),
     contentColor: Color = onCardColor(),
 ) {
-    //检查陀螺仪是否可用
-    val context = LocalContext.current
-
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(all = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        //强制关闭
         item {
             MenuTextButton(
                 modifier = Modifier.fillMaxWidth(),
@@ -211,7 +262,6 @@ private fun GameActionContent(
                 contentColor = contentColor,
             )
         }
-        //日志输出
         item {
             MenuTextButton(
                 modifier = Modifier.fillMaxWidth(),
@@ -222,13 +272,7 @@ private fun GameActionContent(
             )
         }
 
-        //如果开启多人联机，则展示这个按钮
         if (enableTerracotta) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            //打开联机菜单
             item {
                 MenuTextButton(
                     modifier = Modifier.fillMaxWidth(),
@@ -239,51 +283,44 @@ private fun GameActionContent(
                 )
             }
         }
+    }
+}
 
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        //开启菜单悬浮窗
+@Composable
+private fun VisualContent(
+    onRefreshWindowSize: () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = cardColor(false),
+    contentColor: Color = onCardColor(),
+) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         item {
             MenuSwitchButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.game_menu_option_show_menu),
                 switch = AllSettings.showMenuBall.state,
-                onSwitch = { value ->
-                    AllSettings.showMenuBall.save(value)
-                    if (!value) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.game_menu_option_show_menu_hided),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                },
+                onSwitch = { value -> AllSettings.showMenuBall.save(value) },
                 color = color,
                 contentColor = contentColor,
             )
         }
-        //菜单悬浮窗不透明度
         item {
             MenuSliderLayout(
                 modifier = Modifier.fillMaxWidth(),
                 title = stringResource(R.string.game_menu_option_menu_ball_opacity),
                 value = AllSettings.menuBallOpacity.state,
                 valueRange = AllSettings.menuBallOpacity.floatRange,
-                onValueChange = { value ->
-                    AllSettings.menuBallOpacity.updateState(value)
-                },
-                onValueChangeFinished = { value ->
-                    AllSettings.menuBallOpacity.save(value)
-                },
+                onValueChange = { AllSettings.menuBallOpacity.updateState(it) },
+                onValueChangeFinished = { AllSettings.menuBallOpacity.save(it) },
                 suffix = "%",
                 color = color,
                 contentColor = contentColor,
                 enabled = AllSettings.showMenuBall.state
             )
         }
-        //帧率显示
         item {
             MenuSwitchButton(
                 modifier = Modifier.fillMaxWidth(),
@@ -292,10 +329,8 @@ private fun GameActionContent(
                 onSwitch = { AllSettings.showFPS.save(it) },
                 color = color,
                 contentColor = contentColor,
-                enabled = AllSettings.showMenuBall.state
             )
         }
-        //内存显示
         item {
             MenuSwitchButton(
                 modifier = Modifier.fillMaxWidth(),
@@ -304,22 +339,17 @@ private fun GameActionContent(
                 onSwitch = { AllSettings.showMemory.save(it) },
                 color = color,
                 contentColor = contentColor,
-                enabled = AllSettings.showMenuBall.state
             )
         }
-        //游戏窗口分辨率
         item {
             MenuSliderLayout(
                 modifier = Modifier.fillMaxWidth(),
                 title = stringResource(R.string.settings_renderer_resolution_scale_title),
                 value = AllSettings.resolutionRatio.state,
                 valueRange = AllSettings.resolutionRatio.floatRange,
-                onValueChange = { value ->
-                    AllSettings.resolutionRatio.updateState(value)
-//                        onRefreshWindowSize()
-                },
-                onValueChangeFinished = { value ->
-                    AllSettings.resolutionRatio.save(value)
+                onValueChange = { AllSettings.resolutionRatio.updateState(it) },
+                onValueChangeFinished = { 
+                    AllSettings.resolutionRatio.save(it)
                     onRefreshWindowSize()
                 },
                 suffix = "%",

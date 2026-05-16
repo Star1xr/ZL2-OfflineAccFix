@@ -43,10 +43,6 @@ sealed interface NormalNavKey : TitledNavKey {
     ) : NormalNavKey {
         override val title: Int = R.string.page_title_account_list
     }
-    /** 自定义主页编辑器屏幕 */
-    @Serializable data object HomePageEditor : NormalNavKey {
-        override val title: Int = R.string.page_title_home_page_editor
-    }
     /** Web屏幕 */
     @Serializable data class WebScreen(val url: String) : NormalNavKey
     /** 版本管理屏幕 */

@@ -73,7 +73,6 @@ import com.movtery.zalithlauncher.utils.animation.swapAnimateDpAsState
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
-
 @Composable
 fun SettingsScreen(
     key: NestedNavKey.Settings,
@@ -82,6 +81,7 @@ fun SettingsScreen(
     eventViewModel: EventViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit
 ) {
+
     BaseScreen(
         screenKey = key,
         currentKey = backStackViewModel.mainScreen.currentKey
@@ -104,9 +104,6 @@ fun SettingsScreen(
                     backStackViewModel.settingsScreen.currentKey = newKey
                 },
                 openLicenseScreen = openLicenseScreen,
-                toHomePageEditor = {
-                    backStackViewModel.mainScreen.navigateTo(NormalNavKey.HomePageEditor)
-                },
                 eventViewModel = eventViewModel,
                 submitError = submitError,
                 modifier = Modifier.fillMaxHeight()
@@ -191,7 +188,6 @@ private fun NavigationUI(
     settingsScreenKey: TitledNavKey?,
     onCurrentKeyChange: (TitledNavKey?) -> Unit,
     openLicenseScreen: (raw: Int) -> Unit,
-    toHomePageEditor: () -> Unit,
     eventViewModel: EventViewModel,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit,
     modifier: Modifier = Modifier
@@ -242,7 +238,6 @@ private fun NavigationUI(
                             settingsScreenKey = settingsScreenKey,
                             mainScreenKey = mainScreenKey,
                             eventViewModel = eventViewModel,
-                            toHomePageEditor = toHomePageEditor,
                             submitError = submitError,
                         )
                     }

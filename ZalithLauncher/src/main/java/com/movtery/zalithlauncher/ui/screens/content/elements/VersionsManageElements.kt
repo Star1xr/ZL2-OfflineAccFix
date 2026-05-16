@@ -113,6 +113,7 @@ sealed interface VersionsOperation {
     data object None: VersionsOperation
     data class Rename(val version: Version): VersionsOperation
     data class Copy(val version: Version): VersionsOperation
+    data class Export(val version: Version): VersionsOperation
     data class ChangeGroup(val version: Version): VersionsOperation
     data class Delete(val version: Version, val text: String? = null): VersionsOperation
     data class InvalidDelete(val version: Version): VersionsOperation

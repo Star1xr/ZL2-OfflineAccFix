@@ -1258,4 +1258,7 @@
     <string name="versions_manage_group_label">Grup</string>
     <string name="versions_manage_all_groups">Tüm Gruplar</string>
     <string name="versions_manage_change_group">Grubu Değiştir</string>
+    <string name="versions_import_task_finished">Sürümünüz başarıyla içe aktarıldı!</string>
+    <string name="versions_import_version">Sürümü İçe Aktar</string>
+    <string name="versions_import_version_summary">Özel bir zip dosyasından bir sürümü içe aktarın</string>
 </resources>
