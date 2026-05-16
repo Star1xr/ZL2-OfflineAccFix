@@ -477,7 +477,7 @@ fun ChangeGroupDialog(
         title = stringResource(R.string.generic_setting),
         value = group,
         onValueChange = { group = it },
-        label = { Text(text = "Grup") },
+        label = { Text(text = stringResource(R.string.versions_manage_group_label)) },
         singleLine = true,
         onDismissRequest = onDismissRequest,
         onConfirm = {
@@ -849,12 +849,12 @@ fun VersionItemLayout(
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text = "Grubu Değiştir") },
+                        text = { Text(text = stringResource(R.string.versions_manage_change_group)) },
                         leadingIcon = {
                             Icon(
                                 modifier = Modifier.size(20.dp),
                                 painter = painterResource(R.drawable.ic_sort),
-                                contentDescription = "Grubu Değiştir"
+                                contentDescription = stringResource(R.string.versions_manage_change_group)
                             )
                         },
                         onClick = {

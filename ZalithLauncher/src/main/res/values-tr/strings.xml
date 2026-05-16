@@ -1255,4 +1255,7 @@
     <string name="settings_export_failed">Dışa aktarma başarısız!</string>
     <string name="storage_permission_request_title">Depolama İzni Gerekli</string>
     <string name="storage_permission_request_message">Ayarları/Hesapları genel depolama alanına aktarmak için depolama iznine ihtiyacımız var.</string>
+    <string name="versions_manage_group_label">Grup</string>
+    <string name="versions_manage_all_groups">Tüm Gruplar</string>
+    <string name="versions_manage_change_group">Grubu Değiştir</string>
 </resources>

@@ -1309,4 +1309,7 @@
     <string name="settings_export_failed">Export failed!</string>
     <string name="storage_permission_request_title">Storage Permission Required</string>
     <string name="storage_permission_request_message">To export settings/accounts to public storage, we need storage permission.</string>
+    <string name="versions_manage_group_label">Group</string>
+    <string name="versions_manage_all_groups">All Groups</string>
+    <string name="versions_manage_change_group">Change Group</string>
 </resources>

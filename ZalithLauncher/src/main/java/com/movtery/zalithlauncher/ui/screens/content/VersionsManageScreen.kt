@@ -588,7 +588,7 @@ private fun VersionsLayout(
                                     colors = if (selectedGroup == null) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors(),
                                     onClick = { onGroupChange(null) }
                                 ) {
-                                    Text("Tüm Gruplar")
+                                    Text(stringResource(R.string.versions_manage_all_groups))
                                 }
 
                                 groups.forEach { group ->
