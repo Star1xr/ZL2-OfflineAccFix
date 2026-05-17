@@ -1,5 +1,7 @@
 # TREELAUNCHER
 
+[English](README.md) 
+
 > **⚠️ YENIDEN YAPIM**
 >
 > Bu proje bir topluluk tarafından yapılan yeniden yapımdır. Yukarı kaynak kısa sürede güncellenecek ve bu fork'a kapatılacaktır, TreeLauncher hazır olana kadar ZL2+ sürümünden devam edeceğiz.
