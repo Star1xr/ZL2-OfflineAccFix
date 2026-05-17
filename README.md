@@ -24,6 +24,11 @@ This fork aims to enhance and customize the original Zalith Launcher 2 experienc
 - [x] Functional groups 
 - [x] Instance cloning 
 - [x] Top bar navigation rework
+- [x] New codebase
+- [x] Better grouping system
+- [x] In-app turnip driver downloader
+- [x] Version import/exporting
+- [x] New icons
 - [ ] Friend system
 - [ ] First ever performance update
 
