@@ -58,15 +58,15 @@ android {
 
     signingConfigs {
         create("releaseBuild") {
-	        storeFile = file("zalith_launcher.jks")
+	        storeFile = file("TRL.jks")
             storePassword = getKeyFromLocal("STORE_PASSWORD", ".store_password.txt")
-            keyAlias = "zalithkey"
+            keyAlias = "trl-key"
             keyPassword = getKeyFromLocal("KEY_PASSWORD", ".key_password.txt")
         }
         create("debugBuild") {
-            storeFile = file("zalith_launcher_debug.jks")
+            storeFile = file("TRL-debug.jks")
             storePassword = defaultStorePassword
-            keyAlias = "movtery_zalith_debug"
+            keyAlias = "trl-debug-key"
             keyPassword = defaultKeyPassword
         }
     }
@@ -85,7 +85,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("debugBuild")
+            signingConfig = signingConfigs.getByName("releaseBuild")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
