@@ -1,6 +1,8 @@
 
 # TREELAUNCHER
 
+[Türkçe](TREELAUNCHER_TR.md)
+
 > **⚠️ REMAKE**
 >
 > This project is a community remake. The upstream updates soon will be closed in this fork, until TreeLauncher is ready, we will continue from ZL2+.
