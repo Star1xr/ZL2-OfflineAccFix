@@ -1189,7 +1189,6 @@
     <string name="notification_jvm_running_name">Layanan Keep-Alive JVM</string>
     <string name="generic_edit">Edit</string>
     <string name="generic_view">Lihat</string>
-    <string name="page_title_home_page_editor">Editor Halaman Beranda</string>
     <string name="versions_overview_log">Log Proses</string>
     <string name="settings_launcher_home_page_title">Beranda</string>
     <string name="settings_launcher_home_page_type_blank">Kosong</string>

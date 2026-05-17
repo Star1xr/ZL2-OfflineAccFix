@@ -62,7 +62,6 @@
     <string name="page_title_version_manage">管理版本</string>
     <string name="page_title_account_list">账号列表</string>
     <string name="page_title_select_files">选择路径</string>
-    <string name="page_title_home_page_editor">主页编辑器</string>
     <!--  文件  -->
     <string name="files_browse_folder">浏览目录</string>
     <string name="files_importing">导入文件中</string>

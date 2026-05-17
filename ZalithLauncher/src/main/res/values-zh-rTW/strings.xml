@@ -59,7 +59,6 @@
     <string name="page_title_version_manage">管理版本</string>
     <string name="page_title_account_list">帳號列表</string>
     <string name="page_title_select_files">選擇路徑</string>
-    <string name="page_title_home_page_editor">主頁編輯器</string>
     <!--  資料  -->
     <string name="files_browse_folder">瀏覽資料夾</string>
     <string name="files_importing">正在匯入檔案</string>

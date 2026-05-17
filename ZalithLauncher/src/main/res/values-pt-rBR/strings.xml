@@ -1189,7 +1189,6 @@
     <string name="notification_jvm_running_name">Serviço Keep-Alive da JVM</string>
     <string name="generic_edit">Editar</string>
     <string name="generic_view">Visualizar</string>
-    <string name="page_title_home_page_editor">Editor da Página Inicial</string>
     <string name="versions_overview_log">Executando a Log</string>
     <string name="settings_launcher_home_page_title">Página Inicial</string>
     <string name="settings_launcher_home_page_type_blank">Em branco</string>

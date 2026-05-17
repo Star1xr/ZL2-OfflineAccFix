@@ -1209,7 +1209,6 @@
     <string name="generic_edit">Düzenle</string>
     <string name="generic_view">Görüntüle</string>
     <string name="generic_info">Bilgi</string>
-    <string name="page_title_home_page_editor">Ana Sayfa Editörü</string>
     <string name="versions_overview_log">Çalıştırma Günlüğü</string>
     <string name="settings_launcher_home_page_title">Ana Sayfa</string>
     <string name="settings_launcher_home_page_type_blank">Boşluk</string>
