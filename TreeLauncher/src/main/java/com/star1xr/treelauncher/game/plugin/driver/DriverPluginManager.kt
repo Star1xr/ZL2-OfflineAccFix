@@ -1,0 +1,128 @@
+/*
+ * Zalith Launcher 2
+ * Copyright (C) 2025 MovTery <movtery228@qq.com> and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
+ */
+
+package com.star1xr.treelauncher.game.plugin.driver
+
+import android.content.Context
+import android.content.pm.ApplicationInfo
+import com.star1xr.treelauncher.R
+import com.star1xr.treelauncher.game.plugin.ApkPlugin
+import com.star1xr.treelauncher.game.plugin.ApkPluginManager
+import com.star1xr.treelauncher.game.plugin.cacheAppIcon
+import com.star1xr.treelauncher.path.PathManager
+import com.star1xr.treelauncher.setting.AllSettings
+import java.io.File
+
+/**
+ * FCL 驱动器插件
+ * [FCL DriverPlugin.kt](https://github.com/FCL-Team/FoldCraftLauncher/blob/main/FCLauncher/src/main/java/com/tungsten/fclauncher/plugins/DriverPlugin.kt)
+ */
+object DriverPluginManager: ApkPluginManager() {
+    private val driverList: MutableList<Driver> = mutableListOf()
+
+    @JvmStatic
+    fun getDriverList(): List<Driver> = driverList.toList()
+
+    private lateinit var currentDriver: Driver
+
+    @JvmStatic
+    fun setDriverById(driverId: String) {
+        currentDriver = driverList.find { it.id == driverId } ?: driverList[0]
+    }
+
+    @JvmStatic
+    fun getDriver(): Driver = currentDriver
+
+    /**
+     * 初始化驱动器
+     */
+    fun initDriver(context: Context) {
+        driverList.clear()
+        val applicationInfo = context.applicationInfo
+        driverList.add(
+            Driver(
+                id = AllSettings.vulkanDriver.defaultValue,
+                appName = "",
+                appVersion = "",
+                name = "Turnip",
+                path = applicationInfo.nativeLibraryDir
+            )
+        )
+        loadLocalDrivers(context)
+        setDriverById(AllSettings.vulkanDriver.getValue())
+    }
+
+    private fun loadLocalDrivers(context: Context) {
+        val driversDir = PathManager.DIR_DRIVERS
+        if (!driversDir.exists() || !driversDir.isDirectory) return
+
+        driversDir.listFiles { file -> file.isDirectory }?.forEach { dir ->
+            val libDir = File(dir, "arm64-v8a")
+            val actualPath = if (libDir.exists() && libDir.isDirectory) libDir.absolutePath else dir.absolutePath
+
+            driverList.add(
+                Driver(
+                    id = "local_${dir.name}",
+                    appName = "Local",
+                    appVersion = "1.0",
+                    name = dir.name,
+                    summary = context.getString(R.string.settings_renderer_from_local),
+                    path = actualPath
+                )
+            )
+        }
+    }
+
+    /**
+     * 通用 FCL 插件
+     */
+    override fun parseApkPlugin(
+        context: Context,
+        info: ApplicationInfo,
+        loaded: (ApkPlugin) -> Unit
+    ) {
+        if (info.flags and ApplicationInfo.FLAG_SYSTEM == 0) {
+            val metaData = info.metaData ?: return
+            if (metaData.getBoolean("fclPlugin", false)) {
+                val driver = metaData.getString("driver") ?: return
+                val nativeLibraryDir = info.nativeLibraryDir
+
+                val packageManager = context.packageManager
+                val packageName = info.packageName
+                val appName = info.loadLabel(packageManager).toString()
+                val appVersion = packageManager.getPackageInfo(packageName, 0).versionName ?: ""
+
+                val plugin = Driver(
+                    id = packageName,
+                    appName = appName,
+                    appVersion = appVersion,
+                    name = driver,
+                    summary = context.getString(R.string.settings_renderer_from_plugins, appName),
+                    path = nativeLibraryDir
+                )
+
+                driverList.add(plugin)
+
+                runCatching {
+                    cacheAppIcon(context, info)
+                    loaded(plugin)
+                }
+            }
+        }
+    }
+}

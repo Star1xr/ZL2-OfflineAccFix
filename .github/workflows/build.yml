@@ -52,7 +52,7 @@ jobs:
       - name: Build APK for ${{ matrix.arch }}
         run: |
           chmod +x gradlew
-          ./gradlew ZalithLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }}
+          ./gradlew TreeLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }}
 
       - name: Upload Release APK for ${{ matrix.arch }}
         if: inputs.variant == 'Release'
@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release apk (${{ matrix.arch }})
-          path: ZalithLauncher/build/outputs/apk/release/*.apk
+          path: TreeLauncher/build/outputs/apk/release/*.apk
 
       - name: Upload Debug APK for ${{ matrix.arch }}
         if: inputs.variant == 'Debug'
@@ -68,4 +68,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: debug apk (${{ matrix.arch }})
-          path: ZalithLauncher/build/outputs/apk/debug/*.apk
+          path: TreeLauncher/build/outputs/apk/debug/*.apk
