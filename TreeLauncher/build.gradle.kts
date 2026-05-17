@@ -52,6 +52,10 @@ android {
     namespace = zalithPackageName
     compileSdk = 36
 
+    lint {
+        disable.add("ExtraTranslation")
+    }
+
     signingConfigs {
         create("releaseBuild") {
 	        storeFile = file("zalith_launcher.jks")
