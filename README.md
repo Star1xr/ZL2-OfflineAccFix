@@ -13,24 +13,32 @@
 
 This fork aims to enhance and customize the original Zalith Launcher 2 experience. Some key improvements include:
 
-- [x] Cape system
-- [x] Fixes
-- [x] Offline accounts
-- [x] Chroma names
-- [x] Shortcuts in main screen
-- [x] Importing/exporting settings
-- [x] Importing/exporting accounts along with capes and skins
-- [x] New UI
-- [x] Functional groups 
-- [x] Instance cloning 
-- [x] Top bar navigation rework
-- [x] New codebase
-- [x] Better grouping system
-- [x] In-app turnip driver downloader
-- [x] Version import/exporting
-- [x] New icons
-- [ ] Friend system
-- [ ] First ever performance update
+### 🎨 UI & Aesthetics
+- [x] Redesigned with a brand new UI and reworked top bar navigation
+- [x] Updated with new, modern icons
+- [x] Integrated Chroma (animated) names
+
+### 🎮 In-Game Features
+- [x] Implemented a custom cape system
+- [x] Added support for offline accounts
+- [x] Integrated an in-app Turnip driver downloader
+
+### 📁 Management & Portability
+- [x] Added options to import and export settings
+- [x] Enabled importing/exporting accounts along with capes and skins
+- [x] Added support for importing and exporting game versions
+- [x] Added functional groups and instance cloning
+- [x] Improved the instance grouping system
+- [x] Added quick shortcuts to the main screen
+
+### 🛠️ Codebase & Stability
+- [x] Rewritten with a completely new codebase
+- [x] Stability fixes and general improvements
+
+### 🚀 Upcoming Features
+- [ ] Integrated friend system
+- [ ] First-ever major performance update
+
 
 
 ## 🔗 Upstream Project
