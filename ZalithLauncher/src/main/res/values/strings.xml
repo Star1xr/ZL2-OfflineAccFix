@@ -1310,6 +1310,7 @@
     <string name="versions_manage_group_label">Group</string>
     <string name="versions_manage_all_groups">All Groups</string>
     <string name="versions_manage_change_group">Change Group</string>
+    <string name="versions_manage_create_group">Create Group</string>
     <string name="versions_import_task_finished">Your version has been successfully imported!</string>
     <string name="versions_import_version">Import Version</string>
     <string name="versions_import_version_summary">Import a version from a specialized zip file</string>

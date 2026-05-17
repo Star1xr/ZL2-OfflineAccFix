@@ -74,6 +74,7 @@ import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionsOperation
 import com.movtery.zalithlauncher.ui.screens.content.elements.CopyVersionDialog
 import com.movtery.zalithlauncher.ui.screens.content.elements.ChangeGroupDialog
+import com.movtery.zalithlauncher.ui.components.LittleTextLabel
 import com.movtery.zalithlauncher.ui.components.SimpleTaskDialog
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.CardPosition
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCardColumn
@@ -307,9 +308,6 @@ private fun VersionGrid(
     val pinned = versions.filter { it.pinnedState }
     val unpinned = versions.filter { !it.pinnedState }
 
-    val grouped = unpinned.groupBy { it.getVersionConfig().group }
-    val sortedGroupNames = grouped.keys.filter { it.isNotEmpty() }.sorted()
-
     var collapsedGroups by rememberSaveable { mutableStateOf(setOf<String>()) }
 
     LazyColumn(
@@ -347,16 +345,14 @@ private fun VersionGrid(
             }
         }
 
-        // Ungrouped
-        val ungrouped = grouped[""] ?: emptyList()
-        if (ungrouped.isNotEmpty()) {
-            val isExpanded = "ungrouped" !in collapsedGroups
+        if (unpinned.isNotEmpty()) {
+            val isExpanded = "all" !in collapsedGroups
             item {
                 CategoryHeader(
-                    title = stringResource(R.string.category_ungrouped),
+                    title = stringResource(R.string.generic_all),
                     isExpanded = isExpanded,
                     onExpandClick = {
-                        collapsedGroups = if (isExpanded) collapsedGroups + "ungrouped" else collapsedGroups - "ungrouped"
+                        collapsedGroups = if (isExpanded) collapsedGroups + "all" else collapsedGroups - "all"
                     }
                 )
             }
@@ -367,46 +363,12 @@ private fun VersionGrid(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        ungrouped.forEach { version ->
+                        unpinned.forEach { version ->
                             VersionGridItem(
                                 version = version,
                                 isSelected = version == currentVersion,
                                 onClick = { onVersionClick(version) }
                             )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Groups
-        sortedGroupNames.forEach { groupName ->
-            val groupVersions = grouped[groupName] ?: emptyList()
-            if (groupVersions.isNotEmpty()) {
-                val isExpanded = groupName !in collapsedGroups
-                item(key = groupName) {
-                    CategoryHeader(
-                        title = groupName,
-                        isExpanded = isExpanded,
-                        onExpandClick = {
-                            collapsedGroups = if (isExpanded) collapsedGroups + groupName else collapsedGroups - groupName
-                        }
-                    )
-                }
-                if (isExpanded) {
-                    item {
-                        androidx.compose.foundation.layout.FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            groupVersions.forEach { version ->
-                                VersionGridItem(
-                                    version = version,
-                                    isSelected = version == currentVersion,
-                                    onClick = { onVersionClick(version) }
-                                )
-                            }
                         }
                     }
                 }
@@ -421,6 +383,7 @@ private fun VersionGridItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val group = version.getVersionConfig().group
     Column(
         modifier = Modifier
             .width(110.dp)
@@ -437,14 +400,27 @@ private fun VersionGridItem(
                 .clip(RoundedCornerShape(8.dp))
         )
         Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = version.getVersionName(),
-            style = MaterialTheme.typography.labelSmall,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            maxLines = 2,
-            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                modifier = Modifier.weight(1f, fill = false),
+                text = version.getVersionName(),
+                style = MaterialTheme.typography.labelSmall,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+            )
+            if (group.isNotEmpty()) {
+                Spacer(modifier = Modifier.width(4.dp))
+                LittleTextLabel(
+                    text = group,
+                    textStyle = MaterialTheme.typography.labelSmall.copy(fontSize = MaterialTheme.typography.labelSmall.fontSize * 0.8f)
+                )
+            }
+        }
     }
 }
 

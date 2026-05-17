@@ -576,31 +576,6 @@ private fun VersionsLayout(
                             selected = versionCategory == VersionCategory.MODLOADER,
                             onClick = { onCategoryChange(VersionCategory.MODLOADER) }
                         )
-
-                        // Grup Seçici
-                        if (groups.isNotEmpty()) {
-                            Row(
-                                modifier = Modifier.padding(start = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                ScalingActionButton(
-                                    colors = if (selectedGroup == null) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors(),
-                                    onClick = { onGroupChange(null) }
-                                ) {
-                                    Text(stringResource(R.string.versions_manage_all_groups))
-                                }
-
-                                groups.forEach { group ->
-                                    ScalingActionButton(
-                                        colors = if (selectedGroup == group) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors(),
-                                        onClick = { onGroupChange(group) }
-                                    ) {
-                                        Text(group)
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
 

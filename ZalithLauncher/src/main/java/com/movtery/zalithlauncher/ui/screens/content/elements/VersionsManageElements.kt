@@ -473,17 +473,69 @@ fun ChangeGroupDialog(
     onDismissRequest: () -> Unit = {},
     onConfirm: (value: String) -> Unit = {}
 ) {
-    var group by remember { mutableStateOf(version.getVersionConfig().group) }
+    var showCreateDialog by remember { mutableStateOf(false) }
+    val groups = remember {
+        VersionsManager.versions
+            .map { it.getVersionConfig().group }
+            .filter { it.isNotEmpty() }
+            .distinct()
+            .sorted()
+    }
 
-    SimpleEditDialog(
-        title = stringResource(R.string.generic_setting),
-        value = group,
-        onValueChange = { group = it },
-        label = { Text(text = stringResource(R.string.versions_manage_group_label)) },
-        singleLine = true,
+    if (showCreateDialog) {
+        var newGroup by remember { mutableStateOf("") }
+        SimpleEditDialog(
+            title = stringResource(R.string.versions_manage_change_group),
+            value = newGroup,
+            onValueChange = { newGroup = it },
+            label = { Text(text = stringResource(R.string.versions_manage_group_label)) },
+            singleLine = true,
+            onDismissRequest = { showCreateDialog = false },
+            onConfirm = {
+                onConfirm(newGroup.trim())
+                showCreateDialog = false
+            }
+        )
+    }
+
+    AlertDialog(
         onDismissRequest = onDismissRequest,
-        onConfirm = {
-            onConfirm(group.trim())
+        title = { Text(stringResource(R.string.versions_manage_change_group)) },
+        text = {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // "Hiçbiri" seçeneği
+                NavigationDrawerItem(
+                    label = { Text(stringResource(R.string.generic_none)) },
+                    selected = version.getVersionConfig().group.isEmpty(),
+                    onClick = { onConfirm("") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                groups.forEach { group ->
+                    NavigationDrawerItem(
+                        label = { Text(group) },
+                        selected = version.getVersionConfig().group == group,
+                        onClick = { onConfirm(group) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = { showCreateDialog = true }) {
+                Text(stringResource(R.string.versions_manage_create_group))
+            }
+        },
+        dismissButton = {
+            androidx.compose.material3.TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.generic_cancel))
+            }
         }
     )
 }
